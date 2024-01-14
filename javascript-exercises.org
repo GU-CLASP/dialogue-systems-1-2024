@@ -66,11 +66,6 @@ Maybe also check: https://javascript.info/ifelse
 Print (console.log()) even numbers between 1 and 20.
 Check: https://javascript.info/while-for#the-for-loop
 
-## Exercise 7: const as functions
-
-
-## Exercise 8: const vs function
-
 Most exercises were taken from this source, feel free to practice with more of these if you feel like it: https://www.w3resource.com/javascript-exercises/javascript-basic-exercises.php
 
 ## TypeScript
