@@ -62,7 +62,7 @@ One solution:
 https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-26.php
 Maybe also check: https://javascript.info/ifelse
 
-## Exercise 6: for loops
+## Exercise 7: for loops
 Print (console.log()) even numbers between 1 and 20.
 Check: https://javascript.info/while-for#the-for-loop
 
