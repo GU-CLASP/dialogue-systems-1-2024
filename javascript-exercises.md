@@ -52,7 +52,7 @@ One solution:
 https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-18.php
 
 ## Exercise 5: finding string
-In an array of names `var names = ["Anna", "Johannes", "Paula", "Daisy"]` , how would you find the name "Paula" without using position/index?
+In an array of names `let names = ["Anna", "Johannes", "Paula", "Daisy"]` , how would you find the name "Paula" without using position/index?
 
 ## Exercise 6: strings and length
 
