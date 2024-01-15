@@ -42,6 +42,9 @@ Tip: use your html code or check the prompt() function in JavaScript: https://ja
 
 If you don't want to use prompt() or html input, you can use just variables, but it's recommended you that you learn about those.
 
+Check: 
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
 Solution in the source:
 https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-8.php
 
@@ -61,19 +64,44 @@ One solution:
 https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-18.php
 
 ## Exercise 5: finding string
-In an array of names `let names = ["Anna", "Johannes", "Paula", "Daisy"]` , how would you find the name "Paula" without using position/index?
+In an array of names `let names = ["Anna", "Johannes", "Paula", "Daisy"]` , how would you find the index for the name "Paula"? How would you check if the name "Paula" is in the list? And how would you check if the name exists in the list if you could only search it as: "PAULA" or "paula"?
+
+Check this: https://javascript.info/string
 
 ## Exercise 6: strings and length
 
 Write a JavaScript program to create a string from a given string. This is done by taking the last 3 characters and adding them at both the front and back. The string length must be 3 or more.
+For example: umbrella -> lla + umbrella + lla -> llaumbrellalla , cap -> cap + cap + cap -> capcapcap
 
 One solution:
 https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-26.php
 Maybe also check: https://javascript.info/ifelse
 
-## Exercise 7: for loops
-Print (console.log()) even numbers between 1 and 20.
-Check: https://javascript.info/while-for#the-for-loop
+## Exercise 7: looping
+Write a program that returns an array of strings (const) consisting of every name in "names" (from exercise 6) and their respective length multiplied by two: `["Anna 8", "Johannes 16" ...]`
+
+Take a careful look at this!: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
+
+## Exercise 8: objects
+Check the following object: 
+`const zooAnimals = {
+  "giraffe": { "weight": 910, "origin": "Botswana" },
+  "giraffe": { "weight": 910, "origin": "Tanzania" },
+  "lion": { "weight": 200, "origin": "Tanzania" },
+  "elephant": { "weight": 5000, "origin": "India" },
+  "penguin": { "weight": 30, "origin": "Argentina" },
+  "penguin": { "weight": 28, "origin": "Argentina" },
+  "koala": { "weight": 10, "origin": "Australia" },
+};`
+How would you check if an animal exists in the object? How would you check if an animal with a specific weight or a specific origin exists in the object?
+
+Tips:
+
+## Exercise 9: more HTML & CSS
+Take you html code from exercise 2 or 3 and edit it so that you page looks better: write a title, write a short message that tells the user how to use your mini program, choose a background color and put your objects in the center of the page. Try checking how CSS can help you with this.
+
+Check: https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics
+
 
 Most exercises were taken from this source, feel free to practice with more of these if you feel like it: https://www.w3resource.com/javascript-exercises/javascript-basic-exercises.php
 
