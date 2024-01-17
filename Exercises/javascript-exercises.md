@@ -25,8 +25,7 @@ https://www.w3resource.com/javascript-exercises/javascript-basic-exercises.php*
 
 ## Exercise 1: randomize and input/prompt
 
-Write a program that takes a random integer between 1 and 10 from the
-user, and the user is then prompted to input a guess number. The
+Write a program that takes a random integer between 1 and 10, and the user is then prompted to input a guess number. The
 program displays (`console.log()` or `alert()`) a message `"Good Work"` if the input matches the guess
 number otherwise `"Not matched"`.
 
