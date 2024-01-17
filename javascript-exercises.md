@@ -79,23 +79,26 @@ multiplied by two: `["Anna 8", "Johannes 16" ...]`
 Take a careful look at this!: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
 
 ## Exercise 6: objects
-Check the following object: 
+Create the following object: 
 
-    const zooAnimals = {
-      "giraffe": { "weight": 910, "origin": "Botswana" },
+    let zooAnimals = {
       "giraffe": { "weight": 910, "origin": "Tanzania" },
       "lion": { "weight": 200, "origin": "Tanzania" },
       "elephant": { "weight": 5000, "origin": "India" },
       "penguin": { "weight": 30, "origin": "Argentina" },
-      "penguin": { "weight": 28, "origin": "Argentina" },
       "koala": { "weight": 10, "origin": "Australia" },
     };
 
-How would you check if an animal exists in the object? How would you
-check if an animal with a specific weight or a specific origin exists
-in the object?
+- How would you check if an animal exists in the object? 
+- How would you check if an animal with a specific weight or a
+  specific origin exists in the object?
+- How would you add a new animal?
+- (advanced) Create an object method named "about" which generates
+  text about specified animal, e.g. `zooAnimals.about("giraffe") // ->
+  "giraffe weights 910 kg and comes from Tanzania"`. If the animal is
+  not in the zoo, return "we don't have this animal".
 
-Tips:
+Tips: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Basics
 
 # Part 2. Getting started with JavaScript tooling
 1.  [Download and install NodeJS](https://nodejs.org/en/download/) (LTS version).
@@ -124,7 +127,25 @@ Tips:
       
       
 # Part 3. Your first XState program
-TBD (Vlad): &#x2026;turn the counter logic into a state logic&#x2026;
+1. Add XState to your project:
+    
+        yarn add xstate
+     
+2. Follow this documentation: https://stately.ai/docs/xstate and
+   move the program logic in `counter.js` to a state chart:
+   - Information about the counter is stored in the **context** of
+     your state chart.
+   - **Event** `INC` updates the counter. Clicking on the button should
+     emit this event.
+   - Log the counter following the example:
+     https://stately.ai/docs/xstate#create-a-simple-machine
+   - Then, adjust you code so that the page contents are updated
+     according to the state. The variable `counter` should be removed
+     from the `setupCounter(element)` function.
+     
+Resources:
+1. https://stately.ai/docs/xstate
+2. https://stately.ai/docs/actors#actor-snapshots
 
 # Part 4. (optional) HTML exercises
 
