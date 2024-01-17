@@ -1,7 +1,10 @@
 Welcome to LT2216/LT2816 V24 Dialogue systems 1 official repository.
 
-Contents:
-- [[javascript-exercises.md][Exercise 1]]
+Theory:
+- [[Lectures/js.org][Introduction to JavaScript]]
+
+Practice:
+- [[Exercises/javascript-exercises.md][Exercise 1]]
 - Lab I
 - Lab II
 - Lab III

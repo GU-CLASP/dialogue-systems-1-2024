@@ -1,0 +1,270 @@
+* Org
+- Discord
+- Github
+- Exercise 1
+- Evaluation and updates (no TypeScript, more attention to learning
+  JS)
+  
+* Programming environment
+You will be learning many technologies through this course. You will
+learn JavaScript. Standards such as SSML, SCXML (as implimented in
+XState library). And also, if time permits, a bit of VoiceXML.
+
+Prerequisites: 
+- NodeJS :: [[https://nodejs.org/en/download/][download and install NodeJS]] (the LTS version)
+- Text editor :: your editor of choice (e.g. Emacs or VS Code)
+- Github account :: you need to have one, and also know at least a
+  little bit about git.
+
+Course repo: https://github.com/GU-CLASP/dialogue-systems-1-2023
+
+* System architecture
+** Spoken dialogue system architecture
+
+[[./img/sds.png]]
+
+
+** Motivation
+1. Many systems on the market are proprietary: the code is either not
+   available (DialogueFlow) or one need to look how things are
+   actually implemented in the code (not in the documentation) RASA.
+2. In the past (before 2020) we used VoiceXML, and in 2020 we used
+   RASA. VoiceXML was great for dialogue management, because it was
+   very transparent: it is a standard specifically built for voice
+   applications.
+3. This year we will be using state charts, which are standardised
+   (SCXML) and are very flexible. We will employ the JavaScript
+   implementation of SCXML --- *XState*.
+4. The platform that we used in the past for VoiceXML --- Voxeo ---
+   had some terrible speech recognition and synthesis and one needed
+   to dial a phone number to talk to the system. Now everything will
+   just work in your browser.
+5. The browser-based architecture is flexible. In future you can use
+   visual modality, even virtual reality (WebXR). 
+
+** Mentimeter
+
+https://www.menti.com/alkp7fkpo82j
+
+** Caveats
+You will need to learn JavaScript. Why? Because of the browser. And
+because of XState.
+   - It is not hard, you already know some fundamentals of Python. And
+     you will only need fundamentals in this course.
+   - It is very useful, because it is a new way of thinking. You’ll
+     become a better programmer.
+
+     
+* Get started with JavaScript
+** Resources
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide
+- nice free tutorial with a focus on web development:
+  https://scrimba.com/learn/learnjavascript/
+- for more experienced programmers - Douglas Crockford's book
+  "How JavaScript Works"
+
+  
+** Run
+*** In the browser
+- Web Console (Ctrl-Shift-I or Cmd-Option-K or Cmd-Option-I)
+- Multi-line input (Shift-Enter)
+  
+*** HTML and JS
+~index.html~
+#+begin_src html
+<html><body><pre><script src="program.js"></script></pre></body></html>
+#+end_src
+
+~program.js~
+#+begin_src js
+document.writeln('Hello, world!');
+#+end_src
+
+
+** The language
+*** Grammar
+- comments: ~//~ (or ~/*  */~)
+- reserved words can’t be used as variables or even object properties
+  #+begin_example
+  abstract
+  boolean break byte
+  case catch char class const continue
+  debugger default delete do double
+  else enum export extends
+  false final finally float for function
+  goto
+  if implements import in instanceof int interface
+  long
+  native new null
+  package private protected public
+  return
+  short static super switch synchronized
+  this throw throws transient true try typeof
+  var volatile void
+  while with
+  #+end_example
+- no integers, 1 is the same as 1.0
+- ~NaN~ or "not a number". ~NaN~ is not equal to any value, including
+  itself. You can check it with the function ~isNaN(n)~
+  #+begin_src js
+    parseInt("bla")
+  #+end_src
+- Identation does not matter. So JS needs some brackets
+  ("blocks"). For example, if:
+  #+begin_src js
+    if (expression) {
+      statement1;
+      statement2;
+    } else {
+      statement3;
+    }
+  #+end_src
+
+  
+*** Strings
+No character type.
+  #+begin_example
+  'j' + 's' === 'js'
+  'js'.toUpperCase() === 'JS'
+  #+end_example
+
+Template literals and backticks (``):
+#+begin_example
+`Hello, ${username}!`
+#+end_example
+
+
+*** Falsity
+(a lot of) *falsy* values:
+- ~false~
+- ~null~
+- ~undefined~
+- ~""~, ~0~ and ~NaN~
+
+All the rest are *true*.
+
+
+*** Equality
+#+begin_src js
+2 * 2 === 4
+2 * 2 !== 5
+#+end_src
+
+Avoid ~==~ and ~!=~!
+
+*** Trenary ~if~
+~C ? T : F~
+If C is true, then T. Else F.
+
+
+*** ~Let~ and ~const~
+Avoid ~var~!
+
+
+*** Objects
+- Object literals
+  #+begin_src js
+    let simpleGrammar = {
+        "I want big pizza with zuccini": {
+            size: "L",
+            topping: "zuccini"
+        },
+        "I want a small pizza": {
+            size: "S",
+        }
+    };
+  #+end_src
+- Retrieval: ~const size = pizza.size || "unknown";~ (undefined and TypeError)
+- Update (objects are mutable!)
+- Prototype object: ~let another_pizza =
+  Object.create(pizza)~. Delegation & prototype
+  chain. ~.hasOwnProperty()~ method.
+- Objects are passed by reference!
+- Delete. Does not touch any object in prototype linkage!
+- ~in~
+
+  
+*** Functions
+Functions are also objects. You can define function in place:
+#+begin_src js
+    const add = function (a, b) {
+        return a + b;
+    };
+
+  // or
+const add = (a,b) => { return a + b }
+#+end_src
+
+
+Function can be a property of an object. We call it a /method/.
+#+begin_src js
+      let myObject = {
+          value: 0,
+          increment: function (inc) {
+              this.value += typeof inc === 'number' ? inc : 1;
+          }
+      }
+
+  // these are the same
+  myObject["increment"]()
+  myObject.increment()
+#+end_src
+
+Lambda:
+
+
+*** arrays
+- Arrays are special kinds of objects
+- Arrays can contain a mixture of value types.
+  
+#+begin_src js
+const numbers = [
+        'zero', 1, 'two', 3, 'four',
+    ];
+#+end_src
+
+#+begin_src js
+  let i;
+  for (i = 0; i < numbers.length; i += 1) {
+      document.writeln(numbers[i]);
+  }
+
+  // fix me!
+  for (n in numbers) {
+      document.writeln(n);
+  }
+
+#+end_src
+
+
+*** Scoping: ~var~, ~let~ and ~const~
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let
+
+
+*** NodeJS
+Node.js is a cross-platform JavaScript runtime environment that allows
+developers to build server-side and network applications with
+JavaScript.
+
+We will be using Vite as runtime (dev server).
+
+*** Overall...
+JavaScript is nice!
+
+Douglas Crockford for /Beautiful Code/ (O’Reilly):
+#+begin_quote
+/Functions as first class objects/: functions in Simplified JavaScript
+are lambdas with lexical scoping.
+
+/Dynamic objects with prototypal inheritance/: Objects are
+class-free. We can add a new member to any object by ordinary
+assignment. An object can inherit members from another object.
+
+/Object literals and array literals/. This is a very convenient notation
+for creating new objects and arrays. JavaScript literals were the
+inspiration for the JSON data interchange format.
+#+end_quote
+
+*** DOM
+- https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model
+- https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction
