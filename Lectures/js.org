@@ -1,9 +1,9 @@
 * Org
 - Discord
-- Github
-- Exercise 1
+- Exercise 1 (do you need feedback?)
 - Evaluation and updates (no TypeScript, more attention to learning
   JS)
+- Schedule
   
 * Programming environment
 You will be learning many technologies through this course. You will
@@ -16,13 +16,14 @@ Prerequisites:
 - Github account :: you need to have one, and also know at least a
   little bit about git.
 
-Course repo: https://github.com/GU-CLASP/dialogue-systems-1-2023
+Course repo: https://github.com/GU-CLASP/dialogue-systems-1-2024
 
 * System architecture
 ** Spoken dialogue system architecture
 
 [[./img/sds.png]]
 
+Azure, XState and SpeechState
 
 ** Motivation
 1. Many systems on the market are proprietary: the code is either not
