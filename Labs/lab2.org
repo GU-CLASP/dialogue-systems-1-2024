@@ -1,0 +1,120 @@
+#+OPTIONS: num:nil
+
+#+TITLE: Lab II. Basic dialogue management
+
+* Getting started with development environment
+** Preflight step 1. Create Azure account and enable speech services
+1. Apply for free student credits
+   https://azure.microsoft.com/en-us/free/students/. You should be
+   able to login with your GU account.
+2. Make sure that you are logged into the Azure portal (https://portal.azure.com/).
+3. Create a *Resource group* (you can use search field):
+   - Subscription: *Azure for students*
+   - Resource group: any name
+   - Region: *(Europe) North Europe*
+4. Create a *Speech service*:
+   - Name: any name
+   - Subscription: *Azure for students*
+   - Location: *(Europe) North Europe*
+   - Pricing tier: *Free (F0)*
+   - Resource group: group name from the previous step
+5. Within your Speech Service go to: *Resourse management → Keys and
+   Endpoint* and save your KEY 1.
+   
+** Preflight step 2. Run the example project
+1. Install [[https://nodejs.org/en/download/][NodeJS]] (LTS version) and [[Download and https://yarnpkg.com/getting-started/install][Yarn]] 
+2. Fork the example project (this project):
+   https://github.com/GU-CLASP/dialogue-systems-1-2024. Clone your
+   fork to your machine.
+3. Go to the =Code/= folder.
+4. Install all dependencies:
+   #+begin_src
+   yarn
+   #+end_src
+5. Create a file called =azure.js= with the following contents:
+   #+begin_src javascript
+   export const KEY = "paste your KEY 1 here";
+   #+end_src
+   (Note: Don't add this file to version control.)
+6. Run the project:
+   #+begin_src sh
+   yarn dev
+   #+end_src
+7. Open the link that was shown in your browser,
+   e.g. http://localhost:5173/
+8. Allow access to you microphone.
+9. When you unblock the pop-up window, and reload the page you will
+   see the state inspector; this can be useful during development.
+
+* Assignment
+- Task 1 ("appointment") :: Implementation of the finite state machine.
+- Task 1 ("features") :: Add some extra features to your app.
+- Task 2 ("improvements") :: Describe the limitations of your app and
+  try to fix them.
+
+** Task 1. "Appointment"
+#+CAPTION: Flowchart for creating an appointment
+[[./img/flowchart.png]]
+
+In this task you will need to implement the flowchart above.
+
+I have created a starting point for you, so you basically can use the
+project that you forked before:
+- You will need to edit the state chart defined by =dmMachine= in =./dm.js=:
+- You will need to extend the entities in the grammar (~const grammar~)
+  to understand more names, times and dates.
+- There are some helper functions that you can use. Feel free to add
+  your own functions.
+- You will also need to create a similar grammar to understand “yes”
+  and “no”, but also “of course”, “no way” etc.
+
+** Task 2. Additional features
+1. Implement an auto-start of your application after 10 seconds of
+   inactivity.
+2. If the user is not talking, use =ASR_NOINPUT= event to tell the user
+   "I didn't hear you" and re-raise the question.
+3. Define an action in =setup()= section of your machine and use it whenever you want to say something. See [[https://stately.ai/docs/actions][XState documentation]] and example below. You can also do the same for listening.
+   
+   Example:
+   #+begin_src javascript
+   say: ({ context }, params) =>
+     context.ssRef.send({
+       type: "SPEAK",
+       value: {
+         utterance: params,
+       },
+     }),
+   #+end_src
+
+   That's how you execute this action:
+   #+begin_src
+   actions: [{
+     type: "say",
+     params: `Hello world!`,
+   }]
+   #+end_src
+
+** Task 3. Improvements
+ - Write a report (max 1 page) which describes errors and limitation
+   of your app.
+ - Try to fix some of them and briefly describe your solution in the
+   report. You don't have to fix all the limitations.
+ - Add your report to the repository in PDF format (=report-lab2.pdf=)
+
+
+* Resources
+- [[https://stately.ai/docs/][XState documentation]]
+- [[https://github.com/vladmaraev/speechstate][SpeechState documentation]]
+
+Git docs:
+- [[https://docs.github.com/en/get-started/quickstart/hello-world][Getting started with git]]
+- [[https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo][Working with forks]] 
+
+* Submission
+- *Commit* your changes and *push* them to your repository (your fork of
+  this repository)
+- On GitHub page of your repository, click *Contribute* -> *Open pull
+  request*. Then click on *Create pull request*. Change the title to "Lab
+  2 submission" (if you want to ask a question about your code, use
+  the title "Lab 2 work in progress"). Click on *Create pull request*.
+- On Canvas, submit URL to the pull request that you just created.
