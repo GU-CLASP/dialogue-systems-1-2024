@@ -5,8 +5,8 @@ Theory:
 
 Practice:
 - [[Exercises/javascript-exercises.md][Exercise 1]]
-- Lab I
-- Lab II
+- Lab I (see Canvas)
+- [[Labs/lab2.org][Lab II]]
 - Lab III
 - Lab IV
 - Lab V
