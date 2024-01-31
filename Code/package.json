@@ -1,21 +1,21 @@
 {
-    "name": "js-vite",
-    "private": true,
-    "version": "0.0.0",
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build",
-        "preview": "vite preview"
-    },
-    "devDependencies": {
-        "typescript": "^5.3.3",
-        "typescript-language-server": "^4.3.1",
-        "vite": "^5.0.8"
-    },
-    "dependencies": {
-        "@statelyai/inspect": "^0.2.1",
-        "speechstate": "^2.0.0-beta.4",
-        "xstate": "^5.5.1"
-    }
+  "name": "js-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "typescript-language-server": "^4.3.1",
+    "vite": "^5.0.8"
+  },
+  "dependencies": {
+    "@statelyai/inspect": "^0.2.2",
+    "speechstate": "^2.0.0-beta.4",
+    "xstate": "^5.5.1"
+  }
 }
