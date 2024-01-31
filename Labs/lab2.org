@@ -48,8 +48,8 @@
 
 * Assignment
 - Task 1 ("appointment") :: Implementation of the finite state machine.
-- Task 1 ("features") :: Add some extra features to your app.
-- Task 2 ("improvements") :: Describe the limitations of your app and
+- Task 2 ("features") :: Add some extra features to your app.
+- Task 3 ("improvements") :: Describe the limitations of your app and
   try to fix them.
 
 ** Task 1. "Appointment"
