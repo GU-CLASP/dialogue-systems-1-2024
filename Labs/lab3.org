@@ -1,0 +1,48 @@
+#+OPTIONS: num:nil
+#+TITLE: Lab III. Tuning ASR and TTS
+
+In this lab session you will practice styling TTS output using Speech
+Synthesis Markup Language (SSML) and tuning ASR. It is assumed that
+you have read the relevant literature on the subject before attempting
+to solve the assignments.
+
+For reference:
+- Speech Synthesis Markup Language (SSML) Version 1.0, W3C
+  Recommendation 7 September 2004,
+  http://www.w3.org/TR/speech-synthesis/
+- Azure Text-to-Speech: [[https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/index-text-to-speech][Docs]], [[https://speech.microsoft.com/][Speech Studio]] (audio content creation)
+- Azure Speech-to-Text: [[https://learn.microsoft.com/en-us/azure/ai-services/speech-service/index-speech-to-text][Docs]], [[https://speech.microsoft.com/][Speech Studio]] (custom speech)
+
+* Part A: Azure CustomSpeech
+
+
+* Part B: Speech Synthesis Poetry Slam
+#+BEGIN_QUOTE
+A poetry slam is a competition at which poets read or recite original work (or, more rarely, that of others). These performances are then judged on a numeric scale by previously selected members of the audience. (Wikipedia)
+#+END_QUOTE
+
+Your task in this assignment is to use SSML in order to get an artificial poet to recite the your favourite poem (just a couple of verses) with a speed and in "a style" similar to the way how it is read by an actor (or by a poet her/himself). 
+
+You can refer to some poetry performance found on YouTube or
+elsewhere.
+
+Sources for inspiration:
+- [[https://www.youtube.com/watch?v=IZYoGj8D8pY][California Dreaming]] (386DX art project).
+- [[https://raw.githubusercontent.com/vladmaraev/rasa101/master/withoutme.m4a][Without Me]], which was made by Robert Rhys Thomas in 2019 for this course.
+- [[file:media/partC_badguy_voiced.mp3][Bad Guy]], which was made by Fang Yuan in 2020 for this course.
+
+* Submission
+In your submission provide:
+1) text files with your SSML code
+2) audio file for Part B
+3) reference for the performance for Part B
+
+These files can be placed in your Github repository.
+
+- *Commit* your changes and *push* them to your repository (your fork of
+  this repository)
+- On GitHub page of your repository, click *Contribute* -> *Open pull
+  request*. Then click on *Create pull request*. Change the title to "Lab
+  3 submission" (if you want to ask a question about your code, use
+  the title "Lab 3 work in progress"). Click on *Create pull request*.
+- On Canvas, submit URL to the pull request that you just created.
