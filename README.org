@@ -7,6 +7,6 @@ Practice:
 - [[Exercises/javascript-exercises.md][Exercise 1]]
 - Lab I (see Canvas)
 - [[Labs/lab2.org][Lab II]]
-- Lab III
+- [[Labs/lab3.org][Lab III]]
 - Lab IV
 - Lab V
