@@ -51,6 +51,7 @@ const dmMachine = setup({
     meeting_name: '',
     meeting_date: '',
     meeting_time: '',
+    meeting_dur: '',
   },
   id: "DM",
   initial: "Prepare",
@@ -99,7 +100,7 @@ const dmMachine = setup({
       entry: ({ context }) =>
       context.ssRef.send({
       type: "LISTEN",
-    }),
+      }),
       on: {
         RECOGNISED : { 
           actions: assign({meeting_name: ({context, event}) => event.value[0].utterance}),
@@ -116,10 +117,23 @@ const dmMachine = setup({
           utterance: `On which day is your meeting?`,
               },
             }),
-      on: { SPEAK_COMPLETE : "MeetingDur" }
+      on: { SPEAK_COMPLETE : "MeetingDayListen" }
           },
 
-    MeetingDur: {
+    MeetingDayListen: {
+      entry: ({ context }) =>
+        context.ssRef.send({
+        type: "LISTEN",
+        }),
+      on: {
+        RECOGNISED : { 
+            actions: assign({meeting_date: ({context, event}) => event.value[0].utterance}),
+            target: "MeetingDurSpeak"
+            },
+          },
+        },
+
+    MeetingDurSpeak: {
       entry: ({ context }) =>
         context.ssRef.send({
         type: "SPEAK",
@@ -127,10 +141,23 @@ const dmMachine = setup({
           utterance: `Will it take the whole day?`,
               },
             }),
-      on: { SPEAK_COMPLETE: "MeetingTime" }
+      on: { SPEAK_COMPLETE: "MeetingDurListen" }
           },
 
-    MeetingTime: {
+    MeetingDurListen: {
+      entry: ({ context }) =>
+        context.ssRef.send({
+        type: "LISTEN",
+          }),
+      on: {
+        RECOGNISED : { 
+          actions: assign({meeting_dur: ({context, event}) => event.value[0].utterance}),
+          target: "MeetingTimeSpeak"
+            },
+        },
+    },
+
+    MeetingTimeSpeak: {
       entry: ({ context }) =>
         context.ssRef.send({
         type: "SPEAK",
@@ -138,26 +165,35 @@ const dmMachine = setup({
           utterance: `What time is your meeting?`,
               },
             }),
-      on: { SPEAK_COMPLETE: "Ask" },
+      on: { SPEAK_COMPLETE: "MeetingTimeListen" },
         },
 
-    Ask: {
-      entry: 'listenForUsersAnswer',
+
+    MeetingTimeListen: {
+      entry: ({ context }) =>
+        context.ssRef.send({
+        type: "LISTEN",
+          }),
       on: {
-          RECOGNISED: {
-            actions: ({ context, event }) =>
+        RECOGNISED : { 
+          actions: assign({meeting_time: ({context, event}) => event.value[0].utterance}),
+          target: "Verification"
+          },
+        },
+      },
+
+    Verification: {
+      entry: ({ context }) =>
               context.ssRef.send({
               type: "SPEAK",
               value: {
                 utterance: `Do you want me to create an appointment with ${
                       context.meeting_name} on ${context.meeting_date}
-                       at ${context.meeting_time}?`,
+                       at ${context.meeting_time}?`
                   },
                 }),
-            },
-          SPEAK_COMPLETE: "#DM.Done",
-          },
-        },
+      on: { SPEAK_COMPLETE: "#DM.Done"}
+    },
     Done: {
       on: {
         CLICK: "Prompt",
