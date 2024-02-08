@@ -53,7 +53,7 @@ const dmMachine = setup({
       },
     }),
 
-    //assignMeetingName : assign({meeting_name: ({context, event}) => event.value[0].utterance})
+    assignMeetingName : assign({meeting_name: ({context, event}) => event.value[0].utterance})
 
 }}).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAIwBOAOwAaEAE8li1egCsAXyOa06AOoFx1QeTFExxAMIAZAJLOA0tz5IQQqIS0rIKCCpc6ABMBpo6CAYAHAAs0camIOY4ggC2eGKkUhCksADWWNi5+cTkmCxe9M4A8qiYrkzUTL6ygeKSMv5hyar6qrHaiABsk4roitMLiwsmZhjZeQVFJeXbxMzNAOIAcu7kTMjd-r3BA6Bh04mGkzFxiAYGiiuZa5UbhcVldC7Wr1RotNodLq8HrCPohQZKSbJV4IZKKZJfczIaRgFwebyXASwm6hRHIiYJADMlPQYxMGSkgggcFkaBhQX6pIQAFpJijeZifvgiGB2XDbvJEMkoijErN0qtLNYxLZ7I4xSSEQkNBSkqk6Rksr98v9thrOVqoqp9eN4slJjTkspncoopTVFxJlwDMNBRUqpsAeV1vlzfC7ohKVEorTbVNKY95ktk36Q4HtkCymGJfdJgZ0JSDMp3XGEHmaTE-dipKKrsSLRGEjKKdLIlxEtTO13qfSjEA */
@@ -78,16 +78,10 @@ const dmMachine = setup({
 
     WaitToStart: {
       on: {
-        CLICK: "Prompt",
+        CLICK: "MeetingPersonSpeak",
       },
-    },
-
-    Prompt: {
-      entry: [{ type: "speakToTheUser", 
-      params: `Let's create an appointment!`,
-          }],
-      on: {
-      SPEAK_COMPLETE : "MeetingPersonSpeak",
+      after: {
+        10000: { target: "MeetingPersonSpeak"}
       },
     },
 
@@ -95,8 +89,8 @@ const dmMachine = setup({
       entry: [{ type: "speakToTheUser", 
       params: `Who would you like to meet?`,
           }],
-      on: { 
-        SPEAK_COMPLETE: "MeetingPersonListen"
+      on: {
+      SPEAK_COMPLETE : "MeetingPersonListen",
       },
     },
 
@@ -107,6 +101,11 @@ const dmMachine = setup({
           actions: assign({meeting_name: ({context, event}) => event.value[0].utterance}),
           target: "MeetingDaySpeak"
       },
+        ASR_NOINPUT : {
+          actions: [{ type: "speakToTheUser", 
+        params: `I didn't hear you.` }],
+        target: "MeetingPersonSpeak",
+        },
     },
   },
 
@@ -126,6 +125,11 @@ const dmMachine = setup({
             actions: assign({meeting_date: ({context, event}) => event.value[0].utterance}),
             target: "MeetingDurSpeak"
             },
+        ASR_NOINPUT : {
+            actions: [{ type: "speakToTheUser", 
+            params: `I didn't hear you.` }],
+            target: "MeetingDaySpeak",
+            },
           },
         },
 
@@ -144,6 +148,11 @@ const dmMachine = setup({
           actions: assign({meeting_dur: ({context, event}) => event.value[0].utterance}),
           target: "MeetingTimeSpeak"
             },
+        ASR_NOINPUT : {
+          actions: [{ type: "speakToTheUser", 
+          params: `I didn't hear you.` }],
+          target: "MeetingDurSpeak",
+            },
         },
     },
 
@@ -155,7 +164,6 @@ const dmMachine = setup({
     },
   },
 
-
     MeetingTimeListen: {
       entry: "listenForUsersAnswer",
       on: {
@@ -163,12 +171,19 @@ const dmMachine = setup({
           actions: assign({meeting_time: ({context, event}) => event.value[0].utterance}),
           target: "Verification"
           },
+        ASR_NOINPUT : {
+          actions: [{ type: "speakToTheUser", 
+          params: `I didn't hear you.` }],
+          target: "MeetingTimeSpeak",
+          },
         },
       },
 
     Verification: {
       entry: [{ type: "speakToTheUser", 
-      params: `Do you want me to create an appointment with ${context.meeting_name} on ${context.meeting_date} at ${context.meeting_time}?`,
+      params: `Do you want me to create an appointment 
+      with ${context.meeting_name} on ${context.meeting_date} 
+      at ${context.meeting_time}?`,
           }],
       on: { SPEAK_COMPLETE: "#DM.Done" 
     },
@@ -176,7 +191,7 @@ const dmMachine = setup({
 
     Done: {
       on: {
-        CLICK: "Prompt",
+        CLICK: "MeetingPersonSpeak",
       },
     },
   },
