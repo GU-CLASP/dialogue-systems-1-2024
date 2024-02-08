@@ -33,7 +33,7 @@ For reference:
    recognition falters for the examples that you tried?
 
 4) To solve the problem you will use [[https://learn.microsoft.com/en-us/azure/ai-services/speech-service/custom-speech-overview][Custom Speech]]:
-   - You will basically have to provide data, either plain text of
+   - You will basically have to provide data, either plain text or
      audio files, to help the recognition process.
    - Train and deploy your model (enable content logging). Note the
      *Endpoint ID*.
