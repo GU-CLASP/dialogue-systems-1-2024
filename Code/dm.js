@@ -72,12 +72,12 @@ const dmMachine = setup({
             context.ssRef.send({
               type: "SPEAK",
               value: {
-                utterance: `Hello world!`,
+                utterance: `Hello!`,
               },
             }),
-          on: { SPEAK_COMPLETE: "Ask" },
+          on: { SPEAK_COMPLETE: "AfterSystemGreeting" },
         },
-        Ask: {
+        AfterSystemGreeting: {
           entry: ({ context }) =>
             context.ssRef.send({
               type: "LISTEN",
@@ -88,15 +88,46 @@ const dmMachine = setup({
                 context.ssRef.send({
                   type: "SPEAK",
                   value: {
-                    utterance: `You just said: ${
-                      event.value[0].utterance
-                    }. And it ${
-                      isInGrammar(event.value[0].utterance) ? "is" : "is not"
-                    } in the grammar.`,
+                    utterance: `Let's create an appointment`,
                   },
                 }),
             },
-            SPEAK_COMPLETE: "#DM.Done",
+            SPEAK_COMPLETE: "#DM.AskName",
+          },
+        },
+      },
+    },
+    AskName: {
+      initial: "Prompt",
+      states: {
+        Prompt: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                utterance: `Who are you meeting with?`,
+              },
+            }),
+          on: { SPEAK_COMPLETE: "Listen" },
+        },
+        Listen: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "LISTEN",
+            }),
+          on: {
+            RECOGNISED: {
+              actions: ({ context, event }) => {
+                context.name = event.value[0].utterance;
+                context.ssRef.send({
+                  type: "SPEAK",
+                  value: {
+                    utterance: `On which day is your meeting?`,
+                  },
+                })
+                },
+            },
+            //SPEAK_COMPLETE: "#DM.AskDay",
           },
         },
       },
