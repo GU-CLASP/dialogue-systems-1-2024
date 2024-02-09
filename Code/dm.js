@@ -32,11 +32,25 @@ const grammar = {
 
 /* Helper functions */
 function isInGrammar(utterance) {
-  return utterance.toLowerCase() in grammar;
+  if (utterance.toLowerCase() in grammar) {
+    return utterance.toLowerCase() in grammar; //returns True or False
+  }
+  else {
+    return utterance.toLowerCase() in grammar;
+  }
 }
 
 function getPerson(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).person;
+  return (grammar[utterance.toLowerCase()] || {}).person; //returns the value of the value as True or False
+}
+
+function getDay(utterance) {
+  return (grammar[utterance.toLowerCase()] || {}).date;
+
+function getTime(utterance) {
+  return (grammar[utterance.toLowerCase()] || {}).time;
+}
+
 }
 
 const dmMachine = setup({
@@ -45,7 +59,7 @@ const dmMachine = setup({
     context.ssRef.send({
        type: "LISTEN" }),
 
-    speakToTheUser : ({ context }, params) => 
+    speakToTheUser : ({ context}, params) => 
     context.ssRef.send({
        type: "SPEAK",
       value: {
@@ -87,7 +101,7 @@ const dmMachine = setup({
 
     MeetingPersonSpeak: {
       entry: [{ type: "speakToTheUser", 
-      params: `Who would you like to meet?`,
+      params: `Let's create an appointment! Who would you like to meet?`,
           }],
       on: {
       SPEAK_COMPLETE : "MeetingPersonListen",
@@ -99,7 +113,8 @@ const dmMachine = setup({
       on: {
         RECOGNISED : { 
           actions: assign({meeting_name: ({context, event}) => event.value[0].utterance}),
-          target: "MeetingDaySpeak"
+          guard: ({event}) => isInGrammar(event.value[0].utterance),
+          target: "MeetingDaySpeak",
       },
         ASR_NOINPUT : {
           actions: [{ type: "speakToTheUser", 
@@ -137,17 +152,15 @@ const dmMachine = setup({
       entry: [{ type: "speakToTheUser", 
       params: `Will it take the whole day?`,
           }],
-      on: { SPEAK_COMPLETE: "MeetingDurListen"
+      on: { SPEAK_COMPLETE : "MeetingDurListen"
      },
     },
 
     MeetingDurListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED : { 
-          actions: assign({meeting_dur: ({context, event}) => event.value[0].utterance}),
-          target: "MeetingTimeSpeak"
-            },
+        YES : "Verification",
+        NO : "MeetingTimeSpeak",
         ASR_NOINPUT : {
           actions: [{ type: "speakToTheUser", 
           params: `I didn't hear you.` }],
@@ -181,7 +194,7 @@ const dmMachine = setup({
 
     Verification: {
       entry: [{ type: "speakToTheUser", 
-      params: `Do you want me to create an appointment 
+      params: ({ context }) => `Do you want me to create an appointment 
       with ${context.meeting_name} on ${context.meeting_date} 
       at ${context.meeting_time}?`,
           }],
