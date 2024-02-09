@@ -78,7 +78,7 @@ function createSlotFillingState(systemPrompt, entity, nextState) {
         nomatch: {
           entry: ({ context }) =>
             context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
-          on: { ENDSPEECH: "Prompt" },
+          on: { ENDSPEECH: "Listen" },
         },
       }
     };
@@ -138,7 +138,8 @@ const dmMachine = setup({
         },
       },
     },
-    AskName: createSlotFillingState(`Who are you meeting with?`, 'person', '#DM.ConfirmCreateMeeting'),
+    AskName: createSlotFillingState(`Who are you meeting with?`, 'person', '#DM.AskDay'),
+    AskDay: createSlotFillingState(`On which day is your meeting?`, 'day', '#DM.ConfirmCreateMeeting'),
     ConfirmCreateMeeting: {
       initial: "Prompt",
       states: {
