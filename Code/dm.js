@@ -32,13 +32,18 @@ const grammar = {
 };
 
 /* Helper functions */
-function isInGrammar(utterance) {
-  return utterance.toLowerCase() in grammar;
+
+function utteredPerson(event) {
+  var utterance = event.value[0].utterance.toLowerCase();
+  if(utterance in grammar) {
+    var interpretation = grammar[utterance];
+    if(interpretation.person) {
+      return true;
+    }
+  }
+  return false;
 }
 
-function getPerson(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).person;
-}
 
 const dmMachine = setup({
   actions: {
@@ -71,12 +76,7 @@ const dmMachine = setup({
       states: {
         Prompt: {
           entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: `Hello!`,
-              },
-            }),
+            context.ssRef.send({type: "SPEAK", value: { utterance: `Hello!` }}),
           on: { SPEAK_COMPLETE: "AfterSystemGreeting" },
         },
         AfterSystemGreeting: {
@@ -118,37 +118,47 @@ const dmMachine = setup({
               type: "LISTEN",
             }),
           on: {
-            RECOGNISED: {
-              actions: ({ context, event }) => {
-                var utterance = event.value[0].utterance.toLowerCase();
-                if(utterance in grammar) {
-                  var interpretation = grammar[utterance];
-                  if(interpretation.person) {
-                    context.person = interpretation.person;
-                  }
-                }
-                if(context.person) {
-                  context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `On which day is your meeting?`,
-                    },
-                  });
-                }
-                else {
-                  context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `I'm sorry, I didn't understand. Who are you meeting with?`,
-                    },
-                  });
-                }
+            RECOGNISED: [
+              {
+                guard: ({ context, event }) => utteredPerson(event),
+                target: '#DM.AskDay'
               },
-            },
-            //SPEAK_COMPLETE: "#DM.AskDay",
+              {
+                target: "nomatch",
+              },
+            ],
           },
         },
-      },
+        nomatch: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
+          on: { ENDSPEECH: "Prompt" },
+        },
+      }
+    },
+    AskDay: {
+      initial: "Prompt",
+      states: {
+        Prompt: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                utterance: `On which day is your meeting?`,
+              },
+            }),
+          on: { SPEAK_COMPLETE: "Listen" },
+        },
+        Listen: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "LISTEN",
+            }),
+          on: {
+            // TODO
+          }
+        },
+      }
     },
     Done: {
       on: {
