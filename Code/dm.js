@@ -76,16 +76,19 @@ function createSlotFillingState(params) {
               },
             ],
             ASR_NOINPUT: {
-              entry: ({ context }) =>
-                context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
-              on: { ENDSPEECH: "Prompt" },
-            }
+              target: "heard_nothing"
+            },
           },
         },
         nomatch: {
           entry: ({ context }) =>
             context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
-          on: { ENDSPEECH: "Listen" },
+          on: { SPEAK_COMPLETE: "Listen" },
+        },
+        heard_nothing: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+          on: { SPEAK_COMPLETE: "Prompt" },
         },
       }
     };
