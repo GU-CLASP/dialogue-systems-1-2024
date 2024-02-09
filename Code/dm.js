@@ -49,21 +49,23 @@ function getPerson(utterance) {
 function getDay(utterance) {
   return (grammar[utterance.toLowerCase()] || {}).day;
 }
-
+function getTime(utterance) {
+  return (grammar[utterance.toLowerCase()] || {}).time;
+}
 function checkPositive(value) {
   if  (grammarUnderstanding.positive.includes(value)) {
     return true;
   }
 }
 
-function checkNegative(utterance) {
+/*function checkNegative(utterance) {
   for (const key in grammarUnderstanding) {
     if (grammarUnderstanding["negative"].includes(utterance)) {
       return true;
     }
   }
   return false;
-}
+} */
 
 const dmMachine = setup({
   actions: { //not sure what to do here
@@ -195,6 +197,9 @@ const dmMachine = setup({
             ],
             },
         PositiveAnswer : {
+        initial : "CheckInfo",
+        states : {
+        CheckInfo : {
           entry : ({context}) =>
           context.ssRef.send({
             type: "SPEAK",
@@ -202,17 +207,93 @@ const dmMachine = setup({
               utterance : `Do you want me to create an appointment with ${context.person} on ${context.day} for the whole day?`
             },
           }),
-       on : {SPEAK_COMPLETE : "#DM.Done"},
-        },      
+       on : {SPEAK_COMPLETE : "ListenCheckInfo"},
+        },
+        ListenCheckInfo : {
+          entry : ({context}) =>
+          context.ssRef.send({
+            type : "LISTEN",
+          }),
+          on : {RECOGNISED : "AnswerCheckInfo"},
+        }, 
+        AnswerCheckInfo : {
+          entry : assign ({
+            answer : ({context,event}) =>
+            event.value[0].utterance}) , 
+            always : [
+              {
+                target : "Positive",
+                guard : ({context}) => checkPositive(context.answer.toLowerCase()),
+              },
+              {target : "#DM.PromptAndAsk.Ask"},
+            ],
+        },
+        Positive : {
+          entry : ({context}) =>
+          context.ssRef.send({
+            type : "SPEAK",
+            value :{
+              utterance : `Your appointment has been created!`
+            },
+          }),
+        },
+      },
+    },     
       NegativeAnswer : {
-      entry : ({context}) =>
-      context.ssRef.send({
-        type : "SPEAK",
-        value : {
+        initial : "MeetingTime",
+        states : {
+          MeetingTime : {
+        entry : ({context}) =>
+        context.ssRef.send({
+          type : "SPEAK",
+          value : {
           utterance : `What time is your meeting?`
         },
       }),
-    on : {SPEAK_COMPLETE : "#DM.Done"},
+      on : {SPEAK_COMPLETE: "ListenToTime"}
+    },
+    ListenToTime : {
+      entry : ({context}) => 
+      context.ssRef.send({
+        type : "LISTEN",
+      }),
+    on : {RECOGNISED : "UpdateTime"},
+  },
+  UpdateTime : {
+    entry : [
+      assign({
+        time : ({context,event}) =>
+        getTime(event.value[0].utterance),
+      }),
+      ({context}) =>
+      context.ssRef.send({
+        type : "SPEAK",
+        value : {
+          utterance : `Do you want me to create an appointment with ${context.person} on ${context.day} at ${context.time}?`
+        },
+      }),
+    ],
+    on : {SPEAK_COMPLETE : "ListenCheckInformation"},
+    },
+    ListenCheckInformation : {
+      entry : ({context}) =>
+      context.ssRef.send({
+        type : "LISTEN",
+      }),
+      on : {RECOGNISED : "AnswerCheckInformation"},
+    },
+    AnswerCheckInformation : {
+      entry : assign({
+        answer : ({context,event}) =>
+        event.value[0].utterance}),
+        always : [
+          {
+            target : "#DM.PromptAndAsk.ListenToAnswer.PositiveAnswer.Positive",
+            guard : ({context}) => checkPositive(context.answer.toLowerCase()),
+          },
+          {target : "#DM.PromptAndAsk.Ask"}
+        ],
+    },
   },
 },
 },
@@ -224,6 +305,7 @@ const dmMachine = setup({
       },
     },
   },
+},//
 });
 
 const dmActor = createActor(dmMachine, {
