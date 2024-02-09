@@ -24,6 +24,7 @@ const grammar = {
   vlad: { person: "Vladislav Maraev" },
   aya: { person: "Nayat Astaiza Soriano" },
   rasmus: { person: "Rasmus Blanck" },
+  alex: { person: "Alex Berman" },
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
   "10": { time: "10:00" },
@@ -46,6 +47,7 @@ const dmMachine = setup({
 }).createMachine({
   context: {
     count: 0,
+    person: null,
   },
   id: "DM",
   initial: "Prepare",
@@ -118,14 +120,30 @@ const dmMachine = setup({
           on: {
             RECOGNISED: {
               actions: ({ context, event }) => {
-                context.name = event.value[0].utterance;
-                context.ssRef.send({
-                  type: "SPEAK",
-                  value: {
-                    utterance: `On which day is your meeting?`,
-                  },
-                })
-                },
+                var utterance = event.value[0].utterance.toLowerCase();
+                if(utterance in grammar) {
+                  var interpretation = grammar[utterance];
+                  if(interpretation.person) {
+                    context.person = interpretation.person;
+                  }
+                }
+                if(context.person) {
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `On which day is your meeting?`,
+                    },
+                  });
+                }
+                else {
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `I'm sorry, I didn't understand. Who are you meeting with?`,
+                    },
+                  });
+                }
+              },
             },
             //SPEAK_COMPLETE: "#DM.AskDay",
           },
