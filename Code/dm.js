@@ -44,6 +44,21 @@ function getEntity(event, entity) {
 }
 
 function createSlotFillingState(params) {
+  var onRecognised = params.onRecognised;
+  if(onRecognised == null) {
+    onRecognised = [
+      {
+        guard: ({ context, event }) => !!getEntity(event, params.entity),
+        target: params.nextState,
+        actions: ({ context, event }) => {
+          context[params.slot] = getEntity(event, params.entity)
+        },
+      },
+      {
+        target: "nomatch",
+      },
+    ]
+  }
   return {
       initial: "Prompt",
       states: {
@@ -63,18 +78,7 @@ function createSlotFillingState(params) {
               type: "LISTEN",
             }),
           on: {
-            RECOGNISED: [
-              {
-                guard: ({ context, event }) => !!getEntity(event, params.entity),
-                target: params.nextState,
-                actions: ({ context, event }) => {
-                  context[params.slot] = getEntity(event, params.entity)
-                },
-              },
-              {
-                target: "nomatch",
-              },
-            ],
+            RECOGNISED: onRecognised,
             ASR_NOINPUT: {
               target: "heard_nothing"
             },
@@ -175,7 +179,20 @@ const dmMachine = setup({
       prompt: `Will it take the whole day?`,
       slot: 'whole_day',
       entity: 'boolean',
-      nextState: '#DM.AskTime'}),
+      onRecognised: [
+          {
+            guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
+            target: "#DM.ConfirmCreateMeeting",
+          },
+          {
+            guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
+            target: "#DM.AskTime",
+          },
+          {
+            target: "nomatch",
+          },
+        ]
+    }),
     AskTime: createSlotFillingState({
       prompt: `What time is your meeting?`,
       slot: 'time',
