@@ -29,6 +29,8 @@ const grammar = {
   tuesday: { day: "Tuesday" },
   "10": { time: "10:00" },
   "11": { time: "11:00" },
+  yes: { boolean: true },
+  no: { boolean: false },
 };
 
 /* Helper functions */
@@ -41,7 +43,7 @@ function getEntity(event, entity) {
   }
 }
 
-function createSlotFillingState(systemPrompt, entity, nextState) {
+function createSlotFillingState(params) {
   return {
       initial: "Prompt",
       states: {
@@ -50,7 +52,7 @@ function createSlotFillingState(systemPrompt, entity, nextState) {
             context.ssRef.send({
               type: "SPEAK",
               value: {
-                utterance: systemPrompt,
+                utterance: params.prompt,
               },
             }),
           on: { SPEAK_COMPLETE: "Listen" },
@@ -63,10 +65,10 @@ function createSlotFillingState(systemPrompt, entity, nextState) {
           on: {
             RECOGNISED: [
               {
-                guard: ({ context, event }) => !!getEntity(event, entity),
-                target: nextState,
+                guard: ({ context, event }) => !!getEntity(event, params.entity),
+                target: params.nextState,
                 actions: ({ context, event }) => {
-                  context[entity] = getEntity(event, entity)
+                  context[params.slot] = getEntity(event, params.entity)
                 },
               },
               {
@@ -138,8 +140,26 @@ const dmMachine = setup({
         },
       },
     },
-    AskName: createSlotFillingState(`Who are you meeting with?`, 'person', '#DM.AskDay'),
-    AskDay: createSlotFillingState(`On which day is your meeting?`, 'day', '#DM.ConfirmCreateMeeting'),
+    AskName: createSlotFillingState({
+      prompt: `Who are you meeting with?`,
+      slot: 'person',
+      entity: 'person',
+      nextState: '#DM.AskDay'}),
+    AskDay: createSlotFillingState({
+      prompt: `On which day is your meeting?`,
+      slot: 'day',
+      entity: 'day',
+      nextState: '#DM.AskWholeDay'}),
+    AskWholeDay: createSlotFillingState({
+      prompt: `Will it take the whole day?`,
+      slot: 'whole_day',
+      entity: 'boolean',
+      nextState: '#DM.AskTime'}),
+    AskTime: createSlotFillingState({
+      prompt: `What time is your meeting?`,
+      slot: 'time',
+      entity: 'time',
+      nextState: '#DM.ConfirmCreateMeeting'}),
     ConfirmCreateMeeting: {
       initial: "Prompt",
       states: {
