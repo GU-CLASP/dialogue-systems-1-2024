@@ -41,6 +41,48 @@ function getEntity(event, entity) {
   }
 }
 
+function createSlotFillingState(systemPrompt, entity, nextState) {
+  return {
+      initial: "Prompt",
+      states: {
+        Prompt: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                utterance: systemPrompt,
+              },
+            }),
+          on: { SPEAK_COMPLETE: "Listen" },
+        },
+        Listen: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "LISTEN",
+            }),
+          on: {
+            RECOGNISED: [
+              {
+                guard: ({ context, event }) => !!getEntity(event, entity),
+                target: nextState,
+                actions: ({ context, event }) => {
+                  context[entity] = getEntity(event, entity)
+                },
+              },
+              {
+                target: "nomatch",
+              },
+            ],
+          },
+        },
+        nomatch: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
+          on: { ENDSPEECH: "Prompt" },
+        },
+      }
+    };
+}
 
 const dmMachine = setup({
   actions: {
@@ -96,46 +138,7 @@ const dmMachine = setup({
         },
       },
     },
-    AskName: {
-      initial: "Prompt",
-      states: {
-        Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: `Who are you meeting with?`,
-              },
-            }),
-          on: { SPEAK_COMPLETE: "Listen" },
-        },
-        Listen: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN",
-            }),
-          on: {
-            RECOGNISED: [
-              {
-                guard: ({ context, event }) => !!getEntity(event, 'person'),
-                target: '#DM.ConfirmCreateMeeting',
-                actions: ({ context, event }) => {
-                  context.person = getEntity(event, 'person')
-                },
-              },
-              {
-                target: "nomatch",
-              },
-            ],
-          },
-        },
-        nomatch: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
-          on: { ENDSPEECH: "Prompt" },
-        },
-      }
-    },
+    AskName: createSlotFillingState(`Who are you meeting with?`, 'person', '#DM.ConfirmCreateMeeting'),
     ConfirmCreateMeeting: {
       initial: "Prompt",
       states: {
