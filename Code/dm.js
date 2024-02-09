@@ -75,6 +75,11 @@ function createSlotFillingState(params) {
                 target: "nomatch",
               },
             ],
+            ASR_NOINPUT: {
+              entry: ({ context }) =>
+                context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+              on: { ENDSPEECH: "Prompt" },
+            }
           },
         },
         nomatch: {
@@ -127,18 +132,31 @@ const dmMachine = setup({
             }),
           on: {
             RECOGNISED: {
-              actions: ({ context, event }) =>
-                context.ssRef.send({
-                  type: "SPEAK",
-                  value: {
-                    utterance: `Let's create an appointment`,
-                  },
-                }),
+              target: '#DM.InitiateCreateAppointment'
             },
-            SPEAK_COMPLETE: "#DM.AskName",
+            ASR_NOINPUT: {
+              target: '#DM.InitiateCreateAppointment'
+            },
           },
         },
       },
+    },
+    InitiateCreateAppointment: {
+      initial: "Prompt",
+      states: {
+        Prompt: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                utterance: `Let's create an appointment`,
+              },
+            }),
+          on: {
+            SPEAK_COMPLETE: "#DM.AskName",
+          }
+        }
+      }
     },
     AskName: createSlotFillingState({
       prompt: `Who are you meeting with?`,
