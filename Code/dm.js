@@ -33,15 +33,12 @@ const grammar = {
 
 /* Helper functions */
 
-function utteredPerson(event) {
+function getEntity(event, entity) {
   var utterance = event.value[0].utterance.toLowerCase();
   if(utterance in grammar) {
     var interpretation = grammar[utterance];
-    if(interpretation.person) {
-      return true;
-    }
+    return interpretation[entity];
   }
-  return false;
 }
 
 
@@ -120,8 +117,11 @@ const dmMachine = setup({
           on: {
             RECOGNISED: [
               {
-                guard: ({ context, event }) => utteredPerson(event),
-                target: '#DM.AskDay'
+                guard: ({ context, event }) => !!getEntity(event, 'person'),
+                target: '#DM.ConfirmCreateMeeting',
+                actions: ({ context, event }) => {
+                  context.person = getEntity(event, 'person')
+                },
               },
               {
                 target: "nomatch",
@@ -136,7 +136,7 @@ const dmMachine = setup({
         },
       }
     },
-    AskDay: {
+    ConfirmCreateMeeting: {
       initial: "Prompt",
       states: {
         Prompt: {
@@ -144,7 +144,7 @@ const dmMachine = setup({
             context.ssRef.send({
               type: "SPEAK",
               value: {
-                utterance: `On which day is your meeting?`,
+                utterance: `Do you want me to create a meeting with ` + context.person + `?`,
               },
             }),
           on: { SPEAK_COMPLETE: "Listen" },
@@ -154,9 +154,6 @@ const dmMachine = setup({
             context.ssRef.send({
               type: "LISTEN",
             }),
-          on: {
-            // TODO
-          }
         },
       }
     },
