@@ -1,0 +1,93 @@
+#+OPTIONS: num:nil
+#+TITLE: Lab III. Tuning ASR and TTS
+
+In this lab session you will practice styling TTS output using Speech
+Synthesis Markup Language (SSML) and tuning ASR. It is assumed that
+you have read the relevant literature on the subject before attempting
+to solve the assignments.
+
+For reference:
+- Speech Synthesis Markup Language (SSML) Version 1.0, W3C
+  Recommendation 7 September 2004,
+  http://www.w3.org/TR/speech-synthesis/
+- Azure Text-to-Speech: [[https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/index-text-to-speech][Docs]], [[https://speech.microsoft.com/][Speech Studio]] (audio content creation)
+- Azure Speech-to-Text: [[https://learn.microsoft.com/en-us/azure/ai-services/speech-service/index-speech-to-text][Docs]], [[https://speech.microsoft.com/][Speech Studio]] (custom speech)
+
+* Part A: Azure Custom Speech
+
+1) Play with Automatic Speech Recognition:
+   - Can you think of any names for fictional places, people or objects
+     that are not recognized? (Keep your final project in mind!)
+   - If not, can you try any scientific names for plants, animals,
+     geologic terms, etc., or names for classic musical pieces and
+     authors?
+   - Did you come across any real locations or people that are also
+     just not picked up?
+   - Any specific accent you are using that makes words difficult to
+     process?
+
+2) While you do this, take a look at the confidence score with the
+   help of XState's Visualizer (or you can log it). How good is it?
+
+3) Think about how this problem could be solved. Why do you think
+   recognition falters for the examples that you tried?
+
+4) To solve the problem you will use [[https://learn.microsoft.com/en-us/azure/ai-services/speech-service/custom-speech-overview][Custom Speech]]:
+   - You will basically have to provide data, either plain text or
+     audio files, to help the recognition process.
+   - Train and deploy your model (enable content logging). Note the
+     *Endpoint ID*.
+
+5) To test your model:
+   - Upgrade SpeechState: =yarn up speechstate= (you will see the
+     version 2.0.0-beta.5 or higher).
+   - Create a file =dm3.js= which implements a very basic ASR test
+     (analogous to =dm.js= in this repository). Add the following to
+     your =settings= object:
+     #+begin_src javascript
+       speechRecognitionEndpointId: "paste your Endpoint ID here",
+     #+end_src
+   - Now you can test your new ASR model! You will be able to download
+     the log files for your model in Custom Speech interface.
+
+6) Write a report:     
+   - Write a report (max 1 pages) describing which new words are now
+     supported and can be tested. Report should contain your Endpoint
+     ID.
+   - Add your report to the repository in PDF format
+     (=report-lab3.pdf=).
+
+
+* Part B: Speech Synthesis Poetry Slam
+#+BEGIN_QUOTE
+A poetry slam is a competition at which poets read or recite original work (or, more rarely, that of others). These performances are then judged on a numeric scale by previously selected members of the audience. (Wikipedia)
+#+END_QUOTE
+
+Your task in this assignment is to use SSML in Azure Audio Content
+Creation in order to get an artificial poet to recite the your
+favourite poem (just a couple of verses) with a speed and in "a style"
+similar to the way how it is read by an actor (or by a poet
+her/himself).
+
+You can refer to some poetry performance found on YouTube or
+elsewhere.
+
+Sources for inspiration:
+- [[https://www.youtube.com/watch?v=IZYoGj8D8pY][California Dreaming]] (386DX art project).
+- [[https://raw.githubusercontent.com/vladmaraev/rasa101/master/withoutme.m4a][Without Me]], which was made by Robert Rhys Thomas in 2019 for this course.
+- [[file:media/partC_badguy_voiced.mp3][Bad Guy]], which was made by Fang Yuan in 2020 for this course.
+
+* Submission
+In your submission provide:
+1) report for Part A
+3) text file with your SSML code (=Code/lab3.txt=); in the beginning of
+   the file include the reference to the original performance.
+4) audio file for Part B (=Code/lab3.mp3=)
+
+These files can be placed in your Github repository.
+
+- *Commit* your changes and *push* them to your repository (your fork of
+  this repository)
+- We will see the changes in the same pull request that you used for
+  Lab 2. 
+- On Canvas, submit the pull request URL.
