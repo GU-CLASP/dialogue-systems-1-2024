@@ -24,22 +24,33 @@ const grammar = {
   vlad: { person: "Vladislav Maraev" },
   aya: { person: "Nayat Astaiza Soriano" },
   rasmus: { person: "Rasmus Blanck" },
+  staffan : {person : "Staffan Larson"},
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
   wednesday :{ day: "Wednesday"},
+  thursday : {day : "Thursday"},
   "10": { time: "10:00" },
   "11": { time: "11:00" },
   "12" : {time: "12:00"},
+  "1" : {time : "1:00"}, //didn't recognize 13:00
+  "2" : {time : "2:00"},
 };
 const grammarUnderstanding = {
-  continue : ["okay", "ok", "sure"],
-  positive : ["yes", "of course", "yeah"],
+  continue : ["okay", "ok"],
+  positive : ["yes", "of course", "yeah","sure"],
   negative : ["no", "no way"],
 };
 
 /* Helper functions */
-function isInGrammar(utterance) {
-  return utterance.toLowerCase() in grammar;
+function isInGrammar(value) {
+  for (let key in grammar) {
+    if (grammar.hasOwnProperty(key)) {
+      if (Object.values(grammar[key]).includes(value)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 function getPerson(utterance) {
@@ -68,7 +79,7 @@ function checkPositive(value) {
 } */
 
 const dmMachine = setup({
-  actions: { //not sure what to do here
+  actions: { 
   },
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwA2RQFYuGgBwAWQwHZ92-QBoQAT0QBGeyfQaVXRya6L9AZmVqAXwDrNHQAdQJxakFyMSIxYgBhABkASUSAaW4+JBAhUQlpWQUEe011XRU-EwtFEx8fazsEDQ1tdG8GtW9DZRV9IJCMHEEAWzwxUikIUlgAayxsMYnickwWDPpEgHlUTGSmaiZs2XzxSRlcksM1fXR7fRquQ201PTUfDSbEE0d0cxUagsJmMGl6gxAoRG40m01mC2SIlgYjAUhEUigxGYOwA4gA5VLkJjIE65M6FS6gEo6QzqJ56excHzaezaLTfBAmNTOAGM-S+B5+QwQqFLGFTGbzdDw1brUibHZ7A5HUkCYTnIq5ZqeHwuFSOLhGHwmRSNeSIN60tk0pxaDRAxQi4ZiiYS+FYMDYWDSLFMXEEokk3indUU4qIHyGez3Y2GIyKBOR40cuOKdRuQxcNT2RRRvROxbLWGShYAVTwEAIKMwnu9UllGy2u32h2OwbJoYu4YQNLplQ0jOZrPZtkQ5jU6G0ukZQLUpl+A2CkOdRbdUuQBBsvv9hOJqrync1VKU2lp3P7g5Z1o53WjOncl5Mv3sPgL0NdcKl5crKI3W7WjaKi2KrtmqBRdlcJ5nvSA5MleI7NLcaZAg+jjKG0XAmG+LrFu6iLIqi0RTLAADunroPhKL1ti2z4ruQY5GBGqUqOPa5u0PheFynj2KChjWNSp59iosFDta2Grp+CJIlRRFSKR5GUai260QGe72IxB7gUe5o9kJ54iZew6KByihlM4nF1Ny7h8RJ4pSRRMmEYIxFkdgWCdgAbmArmeg28pNkqrb7uSEHHnpGiTqZnHOCoVlPk+maRnZH4lo5BFSHJCnuXiYBQFWIjeb52D+QqzbKm2mmhTp1JtB0xq6JxLI1GY0WYegcXcQlSXCkuoTINIYBJGkmQhYeLElE4d5uE1U6uNy9gcto3iTvYGi-D4L7rRoPiBBCUiCBAcCyGgIbaRNiAALS8fxrGXZFbjuEKbK7dy2H4EQYBncx3a9By+h3moQMfPFvheAWERRDEcTYGI31hpBCDaCYHKtBxvg+PyVTeOtKW4fM8Nhbpl2aByu3tK4-RtKYejJX1K72Wl75wx253dl0HS5kDiWvJhRio-yk7TlwyP6CoILaHja7SRl6JQITNWIHGtKfE4c40+Y2gNDeigTpmdSPOOZQi1LDnwgrF0tLc6haKefj8sjUYcjqeoPoahjGqaptM7WOnVZbHMJjc3IS28Zi3c0Fi6vezw7R7O0mBo3vut+VZgDWXp++N3ZcByvFZug+tmGYrzG5L9OFoz7p-hbOd5wOkWeFZWYzsrydfhWac16zP2I7nrFq3cnUfJodR6I6FfM9L6WyS58lubXiOXXGpkGh1XjxmC2ZrVhk84dPSmZXP2Uz6ii-hf3zRBxxXHWTdYLtzLs-FR54FFfPnrn7pl9KL0kWuN4NwrQEwTyGJXVKeEnJHxfrlfKEh37ZS-iUH+PZXDODeIAzaasuRJwrgNKQX0e4I3CstJaK0G41E+ECJ8-IghBCAA */
@@ -136,11 +147,19 @@ const dmMachine = setup({
           on : {RECOGNISED : "UpdatePerson"},
           },
           UpdatePerson : {
-              entry : [
-                assign({ 
+              entry : assign({ 
                 person : ({context,event}) =>
               getPerson(event.value[0].utterance),
             }),
+            always : [
+              {target : "DayQuestion",
+              guard : ({context}) => isInGrammar(context.person)
+            },
+            {target : "#DM.Done" }
+            ],
+          },
+          DayQuestion : {
+            entry :
             ({context}) =>
             context.ssRef.send({
               type: "SPEAK",
@@ -148,7 +167,6 @@ const dmMachine = setup({
                 utterance : `On which day are you meeting?`,
               },
             }),
-          ],
           on : {SPEAK_COMPLETE: "Day"},
           },
           Day : {
@@ -159,19 +177,25 @@ const dmMachine = setup({
           on : {RECOGNISED : "UpdateDay"},
           },
           UpdateDay : {
-            entry : [
+            entry :
               assign({
               day : ({context,event}) =>
               getDay(event.value[0].utterance),
             }),
-          ({context}) => 
+            always : [
+              {target : "WholeDay",
+              guard : ({context}) => isInGrammar(context.day)},
+              {target : "#DM.Done"},
+            ],
+          },
+          WholeDay : {
+            entry : ({context}) => 
           context.ssRef.send({
             type : "SPEAK",
             value : {
               utterance : `Will it take the whole day?`
             },
           }),
-        ],
           on : { SPEAK_COMPLETE : "ListenToAnswer"},
       },
           ListenToAnswer : {
@@ -236,6 +260,7 @@ const dmMachine = setup({
               utterance : `Your appointment has been created!`
             },
           }),
+          on : {SPEAK_COMPLETE : "#DM.Done"}
         },
       },
     },     
@@ -260,19 +285,24 @@ const dmMachine = setup({
     on : {RECOGNISED : "UpdateTime"},
   },
   UpdateTime : {
-    entry : [
-      assign({
+    entry : assign({
         time : ({context,event}) =>
         getTime(event.value[0].utterance),
       }),
-      ({context}) =>
+      always : [
+        {target : "CheckAllInfo",
+      guard : ({context}) => isInGrammar(context.time)},
+      {target : "#DM.Done"},
+      ],
+    },
+      CheckAllInfo : {
+        entry :({context}) =>
       context.ssRef.send({
         type : "SPEAK",
         value : {
           utterance : `Do you want me to create an appointment with ${context.person} on ${context.day} at ${context.time}?`
         },
       }),
-    ],
     on : {SPEAK_COMPLETE : "ListenCheckInformation"},
     },
     ListenCheckInformation : {
@@ -299,13 +329,13 @@ const dmMachine = setup({
 },
       },
     },
+  },
     Done: {
       on: {
         CLICK: "PromptAndAsk",
       },
     },
   },
-},//
 });
 
 const dmActor = createActor(dmMachine, {
