@@ -36,15 +36,17 @@ const grammar = {
   saturday: {day: "Saturday"},
   sunday: {day: "Sunday"},
   "8": { time: "08:00" },
+  "8,15": {time: "08:15"},
   "9": { time: "09:00" },
+  "9,30": { time: "9:30"},
   "10": { time: "10:00" },
   "11": { time: "11:00" },
   "13": { time: "13:00" },
   "14": { time: "14:00" },
   "15": { time: "15:00" },
   "16": { time: "16:00" },
-  agree: ["yes","yup","of course","yeah"],
-  disagree: ["no","nope","nah"]
+  agree: ["yes","yup","of course","yeah", "yes please"],
+  disagree: ["no","nope","nah", "no thanks"]
 };
 
 /* Helper functions */
@@ -61,17 +63,18 @@ function isTheAnswerNo(utterance) {
 }
 
 function getPerson(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).person; //returns the value of the value as True or False
+  return (grammar[utterance.toLowerCase()] || {}).person; //returns the value of the value 
 }
 
 function getDay(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).date;
+  return (grammar[utterance.toLowerCase()] || {}).day; //returns the value of the value 
+
+}  
 
 function getTime(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).time;
+  return (grammar[utterance.toLowerCase()] || {}).time; //returns the value of the value 
 }
 
-}
 
 const dmMachine = setup({
   actions: {
@@ -95,7 +98,6 @@ const dmMachine = setup({
     meeting_name: '',
     meeting_date: '',
     meeting_time: '',
-    meeting_dur: '',
   },
   id: "DM",
   initial: "Prepare",
@@ -131,18 +133,20 @@ const dmMachine = setup({
     MeetingPersonListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED : { 
+        RECOGNISED : [{ 
+          guard: ({event}) => isInGrammar(event.value[0].utterance) === true, 
           actions: assign({meeting_name: ({context, event}) => event.value[0].utterance}),
-          guard: ({event}) => isInGrammar(event.value[0].utterance) === true,
-          target: "MeetingDaySpeak",
-      },
+          target: "MeetingDaySpeak" },
+          {
+          actions: [{ type: "speakToTheUser", params: `I'm sorry, this person is not in my grammar. Please re-check my grammar.` }],
+          target: "WaitToStart"}],
+
         ASR_NOINPUT : {
           actions: [{ type: "speakToTheUser", 
         params: `I didn't hear you.` }],
-        target: "MeetingPersonSpeak",
+        target: "MeetingPersonSpeak" }
         },
     },
-  },
 
     MeetingDaySpeak: {
       entry: [{ type: "speakToTheUser", 
@@ -156,10 +160,13 @@ const dmMachine = setup({
     MeetingDayListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED : { 
-            actions: assign({meeting_date: ({context, event}) => event.value[0].utterance}),
-            target: "MeetingDurSpeak"
-            },
+        RECOGNISED : [{ 
+          guard: ({event}) => isInGrammar(event.value[0].utterance) === true, 
+          actions: assign({meeting_date: ({context, event}) => event.value[0].utterance}),
+          target: "MeetingDurSpeak" },
+          {
+          actions: [{ type: "speakToTheUser", params: `I'm sorry, this date is not in my grammar. Please re-check my grammar.` }],
+          target: "WaitToStart"}],
         ASR_NOINPUT : {
             actions: [{ type: "speakToTheUser", 
             params: `I didn't hear you.` }],
@@ -179,8 +186,9 @@ const dmMachine = setup({
     MeetingDurListen: {
       entry: "listenForUsersAnswer",
       on: { 
-        RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "VerificationWholeDay" },
-                        { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingTimeSpeak" }],
+        RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "VerificationWholeDaySpeak" },
+                        { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingTimeSpeak" },
+                    ],
         ASR_NOINPUT : {
           actions: [{ type: "speakToTheUser", 
           params: `I didn't hear you.` }],
@@ -200,10 +208,13 @@ const dmMachine = setup({
     MeetingTimeListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED : { 
+        RECOGNISED : [{ 
+          guard: ({event}) => isInGrammar(event.value[0].utterance) === true, 
           actions: assign({meeting_time: ({context, event}) => event.value[0].utterance}),
-          target: "VerificationNotWholeDay"
-          },
+          target: "VerificationNotWholeDaySpeak" },
+          {
+          actions: [{ type: "speakToTheUser", params: `I'm sorry, this time is not in my grammar. Please re-check my grammar.` }],
+          target: "WaitToStart"}],
         ASR_NOINPUT : {
           actions: [{ type: "speakToTheUser", 
           params: `I didn't hear you.` }],
@@ -212,27 +223,44 @@ const dmMachine = setup({
         },
       },
 
-    VerificationNotWholeDay: {
+    VerificationNotWholeDaySpeak: {
       entry: [{ type: "speakToTheUser", 
       params: ({ context }) => `Do you want me to create an appointment 
-      with ${context.meeting_name} on ${context.meeting_date} 
-      at ${context.meeting_time}?`,
+      with ${getPerson(context.meeting_name)} on ${getDay(context.meeting_date)} 
+      at ${getTime(context.meeting_time)}?`,
           }],
-      on: { SPEAK_COMPLETE: "#DM.Done" 
+      on: { SPEAK_COMPLETE: "VerificationNotWholeDayListen" 
     },
   },
 
-  VerificationWholeDay: {
+  VerificationNotWholeDayListen: {
+    entry: "listenForUsersAnswer",
+    on: { 
+      RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "#DM.Done" },
+                      { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingPersonSpeak" }],
+      },
+    },
+
+  VerificationWholeDaySpeak: {
     entry: [{ type: "speakToTheUser", 
       params: ({ context }) => `Do you want me to create an appointment 
-      with ${context.meeting_name} on ${context.meeting_date} 
+      with ${getPerson(context.meeting_name)} on ${getDay(context.meeting_date)} 
       for the whole day?`,
           }],
-      on: { SPEAK_COMPLETE: "#DM.Done" 
+      on: { SPEAK_COMPLETE: "VerificationWholeDayListen" 
     },
   },
-  
+
+  VerificationWholeDayListen: {
+    entry: "listenForUsersAnswer",
+    on: { 
+      RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "#DM.Done" },
+                      { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingPersonSpeak" }],
+      },
+  },
+
     Done: {
+      entry: [{ type: "speakToTheUser", params: "Meeting created!"}],
       on: {
         CLICK: "MeetingPersonSpeak",
       },
