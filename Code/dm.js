@@ -114,16 +114,23 @@ const dmMachine = setup({
 
     WaitToStart: {
       on: {
-        CLICK: "MeetingPersonSpeak",
+        CLICK: "Greeting",
       },
       after: {
-        10000: { target: "MeetingPersonSpeak"}
+        10000: { target: "Greeting"}
       },
+    },
+
+    Greeting: {
+        entry: [{ type: "speakToTheUser", params: `Let's create an appointment!`}],
+        on: {
+          SPEAK_COMPLETE : "MeetingPersonSpeak"
+        }
     },
 
     MeetingPersonSpeak: {
       entry: [{ type: "speakToTheUser", 
-      params: `Let's create an appointment! Who would you like to meet?`,
+      params: `Who would you like to meet?`,
           }],
       on: {
       SPEAK_COMPLETE : "MeetingPersonListen",
@@ -262,7 +269,7 @@ const dmMachine = setup({
     Done: {
       entry: [{ type: "speakToTheUser", params: "Meeting created!"}],
       on: {
-        CLICK: "MeetingPersonSpeak",
+        CLICK: "Greeting",
       },
     },
   },
