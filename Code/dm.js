@@ -112,7 +112,13 @@ function confirmationQuestionUtterance(context) {
 
 const dmMachine = setup({
   actions: {
-    /* define your actions here */
+    say: ({ context }, params) =>
+      context.ssRef.send({
+        type: "SPEAK",
+        value: {
+          utterance: params,
+        },
+      }),
   },
 }).createMachine({
   context: {
@@ -143,8 +149,10 @@ const dmMachine = setup({
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: `Hello!` }}),
+          entry: [{
+              type: "say",
+              params: `Hello!`,
+            }],
           on: { SPEAK_COMPLETE: "AfterSystemGreeting" },
         },
         AfterSystemGreeting: {
@@ -167,13 +175,10 @@ const dmMachine = setup({
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: `Let's create an appointment`,
-              },
-            }),
+          entry: [{
+              type: "say",
+              params: `Let's create an appointment`,
+            }],
           on: {
             SPEAK_COMPLETE: "#DM.AskName",
           }
@@ -251,13 +256,17 @@ const dmMachine = setup({
           },
         },
         nomatch: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
+          entry: [{
+              type: "say",
+              params: "Sorry, I didn't understand.",
+            }],
           on: { SPEAK_COMPLETE: "Listen" },
         },
         heard_nothing: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+          entry: [{
+              type: "say",
+              params: "I didn't hear you.",
+            }],
           on: { SPEAK_COMPLETE: "Prompt" },
         },
       }
@@ -266,13 +275,10 @@ const dmMachine = setup({
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: 'Your meeting has been created!'
-              },
-            }),
+          entry: [{
+              type: "say",
+              params: 'Your meeting has been created!',
+            }],
         },
       },
     },
