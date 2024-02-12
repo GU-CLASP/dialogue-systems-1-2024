@@ -27,7 +27,7 @@ const grammar = {
   eleni: {person: "Eleni Fysikoudi"},
   victoria: {person: "Victoria Danilidou"},
   pewdiepie: { person: "Felix Arvid Ulf Kjellberg" },
-  king: { person: "Carl XVI Gustaf"},
+  "the king": { person: "Carl XVI Gustaf"},
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
   wednesday: { day: "Wednesday"},
@@ -36,17 +36,17 @@ const grammar = {
   saturday: {day: "Saturday"},
   sunday: {day: "Sunday"},
   "8": { time: "08:00" },
-  "8,15": {time: "08:15"},
+  "8,15": {time: "08:15"},    //"8,15" is pronounced as "eight fifteen", why doesn't this work?
   "9": { time: "09:00" },
   "9,30": { time: "9:30"},
   "10": { time: "10:00" },
   "11": { time: "11:00" },
-  "13": { time: "13:00" },
-  "14": { time: "14:00" },
-  "15": { time: "15:00" },
-  "16": { time: "16:00" },
-  agree: ["yes","yup","of course","yeah", "yes please"],
-  disagree: ["no","nope","nah", "no thanks"]
+  "1": { time: "13:00" },
+  "2": { time: "14:00" },
+  "3": { time: "15:00" },
+  "4": { time: "16:00" },
+  agree: ["yes","yup","of course","yeah", "absolutely", "it will"],
+  disagree: ["no","nope","nah", "no thanks", "it won't"]
 };
 
 /* Helper functions */
@@ -149,10 +149,18 @@ const dmMachine = setup({
           target: "WaitToStart"}],
 
         ASR_NOINPUT : {
-          actions: [{ type: "speakToTheUser", 
-        params: `I didn't hear you.` }],
-        target: "MeetingPersonSpeak" }
-        },
+          target: "ReRaiseMeetingPerson"
+       },
+      },
+    },
+
+    ReRaiseMeetingPerson: {
+      entry: [{ type: "speakToTheUser", 
+      params: `I didn't hear you.`,
+        }],
+      on: {
+        SPEAK_COMPLETE: "MeetingPersonSpeak"
+      }
     },
 
     MeetingDaySpeak: {
@@ -175,12 +183,20 @@ const dmMachine = setup({
           actions: [{ type: "speakToTheUser", params: `I'm sorry, this date is not in my grammar. Please re-check my grammar.` }],
           target: "WaitToStart"}],
         ASR_NOINPUT : {
-            actions: [{ type: "speakToTheUser", 
-            params: `I didn't hear you.` }],
-            target: "MeetingDaySpeak",
+            target: "ReRaiseMeetingDay"
             },
           },
         },
+
+    ReRaiseMeetingDay: {
+      entry: [{ type: "speakToTheUser", 
+        params: `I didn't hear you.`,
+            }],
+      on: {
+        SPEAK_COMPLETE: "MeetingDaySpeak"
+          }
+        },
+
 
     MeetingDurSpeak: {
       entry: [{ type: "speakToTheUser", 
@@ -197,11 +213,18 @@ const dmMachine = setup({
                         { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingTimeSpeak" },
                     ],
         ASR_NOINPUT : {
-          actions: [{ type: "speakToTheUser", 
-          params: `I didn't hear you.` }],
-          target: "MeetingDurSpeak",
+          target: "ReRaiseMeetingDur"
             },
         },
+    },
+
+    ReRaiseMeetingDur: {
+      entry: [{ type: "speakToTheUser", 
+      params: `I didn't hear you.`,
+        }],
+      on: {
+        SPEAK_COMPLETE: "MeetingDurSpeak"
+      }
     },
 
     MeetingTimeSpeak: {
@@ -223,11 +246,18 @@ const dmMachine = setup({
           actions: [{ type: "speakToTheUser", params: `I'm sorry, this time is not in my grammar. Please re-check my grammar.` }],
           target: "WaitToStart"}],
         ASR_NOINPUT : {
-          actions: [{ type: "speakToTheUser", 
-          params: `I didn't hear you.` }],
-          target: "MeetingTimeSpeak",
+          target: "ReRaiseMeetingTime"
           },
         },
+      },
+
+      ReRaiseMeetingTime: {
+        entry: [{ type: "speakToTheUser", 
+        params: `I didn't hear you.`,
+          }],
+        on: {
+          SPEAK_COMPLETE: "MeetingTimeSpeak"
+        }
       },
 
     VerificationNotWholeDaySpeak: {
@@ -236,17 +266,29 @@ const dmMachine = setup({
       with ${getPerson(context.meeting_name)} on ${getDay(context.meeting_date)} 
       at ${getTime(context.meeting_time)}?`,
           }],
-      on: { SPEAK_COMPLETE: "VerificationNotWholeDayListen" 
+      on: { 
+        SPEAK_COMPLETE: "VerificationNotWholeDayListen",
     },
   },
 
   VerificationNotWholeDayListen: {
     entry: "listenForUsersAnswer",
     on: { 
-      RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "#DM.Done" },
+      RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "Done" },
                       { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingPersonSpeak" }],
+      ASR_NOINPUT : { target: "ReRaiseVerificationNotWholeDay" }
       },
     },
+
+    ReRaiseVerificationNotWholeDay: {
+      entry: [{ type: "speakToTheUser", 
+      params: `I didn't hear you.`,
+        }],
+      on: {
+        SPEAK_COMPLETE: "VerificationNotWholeDaySpeak"
+      }
+    },
+
 
   VerificationWholeDaySpeak: {
     entry: [{ type: "speakToTheUser", 
@@ -261,9 +303,19 @@ const dmMachine = setup({
   VerificationWholeDayListen: {
     entry: "listenForUsersAnswer",
     on: { 
-      RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "#DM.Done" },
+      RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "Done" },
                       { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingPersonSpeak" }],
+      ASR_NOINPUT : {target: "ReRaiseVerificationWholeDay"}
       },
+  },
+
+  ReRaiseVerificationWholeDay: {
+    entry: [{ type: "speakToTheUser", 
+    params: `I didn't hear you.`,
+      }],
+    on: {
+      SPEAK_COMPLETE: "VerificationWholeDaySpeak"
+    }
   },
 
     Done: {
