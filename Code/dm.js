@@ -87,7 +87,7 @@ function createSlotFillingState(params) {
         nomatch: {
           entry: ({ context }) =>
             context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
-          on: { SPEAK_COMPLETE: "Listen" },
+          on: { SPEAK_COMPLETE: "Prompt" },
         },
         heard_nothing: {
           entry: ({ context }) =>
@@ -260,7 +260,7 @@ const dmMachine = setup({
               type: "say",
               params: "Sorry, I didn't understand.",
             }],
-          on: { SPEAK_COMPLETE: "Listen" },
+          on: { SPEAK_COMPLETE: "Prompt" },
         },
         heard_nothing: {
           entry: [{
