@@ -135,6 +135,9 @@ const dmMachine = setup({
       on: {
         CLICK: "PromptAndAsk",
       },
+      after: {
+        10000: { target: 'PromptAndAsk' },
+      },
     },
     PromptAndAsk: {
       initial: "Prompt",
