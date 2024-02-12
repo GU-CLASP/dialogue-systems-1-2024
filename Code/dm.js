@@ -27,6 +27,7 @@ const grammar = {
   alex: { person: "Alex Berman" },
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
+  "alex on monday": { person: "Alex Berman", day: "Monday" },
   "10": { time: "10:00" },
   "11": { time: "11:00" },
   yes: { boolean: true },
@@ -43,7 +44,33 @@ function getEntity(event, entity) {
   }
 }
 
+const slots = [
+  {name: 'person', entity: 'person'},
+  {name: 'day', entity: 'day'},
+  {name: 'whole_day', entity: 'boolean'},
+  {name: 'time', entity: 'time'},
+];
+
 function createSlotFillingState(params) {
+  function onEntry(context) {
+    if(context[params.slot]) {
+      slots.forEach((slot) => {
+        var value = context[slot.name];
+        if(!value) {
+          dmActor.send({type: "jump_to_ask_" + slot.name});
+        }
+      });
+    }
+    else {
+      context.ssRef.send({
+        type: "SPEAK",
+        value: {
+          utterance: params.prompt,
+        },
+      });
+    }
+  }
+
   var onRecognised = params.onRecognised;
   if(onRecognised == null) {
     onRecognised = [
@@ -51,7 +78,12 @@ function createSlotFillingState(params) {
         guard: ({ context, event }) => !!getEntity(event, params.entity),
         target: params.nextState,
         actions: ({ context, event }) => {
-          context[params.slot] = getEntity(event, params.entity)
+          slots.forEach((slot) => {
+            var value = getEntity(event, slot.entity);
+            if(value) {
+              context[slot.name] = value;
+            }
+          });
         },
       },
       {
@@ -63,13 +95,7 @@ function createSlotFillingState(params) {
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: params.prompt,
-              },
-            }),
+          entry: ({ context }) => onEntry(context),
           on: { SPEAK_COMPLETE: "Listen" },
         },
         Listen: {
@@ -108,6 +134,14 @@ function confirmationQuestionUtterance(context) {
   }
   utterance += `?`;
   return utterance;
+}
+
+function createJumpTosForSlots() {
+  var result = {};
+  slots.forEach((slot) => {
+    result["jump_to_ask_" + slot.name] = "#DM.ask_" + slot.name;
+  });
+  return result;
 }
 
 const dmMachine = setup({
@@ -180,22 +214,22 @@ const dmMachine = setup({
               params: `Let's create an appointment`,
             }],
           on: {
-            SPEAK_COMPLETE: "#DM.AskName",
+            SPEAK_COMPLETE: "#DM.ask_person",
           }
         }
       }
     },
-    AskName: createSlotFillingState({
+    ask_person: createSlotFillingState({
       prompt: `Who are you meeting with?`,
       slot: 'person',
       entity: 'person',
-      nextState: '#DM.AskDay'}),
-    AskDay: createSlotFillingState({
+      nextState: '#DM.ask_day'}),
+    ask_day: createSlotFillingState({
       prompt: `On which day is your meeting?`,
       slot: 'day',
       entity: 'day',
-      nextState: '#DM.AskWholeDay'}),
-    AskWholeDay: createSlotFillingState({
+      nextState: '#DM.ask_whole_day'}),
+    ask_whole_day: createSlotFillingState({
       prompt: `Will it take the whole day?`,
       slot: 'whole_day',
       entity: 'boolean',
@@ -206,14 +240,14 @@ const dmMachine = setup({
           },
           {
             guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
-            target: "#DM.AskTime",
+            target: "#DM.ask_time",
           },
           {
             target: "nomatch",
           },
         ]
     }),
-    AskTime: createSlotFillingState({
+    ask_time: createSlotFillingState({
       prompt: `What time is your meeting?`,
       slot: 'time',
       entity: 'time',
@@ -244,7 +278,7 @@ const dmMachine = setup({
               },
               {
                 guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
-                target: "#DM.AskName",
+                target: "#DM.ask_person",
               },
               {
                 target: "nomatch",
@@ -288,6 +322,7 @@ const dmMachine = setup({
       },
     },
   },
+  on: createJumpTosForSlots(),
 });
 
 const dmActor = createActor(dmMachine, {
