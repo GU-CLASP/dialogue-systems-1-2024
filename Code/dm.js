@@ -98,6 +98,18 @@ function createSlotFillingState(params) {
     };
 }
 
+function confirmationUtterance(context) {
+  var utterance = `Do you want me to create an appointment with ${context.person} on ${context.day} `;
+  if(context.time) {
+    utterance += `at ${context.time}`;
+  }
+  else {
+    utterance += `the whole day`;
+  }
+  utterance += `?`;
+  return utterance;
+}
+
 const dmMachine = setup({
   actions: {
     /* define your actions here */
@@ -206,7 +218,7 @@ const dmMachine = setup({
             context.ssRef.send({
               type: "SPEAK",
               value: {
-                utterance: `Do you want me to create a meeting with ` + context.person + `?`,
+                utterance: confirmationUtterance(context),
               },
             }),
           on: { SPEAK_COMPLETE: "Listen" },
