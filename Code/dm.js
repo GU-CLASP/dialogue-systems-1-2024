@@ -98,7 +98,7 @@ function createSlotFillingState(params) {
     };
 }
 
-function confirmationUtterance(context) {
+function confirmationQuestionUtterance(context) {
   var utterance = `Do you want me to create an appointment with ${context.person} on ${context.day} `;
   if(context.time) {
     utterance += `at ${context.time}`;
@@ -194,7 +194,7 @@ const dmMachine = setup({
       onRecognised: [
           {
             guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
-            target: "#DM.ConfirmCreateMeeting",
+            target: "#DM.AskConfirmCreateMeeting",
           },
           {
             guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
@@ -209,8 +209,8 @@ const dmMachine = setup({
       prompt: `What time is your meeting?`,
       slot: 'time',
       entity: 'time',
-      nextState: '#DM.ConfirmCreateMeeting'}),
-    ConfirmCreateMeeting: {
+      nextState: '#DM.AskConfirmCreateMeeting'}),
+    AskConfirmCreateMeeting: {
       initial: "Prompt",
       states: {
         Prompt: {
@@ -218,7 +218,7 @@ const dmMachine = setup({
             context.ssRef.send({
               type: "SPEAK",
               value: {
-                utterance: confirmationUtterance(context),
+                utterance: confirmationQuestionUtterance(context),
               },
             }),
           on: { SPEAK_COMPLETE: "Listen" },
@@ -228,8 +228,50 @@ const dmMachine = setup({
             context.ssRef.send({
               type: "LISTEN",
             }),
+          on: {
+            RECOGNISED: [
+              {
+                guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
+                target: "#DM.ConfirmCreatedMeeting",
+              },
+              {
+                guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
+                target: "#DM.AskName",
+              },
+              {
+                target: "nomatch",
+              },
+            ],
+            ASR_NOINPUT: {
+              target: "heard_nothing"
+            },
+          },
+        },
+        nomatch: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
+          on: { SPEAK_COMPLETE: "Listen" },
+        },
+        heard_nothing: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+          on: { SPEAK_COMPLETE: "Prompt" },
         },
       }
+    },
+    ConfirmCreatedMeeting: {
+      initial: "Prompt",
+      states: {
+        Prompt: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                utterance: 'Your meeting has been created!'
+              },
+            }),
+        },
+      },
     },
     Done: {
       on: {
