@@ -23,6 +23,10 @@ const settings = {
 const grammar = {
   vlad: { person: "Vladislav Maraev" },
   aya: { person: "Nayat Astaiza Soriano" },
+  manos: {person:"Manos Belantakis"},
+  vasilis: {person: "Vasilis Daniilidis"},
+  eva: {person:"Evaggelia Deligianni"},
+  eleni: {person:"Eleni Dochtsi"},
   rasmus: { person: "Rasmus Blanck" },
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
@@ -31,9 +35,8 @@ const grammar = {
   Friday: {day:"Friday"},
   "10": { time: "10:00" },
   "11": { time: "11:00" },
-  yes: {response: "yes"},
-  no: {response:"no"},
-  ofcourse: {response:"of course"}
+  agree: ["yes", "yeah", "yup","of course"],
+  disagree: ["no", "nope"]
 };
 
 /* Helper functions */
@@ -54,7 +57,12 @@ function getDay(utterance) {
 function getTime(utterance) {
   return (grammar[utterance.toLowerCase()] || {}).time;
 }
-
+function isTheAnswerYes(utterance){
+  return (grammar.agree.includes(utterance.toLowerCase()));
+}
+function isTheAnswerNo(utterance){
+  return (grammar.disagree.includes(utterance.toLowerCase()));
+}
 
 const dmMachine = setup({
   actions: {
@@ -95,10 +103,10 @@ const dmMachine = setup({
               type: "SPEAK",
               value: {
                 utterance: `Let's create an appointment`,
-              }
+              },
               }),
-            },
-          on: { SPEAK_COMPLETE: "Askwithwhom" } 
+
+          on: { SPEAK_COMPLETE: "Askwithwhom" },
         },
         Askwithwhom: {
           entry: ({ context }) =>
@@ -108,7 +116,7 @@ const dmMachine = setup({
                 utterance: `Who are you meeting with?`,
               },
             }),
-          on: { SPEAK_COMPLETE: "Asktheday" },
+          on: { SPEAK_COMPLETE: "Listenwithwhom" },
           },
           Listenwithwhom: {
             entry: ({ context }) =>
@@ -118,17 +126,17 @@ const dmMachine = setup({
             on: {
               RECOGNISED: [
             {
-              guard: ({context}) => isInGrammar(context.result[0].utterance),
-              target: "Asktheday"
+              guard: ({event}) => isInGrammar(event.value[0].utterance),
+              target: "Asktheday",
               actions: assign({
-                MeetingWithwhom: ({context}) => getPerson(context.result[0].utterance)
-              }),  //function
+                MeetingWithwhom: ({event}) => getPerson(event.value[0].utterance),
+            })},  //function
               
+            {target : "#DM.Done"},
+            ],
             },
-            {target : "Done"},
-              ],
-            },
-            },
+          },
+            
         Asktheday: {
           entry: ({ context }) =>
               context.ssRef.send({
@@ -137,7 +145,7 @@ const dmMachine = setup({
                   utterance: `On which day is your meeting?`,
                 },
               }),
-            on: { SPEAK_COMPLETE: "Askwholeday" },
+            on: { SPEAK_COMPLETE: "ListenTheday" },
           },
           ListenTheday: {
             entry: ({ context }) =>
@@ -147,14 +155,14 @@ const dmMachine = setup({
             on: { 
               RECOGNISED:[
             {
-              guard: ({context}) => isInGrammar(context.result[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
+              guard: ({event}) => isInGrammar(event.value[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
               target: "Askwholeday", 
               actions: assign({
-                Dayofmeeting: ({context}) => getDay(context.result[0].utterance)
+                Dayofmeeting: ({event}) => getDay(event.value[0].utterance),
             }),
               
           },
-          {target : "Done"},
+          {target : "#DM.Done"},
             ],
           },
         },
@@ -167,7 +175,7 @@ const dmMachine = setup({
                     utterance: `Will it take the whole day?`,
                   },
                 }),
-            on: { RECOGNISED: "AskTheTime" },
+            on: { SPEAK_COMPLETE: "ListenThewholeday" },
               },
 
               ListenThewholeday:{
@@ -176,20 +184,17 @@ const dmMachine = setup({
                 type: "LISTEN",
               }),
             on: { 
-              RECOGNISED:[
-            {
-              guard: ({context}) => isInGrammar(context.result[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
-              target: "Verifyappointment", 
-              actions: assign({
-                Dayofmeeting: ({context}) => getTime(context.result[0].utterance)
-            }),
+              RECOGNISED:[ 
+              {
+                guard: ({event}) => isTheAnswerYes(event.value[0].utterance),
+              //get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
+              target: "Verifyappointment"},
+              
+              {target: "AskTheTime"},
+              
+            ],
           },
-          {target : "Done"},
-          ],
-        },
-              },
-
-              }
+      }, 
         AskTheTime: {
           entry: ({ context }) =>
               context.ssRef.send({
@@ -198,11 +203,11 @@ const dmMachine = setup({
                   utterance: `What time is your meeting?`,
                       },
                     }),
-            on: { SPEAK_COMPLETE: "Verifyappointment"},
+            on: { SPEAK_COMPLETE: "ListenTheTime"},
 
           },
 
-          ListenThetime: {
+          ListenTheTime: {
             entry: ({ context }) =>
               context.ssRef.send({
                 type: "LISTEN",
@@ -210,13 +215,13 @@ const dmMachine = setup({
             on: { 
               RECOGNISED:[
             {
-              guard: ({context}) => isInGrammar(context.result[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
+              guard: ({event}) => isInGrammar(event.value[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
               target: "Verifyappointment", 
               actions: assign({
-                Dayofmeeting: ({context}) => getTime(context.result[0].utterance)
+                Timeofmeeting: ({event}) => getTime(event.value[0].utterance),
             }),
           },
-          {target : "Done"},
+          {target : "#DM.Done"},
           ],
         },
       },
@@ -225,16 +230,26 @@ const dmMachine = setup({
               context.ssRef.send({
                 type: "SPEAK",
                 value: {
-                    utterance: `Do you want to create an appointment with ${getPerson(context.MeetingWithwhom)} on ${context.Dayofmeeting} at ${context.Timeofmeeting}?`
+                    utterance: `Do you want to create an appointment with ${context.MeetingWithwhom} on ${context.Dayofmeeting} at ${context.Timeofmeeting}?`,
                       },
                     }),
-            on: {RECOGNISED: "NegPosVerif"},
+            on: {SPEAK_COMPLETE: "NegPosVerif"},
           },
         NegPosVerif: {
-            on: {
-              "yes" : "CreateAppointment",
-              "no" : "Prompt",
-          }
+          entry: ({ context }) =>
+          context.ssRef.send({
+            type: "LISTEN",
+          }),
+          on: {
+              RECOGNISED:[ 
+              {
+                guard: ({event}) => isTheAnswerYes(event.value[0].utterance),
+              //get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
+              target: "CreateAppointment"}, 
+              {target: "#DM.PromptAndAsk.Prompt"},
+              ],
+              
+          },
         },
         CreateAppointment:{
           entry: ({ context }) =>
@@ -244,17 +259,14 @@ const dmMachine = setup({
                 utterance: `Your appointment has been created.`,
                 },
               }),
-          on: {SPEAK_COMPLETE: "Done"},
-          },
+          on: {SPEAK_COMPLETE: "#DM.Done"},
+          },},},
           Done:{
             on:{
-              CLICK : "Prompt"
+              CLICK : "PromptAndAsk"
             },
           },
-
-        },
-      },
-    });
+        },});
             
 
 
