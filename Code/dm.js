@@ -28,6 +28,7 @@ const grammar = {
   eva: {person:"Evaggelia Deligianni"},
   eleni: {person:"Eleni Dochtsi"},
   rasmus: { person: "Rasmus Blanck" },
+  victoria: {person: "Victoria Daniilidou"},
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
   wednesday: {day: "Wednesday"},
