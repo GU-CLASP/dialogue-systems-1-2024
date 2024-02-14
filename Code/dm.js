@@ -36,7 +36,7 @@ const grammar = {
   "10": { time: "10:00" },
   "11": { time: "11:00" },
   "12": { time: "12:00" },
-  "noon": {time: "12 pm"},
+  "noon": { time: "12 pm" },
   "1": { time: "1 pm" },
   "2": { time: "2 pm" },
   "3": { time: "3 pm" },
@@ -49,6 +49,7 @@ const confirm = {
   "of course": { bool: true },
   right: { bool: true },
   yup: { bool: true },
+  yep: { bool: true },
   ja: { bool: true },
   yea: { bool: true },
   yeah: { bool: true },
@@ -79,36 +80,41 @@ function hasBoolean(utterance) {
   return utterance.toLowerCase() in confirm;
 
 }
-  
 
 const dmMachine = setup({
   guards: { //somehow pass last utterance value, store in context.input?; always updated
-    inGrammar: ({ event }) => {
+    isPerson: ({ event }) => {
+      return (isInGrammar(event.value[0].utterance) && getPerson(event.value[0].utterance));
+    },
+
+    isDay: ({ event }) => {
       //return true;
-      return isInGrammar(event.value[0].utterance);
+      return (isInGrammar(event.value[0].utterance) && (grammar[event.value[0].utterance.toLowerCase()] || {}).day);
+    },
+
+    isTime: ({ event }) => {
+      //return true;
+      return (isInGrammar(event.value[0].utterance) && (grammar[event.value[0].utterance.toLowerCase()] || {}).time);
     },
 
     isNegation: ({ event }) => {
       return hasBoolean(event.value[0].utterance);
     },
-
   },
 
   actions: {
         /* define your actions here */
-    notInGrammar: ({ context, event }) => 
+    notInGrammar: ({ context, event }, params) => 
       context.ssRef.send({
         type: "SPEAK",
         value: {
           utterance: `Sorry, ${
             event.value[0].utterance
-          } ${
-            isInGrammar(event.value[0].utterance) ? "is" : "is not"
-          } in the grammar.`,
+          } is ${ params }.`,
         },
       }),
 
-    startListening: ({ context }) =>
+    listen: ({ context }) =>
       context.ssRef.send({
         type: "LISTEN",
       }),
@@ -123,10 +129,9 @@ const dmMachine = setup({
   },
 
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwBWAMwBGHV01auWgGwB2ACwAaEAE9EZgBwn05i0ZMbFTxzscBffxs0dAB1AnFqQXIxIjFiAGEAGQBJBIBpbj4kECFRCWlZBQQvHXQdQ0VtCw01LkUTG3sEJ1UqsxMtS0cNYy4zQOCMcMjo2Ox4uVhYsTB0AgAzWewACn0VLgBKYhCRsSiYuKzZPPFJGRzi0vLK6tr6xrtERyN0Mw0OjR1LRR0unUGIBCOEEAFs8GJSFIIKRYABrMhUegAOQA8ilkZgAKrUY45U4FC6gYomRyqT4mHQNNTeYyOJrPLRaN6+AxmKmKRQWTmA4HYMEQqEw+FYfng+LkTAsdL0BKo1CYJJMahMPECYRnQqXZ4WRzoCw6CxcDmOSyWBkIKlmNTqRwGvx+GrvXkYEHioWwuHoT2YMDYWDSb3w0IAC0ExEl0tl8sVytVvBOGsJRUQfwsNs53nTNJMNUezUNihtfjMnKcil0yhMLtFAsh0M9Qbhvv9gaSImmYCkofDzDlAHFkSlyExkGrcknzimECY6m9PJTqbStPSnpbeuo1Fu1HnOToFzW3YKGyKfX6A1J0O3O92w8Q+6jB8PRxwdNl1fkp9rLVp0+hM5YW4NHmFp-FoihvL+fgNBoJgVp4h5isewpejAYjIAQthNqGIgAMYhhhtgRlKpAynKCpKiq44El+xLPM45S5lwnQvI4W5OBauZ6v03h1Noig9OBiF1h6IpoYRV4drMt54SGECYfeTADkOI5jgm+KTlqdE-o4EFUtm2h2lU1hrpSZTmJoZgrr07yzsJ7onqhYDoZhkk3jh+HyURD5Pqpr7vhOn5afI9EuPuRosSu7Grs0GhfK4FSeGoFRaGouZqPZyGNuJrmej2AA2YCEcRUbkbGVHqR+mpEiFlrpqo3JqB0iVmE4mgWhYuZvDBhrcuYJgDZl9YoegOVYde0kFUVCk+SpL6VYF1XThWTjoF4TIaKxXDaB8Fq-syTWeDxai6X8GhDaJTkueNUldlNxWzc+Y5vomQU1cUfy6eUXJboZ3IaCZzTsnqTh6DocVmCopYZUEQKukhw3Zc5EkTXdYaFQ9SmPnNY6KAFNHBR9K56T9hhGQDFpfBo-4wQJpIrlZF2OaNyO5fC1AiKCYAlaR0YUXG1Gae9qY9GYa1wV8Rg8S8WgWlZFiuE1rX-FadpMyNY1udJHNc4pylPYLb3LV0errVom0rtt5tmJxJ3oEYnUqHoXx2gCsN8iJzOa6jUg69zj1+S9GlG9+fgfOLVR-FDAlMpxK7-hYnXcl0FZ1G7Qy1g5I0JLgBCzPdmGkHgEI82RMaUfG+NC8tLzU+mXJcHapR+Ht7jqJ8x2neb6uNjnYB52AftFyXka82VFeG0t34x2UsENMopjNXacu-P+vjg84sH9F8Pcij7w9iAk0gLCI2Cgnr2MGwtBPCz+Nr1L+nI0n8pI22u+6rSWTJAdo6dw5nWU963SkAfI+UgT5nwvr5F8QcqrJm-D0Fw9NNqbUsKYWooEmQNVduBRO+5167y9PvYuh9j6n3PgHF8eNXpT20qWckC4qSzmXDFVMeD-yP1qFZZKbEAjuwwMgaQ3NkhpEyNfauodUroAftyIsvxTCmllmuU0ep2jmBXAaCssFAiwykIICAcBZBoBofA7SABafMiAzEVk3NuOxdjG6IXwEQMAJjaK1W5HLDcbgjCGi4BYUGFgax7AOOMMQbjCaIBXGULkvx2R1GtBvSxLRTTlDQcxLwPgKiEIibfOCNoKRMJpJDFccd9R2NLOvRuTJCHoBDFJXJ047Q2mzFuRwdpQbmmUbBaR-RX6eE6pWWpR5wnB1obVSGDDYJFJYaBKoLgToRQCd8GyMMM4jMuk2FsF5Gmh0NKbH4uZwZpV8IDVMXJqYVlkXaMyDtalnlbJePKYZdnaT0GlNahyDS1FJIaTBnVvpWRMA-cCA1zr8IAYjU88JtltmAT2V5tV9w2K3JSU6cVfBKILL+PUcFLDfF+UuWpY1EUklavOaZS4SmsIQF0MWnIFwP33MCgJxLWZYWebJQipKHBVApYuZh1LOIGHKNMvpupNo8ghRsr27KtZo1kl5Hllp9yqDUF0dMwLkGJ04noVw0yjppRQWy662F0bTWaHA9xH1IYQWNLBIFs5YI7kpnOASYNwIQysnw9ZCNNne3hea7lYzTFIvBtTdVgEtW1x1WuXoCtPBGF8JoNi7xnTSr9bK01no-bKu+MYdQup6jcmtNUGlTqWR6F1N4Xo+g-4eyzkjU1Ptc0hutUoP4EENo7nWgNI0WLECzlUevat7xjTGlqX3AeBdbAH2VfPam+zE6kmcKlXSe1lDt3SrOb4S6gkZs9tnXOswh4kPnZ4bizheruCslZW2w6q26THXW2pxCIRgIgaCZV7JVDbR6B8LV7hwagQBhBV+Ds6jAtvTWQRUhXFtsiQgTxyiGKuzpFmd4rKdFAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwBWAMwBGNV23auANjVaANCACeiAOwAOY+mO2ALBvu6zrxboC+fpZo6ADqBOLUguRiRGLEAMIAMgCS8QDS3HxIIEKiEtKyCggaijroehquPsZaxvZctraWNggOqooatpqNriqdAUEYYRFRMdhxcrAxYmDoBABmM9gAFDoqKgCUxMHDYpHRsZmyueKSMtlFJWUVVYo1dQ1N1oieqrad+u9aWo9qAyDBHCCAC2eDEpCkEFIsAA1mQqPQAHIAeWSiMwAFVqEdsid8udQEUHuhbMYNDUtMoNJ1FPZmi9viT7Dpaj53lUtH9AgCMEDQeDIdCYVhsCCwcRyJgWGl6PFkahMIkmNQmDiBMJTgULi9XPZ0K4dD5vvZPIozTp6QgdIouup7O4fi4uI41K5-oDRfyIVDYeghZgwNhYNI-bCQgALQQSqWkGVyhVKlVqnIa-GFRAs1xOLhmxTuSqu7yWw2KNTley2LSGLSuNQdd28z1g71C0MwgNBkOJERTMBSCNR5hygDiiOS5CYyGTeLO6YQpjeZIpVJpdOeVo0ZXWXBZxhzJi0jgbIrFAp9wv9geDUnQ3d7-cjxCHyNH48nHB0WXVeVn2qtNezXN81rWsa2Lb5FBJGsqzqXw1HsLlBhPL1BV9YcwDEZACCsNsIxEABjcMsKsaNpVleVFWVVVeGOVNf0JF5HHKYxejzQ0qh0a1LRYvUGlLV46mZNQdGPPlm1Q4V0Mw7Dbx7GYHwI8MIGwp8mBHMcJynGjcTorUGP-Hx9TUYzbF8Vwa3cbjOOcLpK2MXxSW0WxRKbM9Wyk4jZPvPDCOUkjn1fTSPy-FMfz0+RGKcHQWJzA0qgNLj12pMpjD0Tx7GpSkyRc08WzQjDPKFAcABswGI0jY3IhMqOnXSCQiq13FUeoszrOtWIsdcs1cEk7g0OtjD3CsbWc7kPVyiT0A8mS73kkqypUgKNPfbTv01eqijNCt0C4LMMptLRSTJS1oPURyzBZHN+q0HKUPPKaCpmuS+3m8qlrfKdP1osKNozGtINrEyzIsjRLVsHQ9QcTM80pewOkUW7xPu6acNml7I1Kt61JfZap0UEKZ3CopoaMoHoKqUGkp0DR0DNMlhNM5RjOMRG3Py6ScKFagRGBMAKrjCjE2ogm6rnCGdFsdRDsBvc7irNQwZrZx4J3Mlajh0akLEtnJMe1HnqkbnedU9SPtqn65y2yXdrqEpKyOymWlMPUflcUk1FsAxBui1m8t1jmvPko2+feoKvp0i2-3FyWzDcZmcxqfruMPWmqmGnNrVM+xfcm+JcAIGZXuw0g8HFSUyPjSik1W0L1sttwep3DwyUNcHDRO8yzvp3Qfg6V0c-uvOwALsBg5LsuYwF6rq5FyP9JtFlnC4TQPdMWkK06lpTLKWld09wa608AfWzRqRx7EeJpHmERsGBE2cbNmvCd+-8yxzKtqYlt3HG+YsXD1CGlYIbKDuNFFmY1GwTXuqfc+l8pDX1vvfQK75w5rTTH+DKWh9SeD0MZD2zpl7gR+NgnwnhORrEGuArWrk-aBz7LAq+N876h3fPjb6dc-ymUXOSCCBhVzFg4rTf6pJHBHUQjydAyBpB8ySKkDIT9RZR05DtXwm5NxuAcPZJ4LQKx6g6F0aKfVqZH3+FIQQEA4CyDQOw9B+kAC0xhLR2N8OoPBbj3HOhcvgIgYAbH0Qaj4MGGhVAuCzHcTQuhBoaGPLsfYYwxB+KJogQ8O8jSHjJPbYSjs7DbS-h4Lw-1-AQOQkjIUiSX72TLI5ZcfCs7J3QME9YDw1heGzsU7WtDwxyXKXOe0ZZAb6AQp4T2bhLQZWzA0fQvR6ge0qMfX02semcJUCSJcvDqR1PXNackdo06Ukyu8eZF5YQdmvEs-SnF3DoEOoeA0rosx1AtFsvMNMzLuE0GaLoCN2k0MmpeTsN4iqRnOQ1TiZhrmVntHoKog1mTgSzOUG0wTTDgwdG6H5UDWz-OvHQh8ggQXE3sm8TQtZyQlFrDmeFeotHIo9oabQ6LqGYvZsRAliAXCS2qes-h65DqSzph4QV8FpmMokR0yaKNcJdMIqyiOHD9KmRplyyktTaTcWXuUcktJUqeB8HMjFd13J61xT5JS2E2VWmiqoWObsWQgMpFZFKWrHAQ3+toI5D0A5AsEJjc1crbGgsGpBTkJgSzCS4JSTeiB+rtGZEinMbgtoeslafIuLQ0H+OJtTGmNrwYqt8IoS0wSepqxZFwyontvjJuNVzHmvj-WZozINHqlJSxVlISaLM3FNBMhZHoFu5kazVoDqfYOFqmaQXBsvLMjR7Tkm0ey+CtNmReAHd8UV41DW+iHiPNN59x3aCwS4CGmh6ggKeS0FVXdUpqFSiModBrSnbvzjMMepcEkNqSQgDovRyiw1LF0EozJXDdr0Suuowlb2cm+UyrdwoYHvrgQg4EFrwZlkGjmUosNjQXozJUSCdRTKVk6I4Phx4pFSHrRmr9gT1wmicFCtivgTA6oCAEIAA */
   context: {
     count: 0,
-    input: '',
     who: '',
     day: '',
     time: '',
@@ -143,7 +148,6 @@ const dmMachine = setup({
       ],
       on: { ASRTTS_READY: "WaitToStart" },
     },
-
     WaitToStart: {
       after: {
         10000:  "PromptAndAsk",
@@ -152,13 +156,11 @@ const dmMachine = setup({
         CLICK: "PromptAndAsk",
       },
     },
-
     PromptAndAsk: {
       initial: "Prompt",
       on: {
         ASR_NOINPUT: {
           target: "PromptAndAsk.hist",
-          //reenter: true,
           actions: [{
             type: "say",
             params: "I didn't hear you",
@@ -167,8 +169,13 @@ const dmMachine = setup({
       
       states: {
         hist: {
-          type: 'history', //why does it keeo going to AskWho??
+          // I tried different positions for the hist state; here on PromptAndAsk as well as on
+          // DM, with both deep/shallow and reenter true/false. My only results were no transition,
+          // or transitions to AskWho. Additonally, I experimented with the placement and reenter conditions
+          // on ASR_NOINPUT, but to no avail.
+          type: "history", //why does it keeo going to AskWho?
           history: "deep",
+          reenter: true,
         },
         Prompt: {
           entry: [{
@@ -188,25 +195,27 @@ const dmMachine = setup({
               on: { SPEAK_COMPLETE: "ListenWho" },
             },
             ListenWho: {
-              entry: "startListening",
+              entry: "listen",
               on: {
                 RECOGNISED: [{
-                  guard: "inGrammar", //tbd: & is person
-                  target: "#DM.PromptAndAsk.getDay",
+                  guard: "isPerson",
+                  target: "#DM.PromptAndAsk.GetDay",
                   actions: assign ({
                     who: ({ event }) => getPerson(event.value[0].utterance)
                   }),
                 }, {
-                  target: "AskWho", //latER: make sure it asks who to meet with again
-                  actions: "notInGrammar",
-                  reenter: true,
+                  target: "AskWho", //later: make sure it asks who to meet with again?
+                  actions: [{
+                    type: "notInGrammar",
+                    params: "not available",
+                  }],
+                  reenter: true, // no effect?
                 }],
               },
             },
           },
         },
-
-        getDay: {
+        GetDay: {
           initial: "AskWhichDay",
           states: {
             AskWhichDay: {
@@ -219,17 +228,20 @@ const dmMachine = setup({
               on: { SPEAK_COMPLETE: "ListenWhichday" },
             },
             ListenWhichday: {
-              entry: "startListening",
+              entry: "listen",
               on: {
                 RECOGNISED: [{
-                  guard: "inGrammar",
+                  guard: "isDay",
                   target: "AskWholeDay",
                   actions: assign ({
                     day: ({ event }) => event.value[0].utterance,
                   }),
                 }, {
-                  target: "AskWhichDay", //latER: make sure it asks when to meet with again (see person issue)
-                  actions: "notInGrammar",
+                  target: "AskWhichDay", //re-raise?
+                  actions:[{
+                    type: "notInGrammar",
+                    params: "not a valid day",
+                  }],
                 }],
               },
             },
@@ -245,17 +257,20 @@ const dmMachine = setup({
               on: { SPEAK_COMPLETE: "ListenWholeDay" },
             },
             ListenWholeDay: {
-              entry: "startListening",
+              entry: "listen",
               on: {
-                RECOGNISED: [{ // if 'Yes' -> create whole day appt
+                RECOGNISED: [{
                   guard: ({ event }) => asBoolean(event.value[0].utterance),
                   target: "#DM.PromptAndAsk.CreateWholeDayAppt",
-                }, { // if 'No' -> ask time
+                }, {
                   guard: "isNegation",
                   target: "AskTime",
                 }, {
-                  target: "AskWholeDay", //latER: make sure it asks if whole day again
-                  actions: "notInGrammar",
+                  target: "AskWholeDay", //re-raise?
+                  actions:[{
+                    type: "notInGrammar",
+                    params: "not a clear confirmation nor negation",
+                  }],
                 }],
               },
             },
@@ -267,23 +282,25 @@ const dmMachine = setup({
                 on: { SPEAK_COMPLETE: "ListenTime" },
             },    
             ListenTime: {
-              entry: "startListening",
+              entry: "listen",
               on: {
                 RECOGNISED: [{
-                  guard: "inGrammar",
+                  guard: "isTime",
                   target: "#DM.PromptAndAsk.CreateTimeAppt",
                   actions: assign ({
-                    time: ({ event }) => event.value[0].utterance,
+                    time: ({ event }) => getTime(event.value[0].utterance),
                   }),
                 }, {
-                  target: "AskTime", //latER: make sure it asks what time
-                  actions: "notInGrammar",
+                  target: "AskTime", // re-raise?
+                  actions: [{
+                    type: "notInGrammar",
+                    params: "not an available timeslot",
+                  }],
                 }],
               },
             },
           },
         },
-        
         CreateWholeDayAppt: {
           entry: [{
             type: "say",
@@ -306,14 +323,14 @@ const dmMachine = setup({
               } on ${
                 context.day
               } at ${
-                getTime(context.time)
+                context.time
               } ?`;
             },
           }],
             on: { SPEAK_COMPLETE: "ListenApptConfirm" }
         },
         ListenApptConfirm: {
-          entry: "startListening",
+          entry: "listen",
           on: { 
             RECOGNISED: [{
               guard: ({ event }) => asBoolean(event.value[0].utterance),
@@ -327,15 +344,17 @@ const dmMachine = setup({
               target: "#DM.PromptAndAsk.AskPerson",
               reenter: true,
             }, {
-              target: "ListenApptConfirm",
-              actions: "notInGrammar",
+              target: "#DM.PromptAndAsk.hist",
               reenter: true,
-            }]
+              actions: [{
+                type: "notInGrammar",
+                params: "not a clear confirmation nor negation",
+              }]
+            }],
           },
         },
       },
     },
-
     Done: {
       on: {
         CLICK: "PromptAndAsk",
