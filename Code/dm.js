@@ -39,11 +39,6 @@ const grammar = {
   positive : ["yes", "of course", "sure", "yeah", "yea","yup"],
 };
 
-/*const grammarUnderstanding = {
-  //continue : ["okay", "ok"],
-  positive : ["yes", "of course", "yeah","sure"],
-  //negative : ["no", "no way"],
-};/*
 
 /* Helper functions */
 function isInGrammar(utterance) {
@@ -113,6 +108,11 @@ const dmMachine = setup({
         CLICK: "PromptAndAsk",
       },
     },
+    WaitToStart2 : {
+      on : {
+        CLICK : "PromptAndAsk",
+      },
+    },
     PromptAndAsk: {
       initial: "Prompt",
       states: {
@@ -152,7 +152,7 @@ const dmMachine = setup({
             type : "listen"
           }],
           on: { RECOGNISED : "Ask",
-        ASR_NOINPUT : "#DM.WaitToStart" },
+        ASR_NOINPUT : "#DM.WaitToStart2" },
         },
         Ask: {
           entry: [{
