@@ -24,7 +24,7 @@ Understanding (CLU) in Azure.
   automatic classification of sentences (or expressions) performed by
   a model/machine.  In order to get the model to recognize your
   intents, you will have to train them first with examples of what
-  sentences with such intents look like. The model will avarage those
+  sentences with such intents look like. The model will average those
   sentences to infer your intents. We won't use entities until point
   (6).
 
@@ -50,7 +50,10 @@ choose =appointment=. (When you re-train the model later on, select
   first need to deploy it. Choose "Deploying a model" in the
   navigation menu and then "Add deployment". Again, as deployment name
   you can choose =appointment=. (When you re-train your model later on
-  and want to re-deploy it, overwrite the existing deployment name.)
+  and want to re-deploy it, overwrite the existing deployment name.) 
+  After deploying, you can see the URL of your deployment by selecting 
+  the model and clicking on "Get prediction URL". You will need it in 
+  step 4.3 below.
 
 ** 4) Integrate the model
 
@@ -71,8 +74,7 @@ choose =appointment=. (When you re-train the model later on, select
      #+begin_src javascript
 
        const azureLanguageCredentials = {
-         endpoint:
-           "https://speechstate.cognitiveservices.azure.com/language/:analyze-conversations?api-version=2022-10-01-preview",
+         endpoint: "" /** your Azure CLU prediction URL */,
          key: NLU_KEY /** reference to your Azure CLU key */,
          deploymentName: "" /** your Azure CLU deployment */,
          projectName: "" /** your Azure CLU project name */,
