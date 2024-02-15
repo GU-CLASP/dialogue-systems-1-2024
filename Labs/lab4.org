@@ -1,0 +1,55 @@
+#+OPTIONS: num:nil
+
+#+TITLE: Lab IV. Natural language understanding
+
+* Task 1: Integrate a statistical NLU in your dialogue system
+In lab 2 (basic dialogue management), you used a simplistic mapping (called "grammar" in the code) from user utterances to intents and entities. In the first task of this lab, you will replace this grammar with a statistical NLU trained and deployed using Conversational Language Understanding (CLU) in Azure.
+
+** Create an NLU project in Azure
+Go to https://language.cognitive.azure.com/ and ensure that you are signed in with your Azure account. Choose Create new -> Conversational language understanding. As part of this, you may need to create a new Azure language resource. Note that resource names are unique across the entire Azure platform, so you may need to include some arbitrary digits or numbers in it (e.g. language_resource_57372).
+
+As project name, you can e.g. enter *appointment*.
+
+** Add intents
+Create two intents, corresponding to "create a meeting" and "who is X". Make sure to use the same names for these intents as you do in your code. Choose "Data labeling" in the navigation menu to the left and add 10 training examples for each intent. (At this stage, you can come up with examples on your own. You can improve the training data later.)
+
+To train the model for the first time, choose "Training jobs" in the navigation menu and select "Train a new model". As model name, you can choose *appointment*. (When you re-train the model later on, select "Overwrite an existing model".)
+
+** Deploy the model
+In order to use your trained model in your dialogue system, you first need to deploy it. Choose "Deploying a model" in the navigation menu and then "Add deployment". Again, as deployment name you can choose *appointment*. (When you re-train your model later on and want to re-deploy it, overwrite the existing deployment name.)
+
+** Integrate the model
+Upgrade your codebase to get NLU results from Azure by merging a change that we have prepared, as follows:
+- In the github web interface, create a new branch for your fork, with the name "azure-nlu". As source, choose the "azure-nlu" branch from the GU-CLASP repo.
+- If you have any uncommited changes in your local working copy, commit them.
+- In your local working copy, fetch branches. If you use the "git" command-line interface, you can run "git fetch --all".
+- Merge the new branch, e.g. "git merge azure-nlu". If there are any conflicts, you will need to resolve them.
+
+Then, configure your NLU by adding the following attributes in static/index.html:
+- data-azure-nlu-key: This is KEY 1 for your Azure language resource. (Note: *Not* same as for your speech service.)
+- data-azure-nlu-url: You get this from the deployment section of CLU. Click the deployment and then "Get prediction URL".
+- data-azure-nlu-project-name: Your project name in CLU, e.g. *appointment*.
+- data-azure-nlu-deployment-name: Your deployment name in CLU, e.g. *appointment*.
+
+Finally, you need to rewire the logic in your code that concerns intents and entities. Results from CLU are available in the field "nluResult" in the context.
+
+** Test
+Validate via manual testing that your dialogue system now uses your deployed NLU model rather than the old "grammar". At this stage, note that only the two intents are supported, and no entities. This is fine for now.
+
+** Add entities
+Go back to the schema definition and add the entities that you need, e.g. for meeting title, meeting time, yes/no, etc. Again, choose entity names corresponding to those in your code.
+
+Note that CLU supports different methods for extracting entities. You will need to choose the most relevant method for each entity.
+
+Note also that meeting title is a bit trickier than other entities, since almost anything can be a title. Don't worry about choosing the "wrong" method for an entity; whatever method you choose, you can always improve things later.
+
+* Task 2: Improve NLU
+Based on insights from testing your own system, and from having the system tested by peer students, you should now try to improve NLU coverage. There are no specific requirements concerning how much coverage you need. You are not expected to spend more than an hour on this task.
+
+* Submission
+Export your NLU project by choosing "Projects" in the navigation menu to the left, then select your project and click Export. (You might need to unblock a pop-up window.) Save the exported content as a JSON file (.json extension).
+
+Submit:
+- link to your forked repo
+- URL of the deployed app
+- your exported NLU model (JSON file)
