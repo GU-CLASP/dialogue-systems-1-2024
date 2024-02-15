@@ -1,5 +1,5 @@
 import "./style.css";
-import { setupButton } from "./dm4.js";
+import { setupButton } from "./dm.js";
 
 document.querySelector("#app").innerHTML = `
   <div>
