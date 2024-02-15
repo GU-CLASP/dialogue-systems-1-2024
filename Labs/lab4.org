@@ -67,17 +67,24 @@ You can use those in your conditions. This is used instead of working with a gra
 Validate via manual testing that your dialogue system now uses your deployed NLU model rather than the old "grammar". At this stage, note that only the two intents are supported, and no entities. This is fine for now.
 
 ** 6) Adding entities
-Go back to "Schema definition" and add the entities that you need, e.g. for meeting title, meeting time, yes/no, etc. Again, choose entity names corresponding to those in your code.
+Entities are specific names (named entities) such as locations, people, organizations... and other concepts such as emotions, opinions... and are used to extract meaningful information from sentences.
+A sentence such as "Get tickets for Taylor Swift's concert in Sweden" could be classified as "Intent: Buy tickets" and have the entities "Artist: Taylor Swift", "Country: Sweden".
+You can read more about labeling here: https://learn.microsoft.com/en-us/azure/ai-services/language-service/conversational-language-understanding/how-to/tag-utterances?tabs=portal
 
-Note that CLU supports different methods for extracting entities. You will need to choose the most relevant method for each entity.
+To get started, go back to "Schema definition" and add the entities that you need. For example, in the case of the appointment intent, you can have entities such as: "meeting title", "meeting time", "yes/no", etc. Again, entity names should correspond to those in your code.
+
+There are two ways of creating entities: by the "Schema definition" menu or inside "Data labeling". 
+
+For the first option, you can select prebuilt entities or give a list with your entities.
+
+For the last option, by hovering over a sentence that has been used/is going to be used as training for your intent, an opeening square bracket will appear, this marks the start of the entity. After clicking, a closing square bracket will appear, then you can click to choose the end of what you consider an entity. By training the model with such labeled entities, the model will (try to) learn the pattern of what they are.
+
+You can experiment and choose the most appropriate method for each entity.
 
 Note also that meeting title is a bit trickier than other entities, since almost anything can be a title. Don't worry about choosing the "wrong" method for an entity; whatever method you choose, you can always improve things later.
 
 * Task 2: Improve NLU
 Based on insights from testing your own system, and from having the system tested by peer students, you should now try to improve NLU coverage. There are no specific requirements concerning how much coverage you need. You are not expected to spend more than an hour on this task.
-
-* Submission
-Export your NLU project by choosing "Projects" in the navigation menu to the left, then select your project and click Export. (You might need to unblock a pop-up window.) Save the exported content as a JSON file (.json extension).
 
 Submit:
 - link to your forked repo
