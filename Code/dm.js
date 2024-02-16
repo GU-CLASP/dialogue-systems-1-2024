@@ -70,12 +70,9 @@ const dmMachine = setup({
       }, 10000);// 10s limit
     },
     clearFields: assign({ name: null, day: null, time: null }),
-    assignName: assign({ name: (context, event) => {
-      console.log(event.flag);
-      getPerson(event.value[0].utterance);
-   } }),
-    assignDay: assign({ day: (context, event) => getDay(event.value[0].utterance) }),
-    assignTime: assign({ time: (context, event) => getTime(event.value[0].utterance) }),
+    assignName: assign({ name: ({context, event}) => getPerson(event.value[0].utterance) }),
+    assignDay: assign({ day: ({context, event}) => getDay(event.value[0].utterance) }),
+    assignTime: assign({ time: ({context, event}) => getTime(event.value[0].utterance) }),
   }
 }).createMachine({
   context: {
@@ -129,7 +126,7 @@ const dmMachine = setup({
                   } in the grammar.`,
                 },
               }),
-            //"assignName",
+            "assignName",
           ],
           target: "WaitingForSpeakComplete1",
         },
@@ -170,7 +167,7 @@ const dmMachine = setup({
                 }   in the grammar.`,
               },
             }),
-            //"assignDay",
+            "assignDay",
           ],
           target: "WaitingForSpeakComplete2",
         },
@@ -194,8 +191,8 @@ const dmMachine = setup({
       }, 
       on: {
         RECOGNISED: [
-          { target: "ConfirmCreateFullDayAppointment" , guard: (context, event) => isYes(event.value[0].utterance) },
-          { target: "AskTime" , guard: (context, event) => isNo(event.value[0].utterance) },
+          { target: "ConfirmCreateFullDayAppointment" , guard: ({event}) => isYes(event.value[0].utterance) },
+          { target: "AskTime" , guard: ({event}) => isNo(event.value[0].utterance) },
         ]
       },
     },
@@ -207,10 +204,12 @@ const dmMachine = setup({
     },
     CreateFullDayAppointment: {
       entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
-      on: [
-        { target: "AppointmentCreated", guard: (context, event) => isYes(event.value[0].utterance) },
-        { target: "AskPerson", guard: (context, event) => isNo(event.value[0].utterance), actions: "clearFields" },
-      ],
+      on: {
+        RECOGNISED: [
+          { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
+          { target: "AskPerson", guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
+        ],
+      },
     },
     AskTime: {
       entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "What time is your meeting?"),
@@ -230,14 +229,21 @@ const dmMachine = setup({
     },
     ConfirmPartialDay: {
       entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
-      on: [
-        { target: "AppointmentCreated", guard: (context, event) => isYes(event.value[0].utterance) },
-        { target: "AskPerson", guard: (context, event) => isNo(event.value[0].utterance), actions: "clearFields" },
-      ],
+      on: {
+        RECOGNISED: [
+          { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
+          { target: "AskPerson", guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
+        ],
+      },
     },
     AppointmentCreated: {
       entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Your appointment has been created!"),
-      type: "final",
+      SPEAK_COMPLETE: "#DM.Done",
+    },
+    Done: {
+      on: {
+        CLICK: "Prompt",
+      },
     },
   },
 });
