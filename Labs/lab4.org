@@ -154,4 +154,14 @@ coverage you need. You are not expected to spend more than an hour on
 this task.
 
 * Submit:
-- link to your forked repo
+Export your NLU project by choosing “Projects” in the navigation menu
+to the left, then select your project and click Export. (You might
+need to unblock a pop-up window.) Save the exported content as a JSON
+file (.json extension).
+
+*Commit* your changes (new file =dm4.js=) and *push* them to your repository
+  (your fork of this repository). This will update your pull request.
+
+Submit:
+- link to your pull request
+- your exported NLU model (JSON file)
