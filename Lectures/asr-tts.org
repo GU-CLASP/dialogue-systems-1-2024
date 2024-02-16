@@ -1,0 +1,211 @@
+* Automatic speech recognition
+*ASR applications*
+- fixed commands
+- grammars (e.g. date)
+- continuous speech recognition (huge vocabulary)
+
+*What is ASR*:
+- The aim is to decode the acoustic signal *X* into a word sequence *Ŵ*
+  which is hopefully close to original word sequence *W*.
+- We need an *acoustic model* that represent our knowledge about acoustics, phonetics, microphone, environment, speakers, dialects, etc.
+- And a *language model*, that knows about words (and non-words), how they co-occur and form sequences (utterances)
+
+*Variability in speech*
+- context variability (/pin/ vs /spin/), coarticulation
+- style variability (“Ford or” vs “Four door”), easier in isolation
+- speaker variability (more than 500 speakers for speaker-independent
+  ASR)
+- environment variability
+
+*Formal definition*
+- The aim is to decode the acoustic signal *X* into a word sequence *Ŵ*
+  which is hopefully close to original word sequence *W*.
+- We can observe the set of parameters *O* (observations) for the
+  acoustic signal.
+- In the following equation acoustic model would be responsible for P(O|W) and language model for P(W)
+  
+\[
+W = \argmax_W P(W | O) = \argmax_W \frac{P(O|W)P(W)}{P(O)} = \argmax_W P(O|W)P(W)
+\]
+
+*But how do we calculate P(O|W)?*
+- Can we use words? Yes, but then there will be a huge range of
+  observations.
+- We can minimise the number of possible observations? Yes, by selecting some smaller phonetic units.
+
+
+*Why word is not a good unit:*
+- New task can have new words but we won’t have any training data.
+- There are too many words, and each of them has too many acoustic realisations. 
+
+*Good unit is:*
+- *accurate*, to represent acoustic realisation in different contexts
+- *trainable*, we should have enough data to estimate the parameters of
+  the unit
+- *generalisable*, so new word could be derived from our units
+
+*What about phonemes?*
+- Just 50 phones in English, no problem to train.
+- They are vocabulary-independent.
+- But phonemes are not produced independently, they are
+  context-dependent, so they can over-generalise.
+- For some languages we can use syllables (1200 in Chinese, 50 in
+  Japanese) but for English (30k+) training is challenging.
+
+*How can we capture context dependency?*
+- A *triphone* phonetic model: it takes into consideration the left and
+  the right contexts.
+- They capture coarticulation.
+- Features: typically 
+
+*Different but similar*
+- It is desirable to find instances of similar contexts and merge
+  them.
+- This would lead to a much more managable number of models that can
+  be trained.
+- We can use phonetic Hidden Markov Models (HMM) as the basic subphonetic unit.
+
+*Phonetic HMMs*
+- Another challenge: variable length of observations for each phoneme.
+- HMM can describe how states (set of features) are distributed in the
+  phoneme.
+- We observe only the acoustic features, but the states are hidden.
+
+*ASR architecture*
+- frames (10ms), feature extraction
+- Mel-frequency cepstral coefficients (MFCCs) are used as an input to
+  individual Gaussian distribution for each phone
+- models (e.g. HMM model of a senone)
+- decoding is integral path: the process which transforms the signal
+  into word hypotheses.
+
+*ASR decoding*:
+- Using Viterbi or other methods, multiple ‘top’ hypotheses can remain
+- The possible outcomes can be stored in a *word-confusion network*
+  (sausage) or a *lattice*.
+
+*Evaluation*
+- Levenshtein distance/alignment
+- $WER = \frac{S + D + I}{N}$
+
+*Incrementalising ASR*
+- We need incremental ASR, which would require incrementalising all
+  the internal processes.
+- We need incremental LMs and AMs, in order to get the best sequences unit-by-unit.
+- It is critical that ASR will provide timing for recognised words in a timely manner.
+
+*ASR should support disfluencies*
+- e.g. “have the engine [ take the oranges to Elmira, + { um, I mean, } take them to Corning ] ” (Core and Schubert 1999)
+- ‘um’ and ‘uh’ should be considered English words
+- it is important to have access to “the oranges” in ASR output
+- incremental disfluency detector (Hough and Purver, 2014)
+
+*Incremental evaluation (Baumann et al., 2017[fn::Baumann, T., Kennington, C., Hough, J., & Schlangen, D. (2017). Recognising conversational speech: What an incremental asr should do for a dialogue system and how to get there. In Dialogues with Social Robots (pp. 421-432). Springer, Singapore.]) I* 
++ Utterance-level Accuracy and Disfluency Suitability
+  - WER disfluency gain to determine how much of disfluent material is recovered
++ Timing: first occurence (FO) and final decision (FD):
+  - FO is the time between the (true) beginning of a word and the
+    first time it occurs in the output (regardless if it is
+    afterwards changed)
+  - FD is the time between the (true) end of a word and the time when
+    the recognizer decides on the word, without later revising it
+    anymore.
+
+*Incremental evaluation (Baumann et al., 2017) II* 
++ Diachronic Evolution: how often consuming processors have to
+  re-consider their output and for how long hypotheses are likely to
+  still change. 
+  - stability of the hypotheses. For words that are added and later
+    revoked or substituted we measure the “survival time” and report
+    aggregated plots of word survival rate (WSR) after a certain age.
+
+
+* TTS and speech synthesis
+*TTS challenges*
+- From the last lecture: coarticulation
+- Text normalisation
+- Homography
+- Code-switching (and borrowed words)
+- Morphology
+
+*Text normalisation*
+- abbreviations and acronyms: Dr., DC, NASA, COVID-19
+- number formats, e.g. IBM 370, dates, times and currencies
+- ~, Ü, *, "", UPPER CASE, :-)
+
+*Homograph disambiguation*
+- Homograph variation can often be resolved on PoS (grammatical)
+  category, e.g. /object/, /bass/, /absent/, /-ate/
+- But sometimes PoS does not help, e.g. /read, /kinda/
+- Variation of dialects
+- Rate of speech (e.g. ‘g’ in /recognise/)
+
+*What is TTS:*
+- text and phonetic analysis, grapheme-to-phoneme
+- prosody
+- speech synthesis
+
+*Prosody*:
+- speaking style (character and emotion)
+- symbolic prosody (pauses, punctuation)
+- accent and stress
+- tone (e.g. yn- vs. wh-questions)
+
+*Speech synthesis*
+- Articulatory synthesis (https://www.youtube.com/watch?v=wR41CRbIjV4)
+- Rule-based formant synthesis: https://www.youtube.com/watch?v=TZh6ZYYqLJc, [[https://en.wikipedia.org/wiki/DECtalk][DECtalk]]
+- Concatenative synthesis
+- Statistical parametric synthesis (generative synthesis)  
+- Deep learning-based synthesis
+
+*Concatenative synthesis* (or unit-selection)
+- Searches for the best sequence of (variably sized) units of speech
+  in a large, annotated corpus of recordings, aiming to find a
+  sequence that closely matches the target sequence.
+- Sounds good if you fit the bits well. Also can be tuned.
+- Can be really expensive to build: need professional speakers, many
+  hours of stable recordings.
+
+*Statistical parametric speech synthesis*
+- Essentially, reproduces the speech signal.
+- Break speech into several factors and represent it as numbers.
+- Learn the model from data.
+- From the model we can generate a spectrogram and then create a waveform.
+
+*HMM speech synthesis*
+- HMM consists of a) sequence model: a weighted finite state network
+  of states and transitions 2) observation model: multivariate
+  Gaussian distribution in each state
+- HMM has many decision-tree context-dependent triphones and three
+  states per triphone.
+- Generates most likely sequence for the given phoneme(s).
+- A global optimisation then computes a stream of vocoding features
+  that optimise both HMM emission probabilities and continuity
+  constraints.
+
+*Neural speech synthesis*
+- text to features
+- features to sound (neural vocoder)
+- sequence2sequence models (e.g. RNN, GRU)
+- e.g. LPCNet, WaveNet
+
+*Some advanced matters*
+- adapting voices, by changing a few parameters in the model
+- repairing voices
+- Simon King - Using Speech Synthesis to give Everyone their own
+  Voice: https://youtu.be/xzL-pxcpo-E
+- Incrementality: INPRO_iSS https://www.youtube.com/watch?v=kwNvcUXfD7Y
+
+*Evaluation*
+- Intelligibility tests, e.g. rhyme tests
+- Quality tests: mean opinion scores (MOS) and preference test
+- Functional tests
+- Automated tests, mainly for letter-to-sound or prosody
+
+*Speech Synthesis Markup Language (SSML)*
+- [[https://www.w3.org/TR/speech-synthesis11/][W3C standard]]
+- [[https://cloud.google.com/text-to-speech/docs/ssml][Google TTS]]
+- Amazon Polly: [[https://developer.amazon.com/en-GB/docs/alexa/custom-skills/speech-synthesis-markup-language-ssml-reference.html][Docs]], [[https://console.aws.amazon.com/polly/home/SynthesizeSpeech][Test]]
+- IBM Watson:[[https://cloud.ibm.com/docs/services/text-to-speech?topic=text-to-speech-ssml&cm_mc_uid=40249035982415833944697&cm_mc_sid_50200000=96929811583394469719&cm_mc_sid_52640000=99688681583394469725][Docs]], [[https://www.ibm.com/demos/live/tts-demo/self-service/home][Demo]]
+- Azure TTS: [[https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/index-text-to-speech][Docs]], [[https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/#features][Demo]]
+

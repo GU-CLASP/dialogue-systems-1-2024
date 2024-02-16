@@ -8,5 +8,5 @@ Practice:
 - Lab I (see Canvas)
 - [[Labs/lab2.org][Lab II]]
 - [[Labs/lab3.org][Lab III]]
-- Lab IV
+- [[Labs/lab4.org][Lab IV]]
 - Lab V

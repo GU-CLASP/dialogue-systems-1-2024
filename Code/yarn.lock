@@ -1744,6 +1744,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@statelyai/inspect@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@statelyai/inspect@npm:0.2.3"
+  dependencies:
+    fast-safe-stringify: ^2.1.1
+    isomorphic-ws: ^5.0.0
+    partysocket: ^0.0.25
+    safe-stable-stringify: ^2.4.3
+    superjson: ^1
+    uuid: ^9.0.1
+  peerDependencies:
+    xstate: ^5.5.1
+  checksum: 36fda2c52f60084b9c66d926249e61daa957da783ae099ff95f2b2a7e4abeee07961f58addb16d47d7a0a322b42b6e7f393e3d58ffb96270d23ba63fcd7a5a35
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.5":
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
@@ -2101,6 +2117,15 @@ __metadata:
   version: 2.0.0
   resolution: "convert-source-map@npm:2.0.0"
   checksum: 63ae9933be5a2b8d4509daca5124e20c14d023c820258e484e32dc324d34c2754e71297c94a05784064ad27615037ef677e3f0c00469fb55f409d2bb21261035
+  languageName: node
+  linkType: hard
+
+"copy-anything@npm:^3.0.2":
+  version: 3.0.5
+  resolution: "copy-anything@npm:3.0.5"
+  dependencies:
+    is-what: ^4.1.8
+  checksum: d39f6601c16b7cbd81cdb1c1f40f2bf0f2ca0297601cf7bfbb4ef1d85374a6a89c559502329f5bada36604464df17623e111fe19a9bb0c3f6b1c92fe2cbe972f
   languageName: node
   linkType: hard
 
@@ -2525,7 +2550,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"event-target-shim@npm:6.0.2":
+"event-target-shim@npm:6.0.2, event-target-shim@npm:^6.0.2":
   version: 6.0.2
   resolution: "event-target-shim@npm:6.0.2"
   checksum: 9be93437e5b84056a7dc70af8b8962f4ef7f6fd41a988efcd39dfa2853e33242a4058e0dac9cc589cb16ed7409010590ac8cbcc2e3f823100cd337e13be953a0
@@ -2536,6 +2561,13 @@ __metadata:
   version: 3.1.1
   resolution: "exponential-backoff@npm:3.1.1"
   checksum: 3d21519a4f8207c99f7457287291316306255a328770d320b401114ec8481986e4e467e854cb9914dd965e0a1ca810a23ccb559c642c88f4c7f55c55778a9b48
+  languageName: node
+  linkType: hard
+
+"fast-safe-stringify@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "fast-safe-stringify@npm:2.1.1"
+  checksum: a851cbddc451745662f8f00ddb622d6766f9bd97642dabfd9a405fb0d646d69fc0b9a1243cbf67f5f18a39f40f6fa821737651ff1bceeba06c9992ca2dc5bd3d
   languageName: node
   linkType: hard
 
@@ -2863,6 +2895,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-what@npm:^4.1.8":
+  version: 4.1.16
+  resolution: "is-what@npm:4.1.16"
+  checksum: baf99e4b9f06003ceb3b2eea4a1e17179524ee3a6310dc44903eb675cfe3c0a17819ab057bb1ae6ba7ca4939ae4bdfcc6a0c4210a8457aff1756abd3607b713c
+  languageName: node
+  linkType: hard
+
 "isexe@npm:^2.0.0":
   version: 2.0.0
   resolution: "isexe@npm:2.0.0"
@@ -2911,7 +2950,7 @@ __metadata:
   resolution: "js-vite@workspace:."
   dependencies:
     "@statelyai/inspect": ^0.2.2
-    speechstate: ^2.0.0-beta.4
+    speechstate: ^2.0.0-beta.6
     typescript: ^5.3.3
     typescript-language-server: ^4.3.1
     vite: ^5.0.8
@@ -3319,6 +3358,15 @@ __metadata:
     json-parse-even-better-errors: "npm:^2.3.0"
     lines-and-columns: "npm:^1.1.6"
   checksum: 62085b17d64da57f40f6afc2ac1f4d95def18c4323577e1eced571db75d9ab59b297d1d10582920f84b15985cbfc6b6d450ccbf317644cfa176f3ed982ad87e2
+  languageName: node
+  linkType: hard
+
+"partysocket@npm:^0.0.25":
+  version: 0.0.25
+  resolution: "partysocket@npm:0.0.25"
+  dependencies:
+    event-target-shim: ^6.0.2
+  checksum: d020bfc9cee0ddc94ed21081595762249d67f425853b1d663ce6cdf8b6b67680685aa150a6f6e8115b1d4d2a250fccfd43851a50296cb42b9e6fbcc8711abe88
   languageName: node
   linkType: hard
 
@@ -3741,14 +3789,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"speechstate@npm:^2.0.0-beta.4":
-  version: 2.0.0-beta.4
-  resolution: "speechstate@npm:2.0.0-beta.4"
+"speechstate@npm:^2.0.0-beta.6":
+  version: 2.0.0-beta.6
+  resolution: "speechstate@npm:2.0.0-beta.6"
   dependencies:
-    microsoft-cognitiveservices-speech-sdk: "npm:^1.31.0"
-    web-speech-cognitive-services: "npm:^7.1.3"
-    xstate: "npm:^5.5.1"
-  checksum: deac5f21c1057139cfc1efe1a1eb1cf0b77ebc6f38321113e0f1cefe79d84b14711901548761834fa68de4070e21758e6b7484478f686f822c7f5680c89b8ff6
+    "@statelyai/inspect": ^0.2.3
+    microsoft-cognitiveservices-speech-sdk: ^1.31.0
+    web-speech-cognitive-services: ^7.1.3
+    xstate: ^5.5.1
+  checksum: 8d7f544cfcf44a0588f297ef9bfb2071ac41be88e5334c7b809cf1d552331a1db97a7d60e152d763ab4041730f5c3b08c621e1045782eba7b3a43f2d405a2012
   languageName: node
   linkType: hard
 
@@ -3798,6 +3847,15 @@ __metadata:
   dependencies:
     ansi-regex: "npm:^6.0.1"
   checksum: 859c73fcf27869c22a4e4d8c6acfe690064659e84bef9458aa6d13719d09ca88dcfd40cbf31fd0be63518ea1a643fe070b4827d353e09533a5b0b9fd4553d64d
+  languageName: node
+  linkType: hard
+
+"superjson@npm:^1":
+  version: 1.13.3
+  resolution: "superjson@npm:1.13.3"
+  dependencies:
+    copy-anything: ^3.0.2
+  checksum: f5aeb010f24163cb871a4bc402d9164112201c059afc247a75b03131c274aea6eec9cf08be9e4a9465fe4961689009a011584528531d52f7cc91c077e07e5c75
   languageName: node
   linkType: hard
 
@@ -3946,7 +4004,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^9.0.0":
+"uuid@npm:^9.0.0, uuid@npm:^9.0.1":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
   bin:
