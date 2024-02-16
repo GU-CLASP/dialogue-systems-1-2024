@@ -61,49 +61,68 @@ const dmMachine = setup({
     },
     WaitToStart: {
       on: {
-        CLICK: "PromptAndAsk",
+        CLICK: "Running",
       },
     },
-    PromptAndAsk: {
-      initial: "Prompt",
+    Running: {
+      initial: "Main",
+      on: { ASR_NOINPUT: ".NoInput" },
       states: {
-        Prompt: {
+        NoInput: {
           entry: ({ context }) =>
             context.ssRef.send({
               type: "SPEAK",
               value: {
-                utterance: `Hello world!`,
+                utterance: `I don't hear you.`,
               },
             }),
-          on: { SPEAK_COMPLETE: "Ask" },
+          on: { SPEAK_COMPLETE: "Main" },
         },
-        Ask: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN",
-            }),
-          on: {
-            RECOGNISED: {
-              actions: ({ context, event }) =>
+        Main: {
+          initial: "hist",
+          states: {
+            hist: { type: "history", target: "Prompt" },
+            Prompt: {
+              entry: ({ context }) =>
                 context.ssRef.send({
                   type: "SPEAK",
                   value: {
-                    utterance: `You just said: ${
-                      event.value[0].utterance
-                    }. And it ${
-                      isInGrammar(event.value[0].utterance) ? "is" : "is not"
-                    } in the grammar.`,
+                    utterance: `Tell me your name!`,
                   },
                 }),
+              on: { SPEAK_COMPLETE: "Ask" },
             },
-            SPEAK_COMPLETE: "#DM.Done",
+            Ask: {
+              entry: ({ context }) =>
+                context.ssRef.send({
+                  type: "LISTEN",
+                }),
+              on: {
+                RECOGNISED: {
+                  actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `You just said: ${
+                          event.value[0].utterance
+                        }. And it ${
+                          isInGrammar(event.value[0].utterance)
+                            ? "is"
+                            : "is not"
+                        } in the grammar.`,
+                      },
+                    }),
+                },
+                SPEAK_COMPLETE: "#DM.Done",
+              },
+            },
           },
         },
       },
     },
     Done: {
       on: {
-        CLICK: "PromptAndAsk",
+        CLICK: "Running",
       },
     },
   },
