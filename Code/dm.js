@@ -30,6 +30,7 @@ const grammar = {
   rasmus: { person: "Rasmus Blanck" },
   victoria: {person: "Victoria Daniilidou"},
   george: {person: "George Daniilidis"},
+  ivan: {person:"Ivan Kostov"},
   monday: { day: "Monday" },
   tuesday: { day: "Tuesday" },
   wednesday: {day: "Wednesday"},
