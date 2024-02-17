@@ -230,7 +230,7 @@ const dmMachine = setup({
               },
             },
             ConfirmCreateFullDayAppointment: {
-              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day?`),
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Ok, let's make a confirmation. Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day?`),
               on: {
                 SPEAK_COMPLETE:"CreateFullDayAppointment",
               },
@@ -240,15 +240,16 @@ const dmMachine = setup({
               on: {
                 RECOGNISED: [
                   { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
-                  { target: "AskPerson",
-                    actions: ({ context, event }) =>
+                  { target: "Prompt",
+                    actions: [ ({ context, event }) =>
                     context.ssRef.send({
                       type: "SPEAK",
                       value: {
                         utterance: `Ok, I will ask you again.`,
                       },
                     }),
-                    guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
+                    "clearFields" ],
+                    guard: ({event}) => isNo(event.value[0].utterance) },
                   { target: "ReCreateFullDayAppointment",
                     actions: ({ context, event }) =>
                     context.ssRef.send({
@@ -314,7 +315,7 @@ const dmMachine = setup({
               }
             },
             AskPartialDay: {
-              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}?`),
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `So let's check all the information. Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}?`),
               on: {
                 SPEAK_COMPLETE:"ConfirmPartialDay",
                 },
@@ -324,26 +325,16 @@ const dmMachine = setup({
               on: {
                 RECOGNISED: [
                   { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
-                  { target: "AskPerson", 
-                    actions:  ({ context, event }) =>
-                    context.ssRef.send({
-                      type: "SPEAK",
-                      value: {
-                        utterance: `Ok, I will ask you again.`,
-                      },
-                    }), 
-                    guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
-                  { target: "" , 
-                    actions: ({ context, event }) =>
+                  { target: "Prompt", 
+                    actions: [ ({ context, event }) =>
                       context.ssRef.send({
-                      type: "SPEAK",
-                      value: {
-                        utterance: `You just said: ${
-                          event.value[0].utterance
-                          }. And it is not in the grammar. Please answer again.`,
+                        type: "SPEAK",
+                        value: {
+                          utterance: `Ok, I will ask you again.`,
                         },
-                      }), 
-                    guard: ({event}) => !isInGrammar(event.value[0].utterance) },
+                      }),
+                    "clearFields" ],
+                    guard: ({event}) => isNo(event.value[0].utterance) },
                   { target: "ReConfirmPartialDay",
                     actions: ({ context, event }) =>
                     context.ssRef.send({
@@ -362,7 +353,7 @@ const dmMachine = setup({
               }
             },
             AppointmentCreated: {
-              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Your appointment has been created!"),
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Great! Your appointment has been created!"),
               SPEAK_COMPLETE: "#DM.Done",
             }
           }
