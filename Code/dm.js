@@ -14,7 +14,7 @@ const azureCredentials = {
 const settings = {
   azureCredentials,
   asrDefaultCompleteTimeout: 0,
-  asrDefaultNoInputTimeout: 5000,
+  asrDefaultNoInputTimeout: 5000, // default value
   locale: "en-US",
   ttsDefaultVoice: "en-US-DavisNeural",
 };
@@ -51,11 +51,11 @@ function getTime(utterance) {
 
 // Define general conditional predicate function
 function isYes(utterance) {
-  return ['yes', 'yeah', 'sure', 'absolutely', 'ofcourse'].includes(utterance.toLowerCase());
+  return ['yes', 'yeah', 'sure', 'absolutely', 'of course'].includes(utterance.toLowerCase());
 }
 
 function isNo(utterance) {
-  return ['no', 'nope', 'nah', 'never', 'noway'].includes(utterance.toLowerCase());
+  return ['no', 'nope', 'nah', 'never', 'no way'].includes(utterance.toLowerCase());
 }
 
 
@@ -63,7 +63,6 @@ const dmMachine = setup({
   devTools: true,
   actions: {
     say: ({ context }, params) => sendSpeechCommand(context.ssRef, "SPEAK", params),
-    handleNoInput: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "I didn't hear you. Please repeat your response."),
     startTimer: ({ context }) => {
       setTimeout(() => {
         dmActor.send({ type: "TIMER_EXPIRED" });
@@ -94,158 +93,288 @@ const dmMachine = setup({
     WaitToStart: {
       entry: "startTimer",
       on: {
-        CLICK: "Prompt",
-        ASR_NOINPUT: {
-          actions: "handleNoInput",
-          target: "Prompt",
-        }, // Handle ASR_NOINPUT event
-        TIMER_EXPIRED: "Prompt", // Handle inactivity event
+        CLICK: "PromptAndAsk",
+        TIMER_EXPIRED: "PromptAndAsk", // Handle inactivity event
       },
     },
-    Prompt: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Let's create an appointment."),
-      on: { SPEAK_COMPLETE: "AskPerson" },
-    },
-    AskPerson: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Who are you meeting with?"),
-      on: { SPEAK_COMPLETE: "GetPerson" },
-    },
-    GetPerson: {
-      entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }),
-      on: {
-        RECOGNISED: {
-          actions: [
-            ({ context, event }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it ${
-                    isInGrammar(event.value[0].utterance) ? "is" : "is not"
-                  } in the grammar.`,
-                },
-              }),
-            "assignName",
-          ],
-          target: "WaitingForSpeakComplete1",
-        },
-      },
-    },
-    WaitingForSpeakComplete1: {
-      on: {
-        SPEAK_COMPLETE: "AskDay"
-      }
-    },
-    AskDay: {
-      entry: ({ context }) => {
-        // console.log("Sending SPEAK command...");
-        sendSpeechCommand(context.ssRef, "SPEAK", "On which day is your meeting?");
-      },
-      on: {
-        SPEAK_COMPLETE: {
-          actions: () => {
-            // console.log("SPEAK command completed.");
-          },
-          target: "GetDay",
-        },
-      },
-    },
-    GetDay: {
-      entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
-      on: {
-        RECOGNISED: {
-          actions: [
-            ({ context, event }) =>
+    PromptAndAsk: { 
+      initial: "Main",
+      on: { ASR_NOINPUT: ".NoInput" },// Handle ASR_NOINPUT event
+      states: {
+        NoInput: {
+          entry: ( {context} ) =>
             context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: `You just said: ${
-                  event.value[0].utterance
-                }. And it ${
-                  isInGrammar(event.value[0].utterance) ? "is" : "is not"
-                }   in the grammar.`,
+                          type: "SPEAK",
+                          value: {
+                            utterance: `"I didn't hear you. Please repeat your answer."`,
+                          },
+          }),
+          on: {
+                SPEAK_COMPLETE: "Main.hist"
+              }
+          }, 
+        Main:{
+          initial: "Prompt",
+          states: {
+            hist: {
+            type: 'history',
+            history: 'shallow' // optional; default is 'shallow'
+            },
+            Prompt:{
+            entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Let's create an appointment."),
+            on: { SPEAK_COMPLETE: "AskPerson" },
+            },        
+            AskPerson: {
+            entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Who are you meeting with?"),
+            on: { SPEAK_COMPLETE: "GetPerson" },
+            },
+            GetPerson: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }),
+              on: {
+                RECOGNISED: [
+                  { target: "WaitingForGetPersonComplete1" , 
+                    actions:  [ ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                        utterance: `You just said: ${
+                          event.value[0].utterance
+                          }. And it is in the grammar.`,
+                        },
+                      }),
+                      "assignName"
+                    ],
+                    guard: ({event}) => isInGrammar(event.value[0].utterance) },
+                  { target: "WaitingForGetPersonComplete2" , 
+                    actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `You just said: ${
+                          event.value[0].utterance
+                        }. And it is not in the grammar. Please answer again.`,
+                      },
+                    }),
+                    guard: ({event}) => !isInGrammar(event.value[0].utterance) },
+                ],
               },
-            }),
-            "assignDay",
-          ],
-          target: "WaitingForSpeakComplete2",
-        },
-      },
-    },
-    WaitingForSpeakComplete2: {
-      on: {
-        SPEAK_COMPLETE: "AskFullDay"
+            },
+            WaitingForGetPersonComplete1: {
+              on: {
+                SPEAK_COMPLETE: "AskDay"
+              }
+            },
+            WaitingForGetPersonComplete2: {
+              on: {
+                SPEAK_COMPLETE: "GetPerson"
+              }
+            },
+            AskDay: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "On which day is your meeting?"),
+              on: { SPEAK_COMPLETE: "GetDay" },
+            },
+            GetDay: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
+              on: {
+                RECOGNISED: [
+                  { target: "WaitingForGetDayComplete1" , 
+                    actions: [ ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is in the grammar.`,
+                        },
+                      }),
+                    "assignDay"
+                    ],
+                    guard: ({event}) => isInGrammar(event.value[0].utterance) },
+                  { target: "WaitingForGetDayComplete2" , 
+                    actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "WaitingForGetDayComplete2",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is not in the grammar. Please answer again.`,
+                        },
+                      }),
+                    guard: ({event}) => !isInGrammar(event.value[0].utterance) },
+                ], 
+              },
+            },
+            WaitingForGetDayComplete1: {
+              on: {
+                SPEAK_COMPLETE: "AskFullDay"
+              }
+            },
+            WaitingForGetDayComplete2: {
+              on: {
+                SPEAK_COMPLETE: "GetDay"
+              }
+            },
+            AskFullDay: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Will it take the whole day?"),
+              on: {
+                SPEAK_COMPLETE:"GetIsFullDay",
+              },
+            },
+            GetIsFullDay: {
+              entry: ({ context }) => { context.ssRef.send({ type: "LISTEN" }); }, 
+              on: {
+                RECOGNISED: [
+                  { target: "ConfirmCreateFullDayAppointment" , guard: ({event}) => isYes(event.value[0].utterance) },
+                  { target: "AskTime" , guard: ({event}) => isNo(event.value[0].utterance) },
+                ]
+              },
+            },
+            ConfirmCreateFullDayAppointment: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day?`),
+              on: {
+                SPEAK_COMPLETE:"CreateFullDayAppointment",
+              },
+            },
+            CreateFullDayAppointment: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
+              on: {
+                RECOGNISED: [
+                  { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
+                  { target: "AskPerson",
+                    actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Ok, I will ask you again.`,
+                      },
+                    }),
+                    guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
+                  { target: "ReCreateFullDayAppointment",
+                    actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Sorry, I cannot understand you. Please answer again.`,
+                      }, 
+                    }),
+                    guard: ({event}) => !isYes(event.value[0].utterance) && !isNo(event.value[0].utterance) },
+                ],
+              },
+            },
+            ReCreateFullDayAppointment: {
+              on: {
+                SPEAK_COMPLETE: "CreateFullDayAppointment"
+              }
+            },
+            AskTime: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "You just said your appointment would not take the whole day, so what time is your meeting?"),
+              on: {
+                SPEAK_COMPLETE:"GetTime",
+                },
+            },
+            GetTime: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
+              on: { 
+              RECOGNISED: [
+                { target: "WaitingForGetTimeComplete1" , 
+                  actions: [ ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `You just said: ${
+                          event.value[0].utterance
+                        }. And it is in the grammar.`,
+                      },
+                    }),
+                  "assignTime"
+                ], 
+                guard: ({event}) => isInGrammar(event.value[0].utterance) },
+                { target: "WaitingForGetTimeComplete2" , 
+                  actions: ({ context, event }) =>
+                    context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                        }. And it is not in the grammar. Please answer again.`,
+                      },
+                    }), 
+                  guard: ({event}) => !isInGrammar(event.value[0].utterance) },
+              ]
+              }
+            },
+            WaitingForGetTimeComplete1: {
+              on: {
+                SPEAK_COMPLETE: "AskPartialDay"
+              }
+            },
+            WaitingForGetTimeComplete2: {
+              on: {
+                SPEAK_COMPLETE: "GetTime"
+              }
+            },
+            AskPartialDay: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}?`),
+              on: {
+                SPEAK_COMPLETE:"ConfirmPartialDay",
+                },
+            },
+            ConfirmPartialDay: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
+              on: {
+                RECOGNISED: [
+                  { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
+                  { target: "AskPerson", 
+                    actions:  ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Ok, I will ask you again.`,
+                      },
+                    }), 
+                    guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
+                  { target: "" , 
+                    actions: ({ context, event }) =>
+                      context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `You just said: ${
+                          event.value[0].utterance
+                          }. And it is not in the grammar. Please answer again.`,
+                        },
+                      }), 
+                    guard: ({event}) => !isInGrammar(event.value[0].utterance) },
+                  { target: "ReConfirmPartialDay",
+                    actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Sorry, I cannot understand you. Please answer again.`,
+                      }, 
+                    }),
+                    guard: ({event}) => !isYes(event.value[0].utterance) && !isNo(event.value[0].utterance) },
+                  ],
+              },
+            },
+            ReConfirmPartialDay: {
+              on: {
+                SPEAK_COMPLETE: "ConfirmPartialDay"
+              }
+            },
+            AppointmentCreated: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Your appointment has been created!"),
+              SPEAK_COMPLETE: "#DM.Done",
+            }
+          }
+        }
       }
-    },
-    AskFullDay: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Will it take the whole day?"),
-      on: {
-        SPEAK_COMPLETE:"GetIsFullDay",
-        },
-    },
-    GetIsFullDay: {
-      entry: ({ context }) => {
-        // console.log("GetIsFullDay state entry, sending LISTEN command");
-        context.ssRef.send({ type: "LISTEN" });
-      }, 
-      on: {
-        RECOGNISED: [
-          { target: "ConfirmCreateFullDayAppointment" , guard: ({event}) => isYes(event.value[0].utterance) },
-          { target: "AskTime" , guard: ({event}) => isNo(event.value[0].utterance) },
-        ]
-      },
-    },
-    ConfirmCreateFullDayAppointment: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day?`),
-      on: {
-        SPEAK_COMPLETE:"CreateFullDayAppointment",
-        },
-    },
-    CreateFullDayAppointment: {
-      entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
-      on: {
-        RECOGNISED: [
-          { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
-          { target: "AskPerson", guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
-        ],
-      },
-    },
-    AskTime: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "What time is your meeting?"),
-      on: {
-        SPEAK_COMPLETE:"GetTime",
-        },
-    },
-    GetTime: {
-      entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
-      on: { RECOGNISED: { target: "AskPartialDay", actions: ["assignTime"],}},
-    },
-    AskPartialDay: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}?`),
-      on: {
-        SPEAK_COMPLETE:"ConfirmPartialDay",
-        },
-    },
-    ConfirmPartialDay: {
-      entry: ({ context }) => context.ssRef.send({ type: "LISTEN" }), 
-      on: {
-        RECOGNISED: [
-          { target: "AppointmentCreated", guard: ({event}) => isYes(event.value[0].utterance) },
-          { target: "AskPerson", guard: ({event}) => isNo(event.value[0].utterance), actions: "clearFields" },
-        ],
-      },
-    },
-    AppointmentCreated: {
-      entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Your appointment has been created!"),
-      SPEAK_COMPLETE: "#DM.Done",
     },
     Done: {
       on: {
-        CLICK: "Prompt",
+        CLICK: "PromptAndAsk",
       },
     },
-  },
+  }
 });
 
 const dmActor = createActor(dmMachine, { inspect: inspector.inspect }).start();
