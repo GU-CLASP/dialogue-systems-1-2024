@@ -79,15 +79,16 @@ Sources for inspiration:
 
 * Submission
 In your submission provide:
-1) report for Part A
-3) text file with your SSML code (=Code/lab3.txt=); in the beginning of
+1) report for Part A (=report-lab3.pdf=)
+2) text file with your SSML code (=Code/lab3.txt=); in the beginning of
    the file include the reference to the original performance.
-4) audio file for Part B (=Code/lab3.mp3=)
+3) audio file for Part B (=Code/lab3.mp3=)
 
 These files can be placed in your Github repository.
 
 - *Commit* your changes and *push* them to your repository (your fork of
   this repository)
 - We will see the changes in the same pull request that you used for
-  Lab 2. 
+  Lab 2.
+- Rename the pull request to e.g. "Labs 2,3 submission".
 - On Canvas, submit the pull request URL.

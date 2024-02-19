@@ -160,7 +160,8 @@ need to unblock a pop-up window.) Save the exported content as a JSON
 file (.json extension).
 
 *Commit* your changes (new file =dm4.js=) and *push* them to your repository
-  (your fork of this repository). This will update your pull request.
+  (your fork of this repository). This will update your pull
+  request. Rename the pull request to e.g. "Labs 2,3,4 submission".
 
 Submit:
 - link to your pull request
