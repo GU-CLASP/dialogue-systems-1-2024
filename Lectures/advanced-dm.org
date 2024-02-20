@@ -1,0 +1,201 @@
+* this Friday 11:00 project discussions
+
+
+
+* Advanced dialogue management
+#+begin_example
+S1: How may I help you?
+U1: I want to travel to Washington Dulles on November fourth.
+S2: From Boston to Washington Dulles on November 4. Can you provide the approximate departure time or airline preference?
+U2: I need to arrive at around 9 a.m.
+S3: Okay. Flights from Boston to Washington Dulles arriving at 9:00 a.m. on November 4.
+One moment please.
+The best matching flight is a US Airways flight arriving at 8:59 a.m. I also have a United flight arriving at 8:36 a.m.
+U3: What time does the United flight leave?
+S4: United flight 1819 departs at 7:00 a.m. from Boston. Shall I book this flight for you?
+U4: Yes please.
+S5: United flight 1819 has been added to your itinerary. You depart Boston at 7:00 a.m. and arrive in Washington Dulles at 8:36 a.m. Where would you like to go next?
+U5: I would like to return to Boston.
+S6: What date will you be returning on?
+U6: The same day.
+(dialog continues)
+#+end_example
+
+
+** User initiative
+
+- user-directed
+- system-directed
+- mixed initiative
+
+Mixed-initiative dialog provides a more natural interaction but
+requires more complex processing by the ASR and NLU components.
+
+Forms/frames
+
+Prompts:
+- directive: “Select savings account or current account”
+- non-directive: “How may I help you?”
+- somewhat mixed, giving an example
+
+Asking for help. 
+** Grounding
+
+Confirmation:
+
+- Explicit
+  #+begin_example
+  U> I want to know timetables from Madrid.
+  S> Do you want to leave from Madrid?
+  U> Yes.
+  #+end_example
+  
+- Implicit
+  #+begin_example
+  U> I want to know timetables from Madrid.
+  S> What time do you want to leave from Madrid?
+  #+end_example
+
+** Confidence threshold
+
+S> Where are you departing from?
+U> Madrid
+S> ....
+
+| x = confidence |        | behaviour                | S>                         |
+|----------------+--------+--------------------------+----------------------------|
+| >= 0.7         | GREEN  | Don't confirm explicitly | Ok. Madrid. What time?     |
+| 0.2 <= x < 0.7 | YELLOW | Confirm                  | Did you just say "Madrid"? |
+| < 0.2          | RED    | Reject                   | I didn't understand        |
+|----------------+--------+--------------------------+----------------------------|
+
+NLU confidence
+
+** Dialogue management:
+
+- Frame-based DM
+- Information State Update (ISU): rich context, including FACTS, QUDs, MOVES, etc. 
+
+** Practice: VoiceXML
+
+*** Links
+#+begin_example xml
+<link next="http://www.voicexml.org/books/main.vxml">
+  <grammar mode="voice" version="1.0" root="root">
+  </grammar>
+</link>
+#+end_example
+
+
+*** Common events and custom events
+
+error, help, noinput, nomatch
+
+custom events
+
+*** Incremental prompts
+- tapered prompts (=<reprompt>=)
+- counts
+
+*** Forms
+|-----------+---|
+| FROM_CITY |   |
+| TO_CITY   |   |
+|-----------+---|
+#+begin_src xml
+  <form id="get_from_and_to_cities">
+     <grammar src="http://www.directions.example.com/grammars/from_to.grxml" 
+         type="application/srgs+xml"/>
+     <block>
+         Welcome to the Driving Directions By Phone.
+     </block>
+     <initial name="bypass_init">
+       <prompt>
+         Where do you want to drive from and to?
+       </prompt>
+       <nomatch count="1">
+          Please say something like "from Atlanta Georgia to Toledo Ohio".
+       </nomatch>
+       <nomatch count="2">
+          I'm sorry, I still don't understand.
+          I'll ask you for information one piece at a time.
+          <assign name="bypass_init" expr="true"/>
+          <reprompt/>
+       </nomatch>
+     </initial>
+     <field name="from_city">
+       <grammar src="http://www.directions.example.com/grammars/city.grxml" 
+                type="application/srgs+xml"/>
+       <prompt>From which city are you leaving?</prompt>
+     </field>
+     <field name="to_city">
+       <grammar src="http://www.directions.example.com/grammars/city.grxml" 
+                type="application/srgs+xml"/>
+       <prompt>Which city are you going to?</prompt>
+     </field>
+  </form>
+#+end_src
+
+* XState practice
+
+reenter: entry and exit actions
+
+state hierarchy and events
+
+Custom events (next time!)
+
+** Abstraction over SPEAK
+
+Defined action:
+#+begin_src javascript
+  /** inside setup({}) */
+  actions: {
+      say: ({ context, event }, params) => {
+        const shorthands = {
+          greet: "Hello ladies and gentlemen!",
+          andw: "and Welcome!",
+          hcih: "How can I help",
+        };
+        context.ssRef.send({
+          type: "SPEAK",
+          value: { utterance: shorthands[params] },
+        });
+      },
+    }
+
+  /** to be called from e.g. entry, as follows: */
+  { type: "say", params: "andw" }
+#+end_src
+
+Helper function in JavaScript:
+#+begin_src javascript
+function say(utterance) {
+  return { type: "say", params: utterance };
+}
+#+end_src
+
+Homework:
+- How to just say something not defined in =shorthands=, i.e. ={ type: "say", params: "hello and welcome to this wonderful dialogue" }=? Hint: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators#logical_operators
+
+** States and hierarchy:
+#+begin_src javascript
+  Test: {
+    initial: "Hello",
+    on: { SPEAK_COMPLETE: "HowCanIHelp" },
+    states: {
+      Hello: {
+        entry: {
+          type: "say",
+          params: "hello",
+        },
+        on: { SPEAK_COMPLETE: "AndWelcome" },
+      },
+      AndWelcome: {
+        entry: { type: "say", params: "andw" },
+      },
+    },
+  },
+  HowCanIHelp: {
+    entry: { type: "say", params: "hcih" },
+  },
+#+end_src
