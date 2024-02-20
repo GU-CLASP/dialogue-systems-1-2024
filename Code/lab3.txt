@@ -1,0 +1,7 @@
+Original performance: https://www.youtube.com/watch?v=FJEIAGULmPQ
+
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"087e625d-ea24-4084-bea7-1cd8615d8900","Name":"Microsoft Server Speech Text to Speech Voice (en-US, EmmaNeural)","ShortName":"en-US-EmmaNeural","Locale":"en-US","VoiceType":"StandardVoice"}]}-->
+<!--ID=FCB40C2B-1F9F-4C26-B1A1-CF8E67BE07D1;Version=1|{"Files":{}}-->
+<!--ID=5B95B1CC-2C7B-494F-B746-CF22A0E779B7;Version=1|{"Locales":{"en-US":{"AutoApplyCustomLexiconFiles":[{}]}}}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-US-EmmaNeural"><s><prosody range="x-low" rate="-15%">If I told him would he like it. Would he like it if I told him. Would he like it would Napoleon would Napoleon would <break time="500ms"/>would he like it.</prosody></s> 
+If Napoleon if I told him if I told him if Napoleon. Would he like it if I told him if I told him if Napoleon. Would he like it if Napoleon if Napoleon if I told him. If I told him if Napoleon if Napoleon if I told him. If I told him would he like it would he like it if I told him.</voice></speak>
