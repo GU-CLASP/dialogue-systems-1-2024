@@ -53,13 +53,17 @@ function getTime(utterance){
   return (grammar[utterance.toLowerCase()] || {}).time;
 }
 
+// function say(utterance) {
+//   return {type: "Say", params: {utterance: utterance}}
+// }
+
 const dmMachine = setup({
   actions: {
-    Say:({ context }, value) =>
+    Say:({ context }, params) => 
       context.ssRef.send({
         type: "SPEAK",
         value: {
-          utterance: value,
+          utterance: params,
         },
       }),
   },
@@ -83,284 +87,341 @@ const dmMachine = setup({
     },
     WaitToStart: {
       on: {
-        CLICK: "PromptAndAsk",
+        CLICK: "Running",
       },
     },
-    PromptAndAsk: {
-      initial: "Prompt",
+    Running: {
+      initial: "Main",
+      on: { ASR_NOINPUT : ".NoInput"},
       states: {
-        Prompt: {
-          entry: [{
+        NoInput : {
+          entry: ({
             type: "Say",
-            params: `Hi! Let's create an appointment.Shall we?`,
-          }],
-          on: { SPEAK_COMPLETE: "FirstListen" },
-        },
-        FirstListen: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN", value:{completeTimeout: 5}
+            params: `Are you there?`,
             }),
-          on: {
-            RECOGNISED: [
-              {target: "FirstQuestion",
-              guard: ({ event }) => 
-                {const recognizedUtterance = event.value[0]?.utterance;
-                return (
-                  recognizedUtterance &&
-                  isInGrammar(recognizedUtterance) && 
-                  grammar[recognizedUtterance.toLowerCase()].response === 'positive'
-                );
-                },
-              },
-              {actions: ({ context, event }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it is not an expected answer in the grammar, please say yes`,
-                },
-              }),
-              target: "Prompt",
-              },
-            ],
-          },
+          on: { SPEAK_COMPLETE: "Main" },
         },
-        FirstQuestion: {
-          entry: [{
-            type: "Say",
-            params: `Who are you meeting with?`,
-          }], 
-          on: { SPEAK_COMPLETE: "SecondListen" },
-        },
-        SecondListen:{
-          entry: ({ context }) =>
-          context.ssRef.send({
-            type: "LISTEN", value:{completeTimeout: 5}
-          }),
-          on:{
-            RECOGNISED: [{
-              target: "SecondQuestion",
-              guard: ({ context, event }) => 
-                {const recognizedUtterance = event.value[0]?.utterance;
-                context.name = recognizedUtterance;
-                return (
-                  recognizedUtterance &&
-                  isInGrammar(recognizedUtterance) && 
-                  grammar[recognizedUtterance.toLowerCase()].person
-                );
+        // Test: {
+        //   initial: "TestChild",
+        //   entry: ({}) => console.log("Test Entry"),
+        //   exit: ({}) => console.log("Test Exit"),
+        //   states:{
+        //     TestChild: {
+        //       entry: [({
+        //         type: "Say",
+        //         params: `Hello!`,
+        //         }),({}) => console.log("TestChild Entry"),],
+        //         exit: ({}) => console.log("TestChild Exit"),
+        //     },
+        //   },
+
+        // Test: {
+        //   initial: "Hello",
+        //   on: "AndWelcome"
+        //   states:{
+        //     Hello: {
+        //       entry: [({
+        //         type: "Say",
+        //         params: `Hello!`,
+        //         }),({}) => console.log("TestChild Entry"),],
+        //       on: {SPEAK_COMPLETE: "AndWelcome"}
+        //       
+        //     },
+        //     AndWelcome: {
+        //        entry: [({
+        //         type: "Say",
+        //         params: `And welcome!`,
+        //         })
                 },
-              },
-              {actions: ({ context, event }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it is not a name in the grammar, please try again with a name.`,
-                },
-              }),
-              target: "FirstQuestion",
-              }
-            ],
-          },
-        },
-        SecondQuestion: {
-          entry:[{
-            type: "Say",
-            params: `On which day is your meeting?`,
-          }],
-          on: { SPEAK_COMPLETE: "ThirdListen" },
-        },
-        ThirdListen: {
-          entry: ({ context }) =>
-          context.ssRef.send({
-            type: "LISTEN", value:{completeTimeout: 5}
-          }),
-          on:{
-            RECOGNISED: [{
-              guard:({ context,event }) => 
-                {const recognizedday = event.value[0]?.utterance;
-                context.day = recognizedday;
-                return (
-                  recognizedday &&
-                  isInGrammar(recognizedday) && 
-                  grammar[recognizedday.toLowerCase()].day
-                );
-                },
-              target: "ThirdQuestion",
-              },
-              {actions: ({ context, event }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it is not a day in the grammar, please try again with a day.`,
-                },
-              }),
-              target: "SecondQuestion",
-              }
-            ],
-          },
-        },
-        ThirdQuestion: {
-          entry:[{
-            type: "Say",
-            params: `Will it take the whole day? Answer with yes or no please.`,
-          }],
-          on: { SPEAK_COMPLETE: "FourthListen" },
-        },
-        FourthListen:{
-          entry: ({ context }) =>
-          context.ssRef.send({
-            type: "LISTEN", value:{completeTimeout: 5}
-          }),
-          on:{
-            RECOGNISED: [
-              {target: "LastQuestion",
-              guard: ({ event }) => 
-                {const answer = event.value[0]?.utterance;
-                  return (
-                  answer &&
-                  isInGrammar(answer) && 
-                  grammar[answer.toLowerCase()].response === 'positive'
-                );
-                },
-              },
-              {target: "FifthQuestion",
-              guard: ({ event }) => 
-                {const answer = event.value[0]?.utterance;
-                return (
-                  answer &&
-                  isInGrammar(answer) && 
-                  grammar[answer.toLowerCase()].response === 'negative'
-                );
-                },
-              },
-              {actions: ({ context, event }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it is not an expected answer in the grammar, please try again with yes or no`,
-                },
-              }),
-              target: "ThirdQuestion",
-              }
-            ],
-          },
-        },
-        FifthQuestion: {
-          entry:[{
-            type: "Say",
-            params: `What time is your meeting?`,
-          }],
-          on: { SPEAK_COMPLETE: "FifthListen" },
-        },
-        FifthListen: {
-          entry: ({ context }) =>
-          context.ssRef.send({
-            type: "LISTEN", value:{completeTimeout: 5}
-          }),
-          on:{
-            RECOGNISED: [
-              {target: "SixthQuestion",
-              guard: ({ context,event }) => 
-                {const recognizedtime = event.value[0]?.utterance;
-                context.time = recognizedtime;
-                return (
-                  recognizedtime &&
-                  isInGrammar(recognizedtime) && 
-                  grammar[recognizedtime.toLowerCase()].response === 'time'
-                );
-                },
-              },
-              {actions: ({ context, event }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it is not a time in the grammar, please try again with a time number from 1 to 24`,
-                },
-              }),
-              target: "FifthQuestion",
-              }
-            ],
-          },
-        },
-        SixthQuestion:{
-          entry:({ context }) =>
-            context.ssRef.send({
-            type: "SPEAK",
-            params: `Do you want to create an appointment with ${context.name} 
-            on ${context.day} at ${context.time}?`,
-          }),
-          on: { SPEAK_COMPLETE: "LastListen" },
-        },
-        LastQuestion:{
-          entry:({ context }) =>
-          context.ssRef.send({
-          type: "SPEAK",
-            params: `Do you want to create an appointment with ${context.name} 
-            on ${context.day} for the whole day?`,
-          }),
-          on: { SPEAK_COMPLETE: "LastListen" },
-        },
-        LastListen:{
-          entry: ({ context }) =>
-          context.ssRef.send({
-            type: "LISTEN", value:{completeTimeout: 5}
-          }),
-          on:{
-            RECOGNISED: [
-              {target: "Done",
-              guard: ({ event }) => 
-                {const recognizedUtterance = event.value[0]?.utterance;
-                return (
-                  recognizedUtterance &&
-                  isInGrammar(recognizedUtterance) && 
-                  grammar[recognizedUtterance.toLowerCase()].response === 'positive'
-                );
-                },
-              },
-              {target: "FirstQuestion",
-              guard: ({ event }) => 
-                {const recognizedUtterance = event.value[0]?.utterance;
-                return (
-                  recognizedUtterance &&
-                  isInGrammar(recognizedUtterance) && 
-                  grammar[recognizedUtterance.toLowerCase()].response === 'negative'
-                );
-                },
-              actions: {
+        //   },
+        // HowCanIHelp
+
+        //   on: { SPEAK_COMPLETE: ".TestChild", reenter: true},
+        // },
+        Main: {
+          initial: "hist",
+          states: {
+            hist: { type: "history", history: "deep", target: "Prompt"}, /* here
+            target means: if there is no hist then go to prompt */
+            Prompt: {
+              entry: [{
                 type: "Say",
-                params: `I see. Let's do it over again.`,
+                params: `Hi! Let's create an appointment.Shall we?`,
+              }],
+              on: { SPEAK_COMPLETE: "FirstListen" },
+            },
+            FirstListen: {
+              entry: ({ context }) =>
+                context.ssRef.send({
+                  type: "LISTEN", value:{completeTimeout: 5}
+                }),
+              on: {
+                RECOGNISED: [
+                  {target: "FirstQuestion",
+                  guard: ({ event }) => 
+                    {const recognizedUtterance = event.value[0].utterance;
+                    return (
+                      recognizedUtterance &&
+                      isInGrammar(recognizedUtterance) && 
+                      grammar[recognizedUtterance.toLowerCase()].response === 'positive'
+                    );
+                    },
+                  },
+                  {actions: ({ context, event }) =>
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                      }. And it is not an expected answer in the grammar, please say yes`,
+                    },
+                  }),
+                  target: "Prompt",
+                  },
+                ],
               },
-              },
-              {actions: ({ context, event }) =>
+            },
+            FirstQuestion: {
+              entry: [{
+                type: "Say",
+                params: `Who are you meeting with?`,
+              }], 
+              on: { SPEAK_COMPLETE: "SecondListen" },
+            },
+            SecondListen:{
+              entry: ({ context }) =>
               context.ssRef.send({
+                type: "LISTEN", value:{completeTimeout: 5}
+              }),
+              on:{
+                RECOGNISED: [{
+                  target: "SecondQuestion",
+                  guard: ({ event }) => 
+                    {const recognizedname = event.value[0].utterance;
+                    return (
+                      !!getPerson(recognizedname)
+                    );
+                    },
+                  actions: [
+                    assign({ person: ({event}) => getPerson(event.value[0].utterance) }),
+                    ({event}) => console.log( getPerson(event.value[0].utterance ))
+                  ],
+                  },
+                  {actions: ({ context, event }) =>
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                      }. And it is not a name in the grammar, please try again with a name.`,
+                    },
+                  }),
+                  target: "FirstQuestion",
+                  }
+                ],
+              },
+            },
+            SecondQuestion: {
+              entry:[{
+                type: "Say",
+                params: `On which day is your meeting?`,
+              }],
+              on: { SPEAK_COMPLETE: "ThirdListen" },
+            },
+            ThirdListen: {
+              entry: ({ context }) =>
+              context.ssRef.send({
+                type: "LISTEN", value:{completeTimeout: 5}
+              }),
+              on:{
+                RECOGNISED: [{
+                  guard: ({ event }) => 
+                    {const recognizedday = event.value[0].utterance;
+                    return (
+                      !!getDay(recognizedday)
+                    );
+                    },
+                  actions: [
+                    assign({ day: ({event}) => getDay(event.value[0].utterance) }),
+                    ({event}) => console.log( getDay(event.value[0].utterance ))
+                  ],
+                  target: "ThirdQuestion",
+                  },
+                  {actions: ({ context, event }) =>
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                      }. And it is not a day in the grammar, please try again with a day.`,
+                    },
+                  }),
+                  target: "SecondQuestion",
+                  }
+                ],
+              },
+            },
+            ThirdQuestion: {
+              entry:[{
+                type: "Say",
+                params: `Will it take the whole day? Answer with yes or no please.`,
+              }],
+              on: { SPEAK_COMPLETE: "FourthListen" },
+            },
+            FourthListen:{
+              entry: ({ context }) =>
+              context.ssRef.send({
+                type: "LISTEN", value:{completeTimeout: 5}
+              }),
+              on:{
+                RECOGNISED: [
+                  {target: "LastQuestion",
+                  guard: ({ event }) => 
+                    {const answer = event.value[0].utterance;
+                      return (
+                      answer &&
+                      isInGrammar(answer) && 
+                      grammar[answer.toLowerCase()].response === 'positive'
+                    );
+                    },
+                  },
+                  {target: "FifthQuestion",
+                  guard: ({ event }) => 
+                    {const answer = event.value[0].utterance;
+                    return (
+                      answer &&
+                      isInGrammar(answer) && 
+                      grammar[answer.toLowerCase()].response === 'negative'
+                    );
+                    },
+                  },
+                  {actions: ({ context, event }) =>
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                      }. And it is not an expected answer in the grammar, please try again with yes or no`,
+                    },
+                  }),
+                  target: "ThirdQuestion",
+                  }
+                ],
+              },
+            },
+            FifthQuestion: {
+              entry:[{
+                type: "Say",
+                params: `What time is your meeting?`,
+              }],
+              on: { SPEAK_COMPLETE: "FifthListen" },
+            },
+            FifthListen: {
+              entry: ({ context }) =>
+              context.ssRef.send({
+                type: "LISTEN", value:{completeTimeout: 5}
+              }),
+              on:{
+                RECOGNISED: [
+                  {target: "SixthQuestion",
+                  guard: ({ event }) => 
+                    {const recognizedtime = event.value[0].utterance;
+                    return (
+                      !!getTime(recognizedtime)
+                    );
+                    },
+                  actions: [
+                    assign({ time: ({event}) => getTime(event.value[0].utterance) }),
+                    ({event}) => console.log( getTime(event.value[0].utterance ))
+                  ]
+                  },
+                  {actions: ({ context, event }) =>
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                      }. And it is not a time in the grammar, please try again with a time number from 1 to 24`,
+                    },
+                  }),
+                  target: "FifthQuestion",
+                  }
+                ],
+              },
+            },
+            SixthQuestion:{
+              entry:({ context }) =>
+                context.ssRef.send({
                 type: "SPEAK",
                 value: {
-                  utterance: `You just said: ${
-                    event.value[0].utterance
-                  }. And it is not an expected answer in the grammar, please try again with yes or no.`,
-                },
+                  utterance:`Do you want to create an appointment with ${context.person} 
+                on ${context.day} at ${context.time}?`},
               }),
-              target: "FifthQuestion",
-              }
-            ],
+              on: { SPEAK_COMPLETE: "LastListen" },
+            },
+            LastQuestion:{
+              entry:({ context }) =>
+              context.ssRef.send({
+              type: "SPEAK",
+                value: {
+                  utterance: `Do you want to create an appointment with ${context.person} 
+                on ${context.day} for the whole day?`},
+              }),
+              on: { SPEAK_COMPLETE: "LastListen" },
+            },
+            LastListen:{
+              entry: ({ context }) =>
+              context.ssRef.send({
+                type: "LISTEN", value:{completeTimeout: 5}
+              }),
+              on:{
+                RECOGNISED: [
+                  {target: "Done",
+                  guard: ({ event }) => 
+                    {const recognizedUtterance = event.value[0].utterance;
+                    return (
+                      recognizedUtterance &&
+                      isInGrammar(recognizedUtterance) && 
+                      grammar[recognizedUtterance.toLowerCase()].response === 'positive'
+                    );
+                    },
+                  },
+                  {target: "FirstQuestion",
+                  guard: ({ event }) => 
+                    {const recognizedUtterance = event.value[0].utterance;
+                    return (
+                      recognizedUtterance &&
+                      isInGrammar(recognizedUtterance) && 
+                      grammar[recognizedUtterance.toLowerCase()].response === 'negative'
+                    );
+                    },
+                  actions: {
+                    type: "Say",
+                    params: `I see. Let's do it over again.`,
+                  },
+                  },
+                  {actions: ({ context, event }) =>
+                  context.ssRef.send({
+                    type: "SPEAK",
+                    value: {
+                      utterance: `You just said: ${
+                        event.value[0].utterance
+                      }. And it is not an expected answer in the grammar, please try again with yes or no.`,
+                    },
+                  }),
+                  target: "FifthQuestion",
+                  }
+                ],
+              },
+            },
+            Done: {
+              entry:[{
+                type: "Say",
+                params: `Your appointment has been created!`,
+              }],
+              on: { CLICK: "#DM.Running"},
+            },
           },
-        },
-        Done: {
-          entry:[{
-            type: "Say",
-            params: `Your appointment has been created!`,
-          }],
-          on: { CLICK: "#DM.PromptAndAsk"},
         },
       },
     },
@@ -373,7 +434,7 @@ const dmActor = createActor(dmMachine, {
 }).start();
 
 dmActor.subscribe((state) => {
-  /* if you want to log some parts of the state */
+  console.log ( state )
 });
 
 export function setupButton(element) {
