@@ -53,13 +53,9 @@ function getTime(utterance){
   return (grammar[utterance.toLowerCase()] || {}).time;
 }
 
-// function say(utterance) {
-//   return {type: "Say", params: {utterance: utterance}}
-// }
-
 const dmMachine = setup({
   actions: {
-    Say:({ context }, params) => 
+    Say:({ context }, params) =>
       context.ssRef.send({
         type: "SPEAK",
         value: {
@@ -86,6 +82,11 @@ const dmMachine = setup({
       on: { ASRTTS_READY: "WaitToStart" },
     },
     WaitToStart: {
+      after:{
+        3000: {
+          target: "Running",
+        }
+      },
       on: {
         CLICK: "Running",
       },
@@ -101,48 +102,10 @@ const dmMachine = setup({
             }),
           on: { SPEAK_COMPLETE: "Main" },
         },
-        // Test: {
-        //   initial: "TestChild",
-        //   entry: ({}) => console.log("Test Entry"),
-        //   exit: ({}) => console.log("Test Exit"),
-        //   states:{
-        //     TestChild: {
-        //       entry: [({
-        //         type: "Say",
-        //         params: `Hello!`,
-        //         }),({}) => console.log("TestChild Entry"),],
-        //         exit: ({}) => console.log("TestChild Exit"),
-        //     },
-        //   },
-
-        // Test: {
-        //   initial: "Hello",
-        //   on: "AndWelcome"
-        //   states:{
-        //     Hello: {
-        //       entry: [({
-        //         type: "Say",
-        //         params: `Hello!`,
-        //         }),({}) => console.log("TestChild Entry"),],
-        //       on: {SPEAK_COMPLETE: "AndWelcome"}
-        //       
-        //     },
-        //     AndWelcome: {
-        //        entry: [({
-        //         type: "Say",
-        //         params: `And welcome!`,
-        //         })
-                },
-        //   },
-        // HowCanIHelp
-
-        //   on: { SPEAK_COMPLETE: ".TestChild", reenter: true},
-        // },
         Main: {
           initial: "hist",
           states: {
-            hist: { type: "history", history: "deep", target: "Prompt"}, /* here
-            target means: if there is no hist then go to prompt */
+            hist: { type: "history", history: "deep", target: "Prompt"},
             Prompt: {
               entry: [{
                 type: "Say",
