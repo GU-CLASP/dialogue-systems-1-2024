@@ -1,0 +1,225 @@
+#+TITLE: Natural Language Understanding (NLU)
+
+* Speech acts
+- Or dialogue acts
+- Examples
+  | Class            | Example                    |
+  |------------------+----------------------------|
+  | Constatives      | "I need a visa"            |
+  | Directives       | "Turn up the music"        |
+  | Comissives       | "I will talk to you later" |
+  | Acknowledgements | "Thank you"                |
+
+"Please sit down" -- "Thank you, I will rather stand"
+(illocutionary vs perlocutionary)
+
+Simplification: intents
+
+
+* Practical example
+
+** Domains, intents and entities
+Domain -> Intent -> Entities
+
+Domains: *clock*, calendar, ticket booking
+
+Intent (goal): set a timer, *set alarm clock*, snooze the alarm
+
+For utterance: "Wake me up tomorrow at 9"
+- intent :: setAlarm
+- entities :: {time: "2024-02-17 0900"}
+
+
+** Recap from Lab 2 ("the grammar")
+#+begin_src javascript
+
+  const grammar = {
+    vlad: { person: "Vladislav Maraev" },
+    aya: { person: "Nayat Astaiza Soriano" },
+    rasmus: { person: "Rasmus Blanck" },
+    monday: { day: "Monday" },
+    tuesday: { day: "Tuesday" },
+    "10": { time: "10:00" },
+    "11": { time: "11:00" },
+  };
+  
+#+end_src
+
+** Grammar with intents and entities ("rule-based NLU")
+#+begin_src javascript
+
+  const nluGrammar = {
+    "wake me up": {
+      intent: "setAlarm",
+      entities: {},
+    },
+    "set an alarm": {
+      intent: "setAlarm",
+      entities: {},
+    },
+    "wake me up tomorrow at 9": {
+      intent: "setAlarm",
+      entities: { time: "0900", date: "2024-02-17" },
+    },
+  };
+  
+#+end_src
+
+
+* Rule-based NLU
+
+- Good level of control
+- Lots of manual work (i.e. writing regular expressions, keywords)
+  
+
+* Statistical NLU
+
+Approach: train the model for intent and entity recognition on structured data
+
+Question: how to structure the data?
+
+** Intent recognition
+
+Text classification
+
+*** example
+| Utterance                  | Class       |
+|----------------------------+-------------|
+| "wake me up"               | setAlarm    |
+| "wake me up tomorrow at 9" | setAlarm    |
+| "set an alarm"             | setAlarm    |
+| "snooze the alarm"         | snoozeAlarm |
+| "turn on the music"        | None        |
+|                            |             |
+
+** Entity recogniton
+
+BIO markup:
+- B :: beginning
+- I :: inside
+- O :: outside
+
+  #+begin_src 
+
+    Utterance:   wake me up tomorrow at 9
+    Entities:    O    O  O  B-TIME   I  I 
+    Entities:    O    O  O  B-DAY    O  B-HOUR
+    
+  #+end_src
+
+
+
+*** exercise:
+
+DES, DEPTIME    B/I/O
+
+#+begin_src
+
+  I want to fly to    San     Francisco on    Monday    afternoon please
+  O O    O  O   O     I-DES   I         O     B-DEPTIME I          O
+#+end_src
+
+
+** Evaluation
+
+*** Intent classification: accuracy/precision/recall/F1
+
+**** exercise 1
+
+| Utterance                  | True Class  | Prediction | setAlarm | snoozeAlarm | None |
+|----------------------------+-------------+------------+----------+-------------+------|
+| "wake me up"               | setAlarm    | setAlarm   | TP       | TN          | TN   |
+| "wake me up tomorrow at 9" | setAlarm    | setAlarm   | TP       | TN          | TN   |
+| "set an alarm"             | setAlarm    | None       | FN       | TN          | FP   |
+| "snooze the alarm"         | snoozeAlarm | setAlarm   | FP       | FN          | TN   |
+| "turn on the music"        | None        | setAlarm   | FP       | TN          | FN   |
+| "turn off the music"       | None        | None       | TN       | TN          | TP   |
+|----------------------------+-------------+------------+----------+-------------+------|
+|                            |             | PRECISION  | 0.5      | 0           | 1/2  |
+|                            |             | RECALL     | 2/3      | 0           | 1/2  |
+|                            |             | F1         | 0.57     | 0           | 0.5  |
+|                            |             | F1-macro   = 0.358
+
+#+begin_src
+
+PRECISION = TP / (TP + FP)
+RECALL    = TP / (TP + FN)
+ACCURACY  = correct / all
+F1 = 2 * PRECISION * RECALL  / ( PRECISION + RECALL )
+F1 = 2 * TP / (2 * TP + FP + FN )
+
+#+end_src
+
+*** Entity recognition: slot error rate
+
+Slot error rate = I or D or S slots / total reference slots
+
+
+*** Extrinsic evaluation: task completion
+
+
+* Systems
+- What components are out there?
+- How do they differ?
+  
+** How to choose?
+1. Assess needs
+2. Switch if needed
+3. Build a custom NLU
+
+   
+* Advanced
+** "None" and confidence threshold
+** Data augmentation
+** Context and re-ranking
+
+"9 o'clock"
+- {date: "Monday"}
+- {time: "0900"}
+- {time: "0600"}
+
+  
+** Dialogue acts
+
+#+ATTR_HTML: :width 1000px
+[[./img/his-1.png]]
+
+#+ATTR_HTML: :width 1000px
+[[./img/his-2.png]]
+
+
+* Practice: Azure CLU
+
+- [[https://learn.microsoft.com/en-us/azure/ai-services/language-service/conversational-language-understanding/overview][Documentation]]
+- [[https://language.cognitive.azure.com/][CLU]]
+
+
+
+* Key
+
+*** exercise 1
+
+| Utterance                  | True Class  | Prediction | setAlarm | snoozeAlarm | None |
+|----------------------------+-------------+------------+----------+-------------+------|
+| "wake me up"               | setAlarm    | setAlarm   | TP       | TN          | TN   |
+| "wake me up tomorrow at 9" | setAlarm    | setAlarm   | TP       | TN          | TN   |
+| "set an alarm"             | setAlarm    | None       | FN       | TN          | FP   |
+| "snooze the alarm"         | snoozeAlarm | setAlarm   | FP       | FN          | TN   |
+| "turn on the music"        | None        | setAlarm   | FP       | TN          | FN   |
+| "turn off the music"       | None        | None       | TN       | TN          | TP   |
+|----------------------------+-------------+------------+----------+-------------+------|
+|                            |             | PRECISION  | 2/4      | 0/0         | 1/2  |
+|                            |             | RECALL     | 2/3      | 0/1         | 1/2  |
+|                            |             | F1         | 0.57     | 0           | 0.5  |
+|                            |             | F1-macro   |          |             |      |
+
+#+begin_src
+
+PRECISION = TP / (TP + FP)
+RECALL    = TP / (TP + FN)
+ACCURACY  = correct / all
+F1 = 2 * PRECISION * RECALL  / ( PRECISION + RECALL )
+F1 = 2 * TP / (2 * TP + FP + FN )
+
+#+end_src
+
