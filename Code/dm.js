@@ -17,6 +17,7 @@ const settings = {
   asrDefaultNoInputTimeout: 5000,
   locale: "en-US",
   ttsDefaultVoice: "en-US-DavisNeural",
+  speechRecognitionEndpointId: "9a735a2d-1224-4398-baaa-9b0c80e1032e",
 };
 
 /* Grammar definition */
