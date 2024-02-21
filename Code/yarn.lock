@@ -1760,6 +1760,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@statelyai/inspect@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@statelyai/inspect@npm:0.2.3"
+  dependencies:
+    fast-safe-stringify: ^2.1.1
+    isomorphic-ws: ^5.0.0
+    partysocket: ^0.0.25
+    safe-stable-stringify: ^2.4.3
+    superjson: ^1
+    uuid: ^9.0.1
+  peerDependencies:
+    xstate: ^5.5.1
+  checksum: 36fda2c52f60084b9c66d926249e61daa957da783ae099ff95f2b2a7e4abeee07961f58addb16d47d7a0a322b42b6e7f393e3d58ffb96270d23ba63fcd7a5a35
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.5":
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
@@ -2571,6 +2587,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-safe-stringify@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "fast-safe-stringify@npm:2.1.1"
+  checksum: a851cbddc451745662f8f00ddb622d6766f9bd97642dabfd9a405fb0d646d69fc0b9a1243cbf67f5f18a39f40f6fa821737651ff1bceeba06c9992ca2dc5bd3d
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.0.1":
   version: 7.0.1
   resolution: "fill-range@npm:7.0.1"
@@ -2902,6 +2925,13 @@ __metadata:
   version: 4.1.16
   resolution: "is-what@npm:4.1.16"
   checksum: 10c0/611f1947776826dcf85b57cfb7bd3b3ea6f4b94a9c2f551d4a53f653cf0cb9d1e6518846648256d46ee6c91d114b6d09d2ac8a07306f7430c5900f87466aae5b
+  languageName: node
+  linkType: hard
+
+"is-what@npm:^4.1.8":
+  version: 4.1.16
+  resolution: "is-what@npm:4.1.16"
+  checksum: baf99e4b9f06003ceb3b2eea4a1e17179524ee3a6310dc44903eb675cfe3c0a17819ab057bb1ae6ba7ca4939ae4bdfcc6a0c4210a8457aff1756abd3607b713c
   languageName: node
   linkType: hard
 
@@ -3377,6 +3407,15 @@ __metadata:
   dependencies:
     event-target-shim: "npm:^6.0.2"
   checksum: 10c0/ecc7c8314c649878383b686773309b23fb905f35f27d25139db09633b7f14733865ff378fa78838c25dc42141732b81bb35a2f12ba4c2e9e4106f86afd54b21e
+  languageName: node
+  linkType: hard
+
+"partysocket@npm:^0.0.25":
+  version: 0.0.25
+  resolution: "partysocket@npm:0.0.25"
+  dependencies:
+    event-target-shim: ^6.0.2
+  checksum: d020bfc9cee0ddc94ed21081595762249d67f425853b1d663ce6cdf8b6b67680685aa150a6f6e8115b1d4d2a250fccfd43851a50296cb42b9e6fbcc8711abe88
   languageName: node
   linkType: hard
 
@@ -3884,6 +3923,15 @@ __metadata:
   dependencies:
     copy-anything: "npm:^3.0.2"
   checksum: 10c0/389a0a0c86884dd0558361af5d6d7f37102b71dda9595a665fe8b39d1ba0e57c859e39a9bd79b6f1fde6f4dcceac49a1c205f248d292744b2a340ee52846efdb
+  languageName: node
+  linkType: hard
+
+"superjson@npm:^1":
+  version: 1.13.3
+  resolution: "superjson@npm:1.13.3"
+  dependencies:
+    copy-anything: ^3.0.2
+  checksum: f5aeb010f24163cb871a4bc402d9164112201c059afc247a75b03131c274aea6eec9cf08be9e4a9465fe4961689009a011584528531d52f7cc91c077e07e5c75
   languageName: node
   linkType: hard
 
