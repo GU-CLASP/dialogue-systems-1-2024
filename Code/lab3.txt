@@ -1,0 +1,12 @@
+reference: https://www.youtube.com/watch?v=De9Jwe1ogJI
+
+
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"1fcefcc6-c578-4aec-99fa-bcd38dfa0a02","Name":"Microsoft Server Speech Text to Speech Voice (en-US, JaneNeural)","ShortName":"en-US-JaneNeural","Locale":"en-US","VoiceType":"StandardVoice"}]}-->
+<!--ID=FCB40C2B-1F9F-4C26-B1A1-CF8E67BE07D1;Version=1|{"Files":{}}-->
+<!--ID=5B95B1CC-2C7B-494F-B746-CF22A0E779B7;Version=1|{"Locales":{"en-US":{"AutoApplyCustomLexiconFiles":[{}]}}}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-US-JaneNeural"><prosody rate="-30.00%" contour="(6%, +56%)">There</prosody><prosody rate="-10.00%"> Robert</prosody>, you have <prosody rate="x-slow" contour="(33%, +19%) (84%, +24%) (93%, +24%) (100%, +24%)">kill</prosody><prosody rate="-60.00%">'<phoneme alphabet="ipa" ph="dˌ">d</phoneme></prosody> that fly <break strength="weak" />
+<prosody rate="-30.00%">And should you </prosody><prosody rate="-30.00%" contour="(15%, +33%) (42%, -2%) (71%, +18%) (100%, +0%)">thousand</prosody><prosody rate="-30.00%"> ages </prosody><prosody rate="-50.00%">try</prosody>
+The <prosody rate="-20.00%">life you've taken</prosody><prosody rate="-40.00%"> to supply</prosody> you <prosody rate="-30.00%" contour="(19%, +69%)">could</prosody><prosody rate="-30.00%" contour="(12%, +43%)"> not</prosody> do it.
+You surely <prosody rate="-10.00%">must have been devoid of</prosody><prosody rate="-10.00%" contour="(10%, +37%)"> thought</prosody><prosody rate="-10.00%">,</prosody>
+and <prosody contour="(9%, +45%) (100%, -17%)">sense</prosody> to have destroy'd a thing, which no way you annoy'd
+You'll one day rue it.</voice></speak>
