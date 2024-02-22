@@ -1,0 +1,14 @@
+Johnny Cash - Folsom Prison Blues
+---------------------------------
+
+Performance: https://www.youtube.com/watch?v=AeZRYhLDLeU
+
+SSML:
+
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"e0638b39-fbd2-4497-a482-e2f65759412a","Name":"Microsoft Server Speech Text to Speech Voice (en-US, GuyNeural)","ShortName":"en-US-GuyNeural","Locale":"en-US","VoiceType":"StandardVoice"}]}-->
+<!--ID=FCB40C2B-1F9F-4C26-B1A1-CF8E67BE07D1;Version=1|{"Files":{}}-->
+<!--ID=5B95B1CC-2C7B-494F-B746-CF22A0E779B7;Version=1|{"Locales":{"en-US":{"AutoApplyCustomLexiconFiles":[{}]}}}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-US-GuyNeural">I hear the train a coming <break strength="x-weak" /> it's rolling round the bend <break strength="x-weak" /> and <prosody rate="slow" volume="+50.00%" pitch="+50.00%">I</prosody> ain't seen the sunshine <break strength="x-weak" /> since I don't know when <break strength="medium" />I'm stuck in Folsom prison <break strength="x-weak" /> and time keeps dragging on <break strength="x-weak" /> but that <prosody rate="slow">train</prosody> keeps a rolling <break strength="x-weak" /> on down to Sanan ton.<break strength="weak" />
+When I was just a baby <break strength="x-weak" /> my mama told me son <break strength="x-weak" /> <s /><mstts:express-as style="hopeful">Always be a good boy <break strength="x-weak" /> don't ever play with guns</mstts:express-as><s />  But I shot a man in Reno <break strength="x-weak" /> just to watch him die <break strength="weak" /> When I <prosody pitch="medium">hear</prosody> that whistle blowing, <break strength="x-weak" /> I <prosody pitch="low">hang</prosody><prosody rate="medium"> my</prosody><prosody rate="slow" pitch="low"> head</prosody><prosody rate="slow"> and</prosody><prosody pitch="x-low"> cry</prosody><break strength="medium" />
+Well if they freed me from this prison <break strength="weak" /> if that railroad train was mine <break strength="weak" />I bet I'd move it <prosody rate="x-slow" volume="x-loud" pitch="high">on,</prosody> a little farther down the line <break strength="weak" />Far from Folsom prison <break strength="weak" />that's where I want to stay <break strength="weak" />And I'd let that lonesome whistle <break strength="weak" /> blow my blues a <prosody rate="slow">way</prosody>
+<prosody pitch="x-low"></prosody></voice></speak>
