@@ -1207,10 +1207,22 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.11.0.tgz#a59158f78d07cd3ac15092ffca2f0319f3bb69f6"
   integrity sha512-f3I7h9oTg79UitEco9/2bzwdciYkWr8pITs3meSDSlr1TdvQ7IxkQaaYN2YqZXX5uZhiYL+VuYDmHwNzhx+HOg==
 
-"@statelyai/inspect@^0.2.2", "@statelyai/inspect@^0.2.3":
+"@statelyai/inspect@^0.2.2":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@statelyai/inspect/-/inspect-0.2.3.tgz#58666552b9bdcf7a9a280be710efe8537e48a2f8"
   integrity sha512-3EgAJ89VTKjwLM+RzocU0V2UhRhxtCbtcRJs7TQVZSWDHzsvMbBz9b7M4kHI5irMK8JjIyq+3KBtaBPSdgH3uQ==
+  dependencies:
+    fast-safe-stringify "^2.1.1"
+    isomorphic-ws "^5.0.0"
+    partysocket "^0.0.25"
+    safe-stable-stringify "^2.4.3"
+    superjson "^1"
+    uuid "^9.0.1"
+
+"@statelyai/inspect@^0.2.3":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@statelyai/inspect/-/inspect-0.2.4.tgz#361ff7efbed78234f1b7a262d3e89787a47c633e"
+  integrity sha512-efzWSPV+x4lslO58qlsa1+UaW7MGEvL5tzSvVz9MhZBMYQLz/SuoOoYzEBd1xipnV88cSK9CGQYRUnxwE6PnwQ==
   dependencies:
     fast-safe-stringify "^2.1.1"
     isomorphic-ws "^5.0.0"
@@ -1340,9 +1352,9 @@ bytesish@^0.4.1:
   integrity sha512-i4uu6M4zuMUiyfZN4RU2+i9+peJh//pXhd9x1oSe1LBkZ3LEbCoygu8W0bXTukU1Jme2txKuotpCZRaC3FLxcQ==
 
 caniuse-lite@^1.0.30001587:
-  version "1.0.30001587"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001587.tgz#a0bce920155fa56a1885a69c74e1163fc34b4881"
-  integrity sha512-HMFNotUmLXn71BQxg8cijvqxnIAofforZOwGsxyXJ0qugTdspUF4sPSJ2vhgprHCB996tIDzEq1ubumPDV8ULA==
+  version "1.0.30001589"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001589.tgz#7ad6dba4c9bf6561aec8291976402339dc157dfb"
+  integrity sha512-vNQWS6kI+q6sBlHbh71IIeC+sRwK2N3EDySc/updIGhIee2x5z00J4c1242/5/d6EpEMdOnk/m+6tuk4/tcsqg==
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1427,9 +1439,9 @@ debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1:
     ms "2.1.2"
 
 electron-to-chromium@^1.4.668:
-  version "1.4.670"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.670.tgz#0fc5ac92ada8371e898ea72d577ffc888167a017"
-  integrity sha512-hcijYOWjOtjKrKPtNA6tuLlA/bTLO3heFG8pQA6mLpq7dRydSWicXova5lyxDzp1iVJaYhK7J2OQlGE52KYn7A==
+  version "1.4.680"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.680.tgz#18a30d3f557993eda2d5b1e21a06c4d51875392f"
+  integrity sha512-4nToZ5jlPO14W82NkF32wyjhYqQByVaDmLy4J2/tYcAbJfgO2TKJC780Az1V13gzq4l73CJ0yuyalpXvxXXD9A==
 
 error-ex@^1.3.1:
   version "1.3.2"
@@ -2172,9 +2184,9 @@ spdx-license-ids@^3.0.0:
   integrity sha512-sh8PWc/ftMqAAdFiBu6Fy6JUOYjqDJBJvIhpfDMyHrr0Rbp5liZqd4TjtQ/RgfLjKFZb+LMx5hpml5qOWy0qvg==
 
 speechstate@^2.0.0-beta.4:
-  version "2.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/speechstate/-/speechstate-2.0.0-beta.6.tgz#340f2c44525abff39f361c47937b4713bc156f19"
-  integrity sha512-813RKrKkyYj9ZCR97oN2l2uX912UjS6rGZKdZihjuuOm+GL5cDjRqz7JOGCqZZaZg9XcO2BkIQZYDkDuFHHkOg==
+  version "2.0.0-beta.7"
+  resolved "https://registry.yarnpkg.com/speechstate/-/speechstate-2.0.0-beta.7.tgz#32c034f1b4d13f80b50214bd582c325aa6db14a4"
+  integrity sha512-l8nlgyyOU6VgLHHGgyUkYTMB2ZSTpXvFhXsoCxZ7B+r6gyXQMLh0sVVOhbbiP//afMYOzSjWqAHkJIChEgvaSg==
   dependencies:
     "@statelyai/inspect" "^0.2.3"
     microsoft-cognitiveservices-speech-sdk "^1.31.0"
