@@ -99,7 +99,7 @@ const dmMachine = setup({
                 context.ssRef.send({
                   type: "SPEAK",
                   value: {
-                    utterance: `You just said: ${event.value[0].utterance}. And it's confidence score is ${event.value[0].}`,
+                    utterance: `You just said: ${event.value[0].utterance}. And it's confidence score is ${event.value[0].confidence}`,
                   },
                 }),
             },
