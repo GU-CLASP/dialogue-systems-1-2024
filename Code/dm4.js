@@ -28,16 +28,11 @@ const settings = {
 };
         
 
-/* Grammar definition */
-const grammar = {
-  vlad: { person: "Vladislav Maraev" },
-  aya: { person: "Nayat Astaiza Soriano" },
-  rasmus: { person: "Rasmus Blanck" },
-  monday: { day: "Monday" },
-  tuesday: { day: "Tuesday" },
-  "10": { time: "10:00" },
-  "11": { time: "11:00" },
-};
+//Defining our NLU intents
+const intents = {
+  celebrityInfo: "WhoIsX",
+  BookMeeting: "CreateMeeting"
+}
 
 /* Helper functions */
 function isInGrammar(utterance) {
@@ -48,9 +43,23 @@ function getPerson(utterance) {
   return (grammar[utterance.toLowerCase()] || {}).person;
 }
 
+function checkIntent(event) {
+  //
+}
+
 const dmMachine = setup({
   actions: {
-    /* define your actions here */
+    listenForUsersAnswer : ({ context }) => 
+    context.ssRef.send({
+       type: "LISTEN", value: { nlu: true } }),
+
+    speakToTheUser : ({ context }, params) => 
+    context.ssRef.send({
+       type: "SPEAK",
+      value: {
+        utterance: params
+      },
+    }),
   },
 }).createMachine({
   context: {
@@ -77,22 +86,12 @@ const dmMachine = setup({
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: `How can I help you?`,
-              },
-            }),
+          entry: [{ type: "speakToTheUser", params: `How can I help you today?`}],
           on: { SPEAK_COMPLETE: "Listen" },
         },
 
         Listen: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN",
-              value: { nlu: true }
-            }),
+          entry: "listenForUsersAnswer",
 
           on: {
             RECOGNISED: {
@@ -100,11 +99,7 @@ const dmMachine = setup({
                 context.ssRef.send({
                   type: "SPEAK",
                   value: {
-                    utterance: `You just said: ${
-                      event.value[0].utterance
-                    }. And it ${
-                      isInGrammar(event.value[0].utterance) ? "is" : "is not"
-                    } in the grammar.`,
+                    utterance: `You just said: ${event.value[0].utterance}. And it's confidence score is ${event.value[0].}`,
                   },
                 }),
             },
@@ -117,6 +112,12 @@ const dmMachine = setup({
       on: {
         CLICK: "PromptAndAsk",
       },
+    },
+  },
+  guards: {
+    matchesGrammar: (context, event) => {
+      // check if player won
+      return isInGrammar(event.value[0]);
     },
   },
 });
