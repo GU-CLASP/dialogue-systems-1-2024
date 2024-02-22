@@ -1,0 +1,16 @@
+/* Link to the original poem (I only worked on the first two verses): https://www.youtube.com/watch?v=qviM_GnJbOM */
+
+
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"f1b81aff-514c-4ea8-b602-0c56180c7c63","Name":"Microsoft Server Speech Text to Speech Voice (en-US, ElizabethNeural)","ShortName":"en-US-ElizabethNeural","Locale":"en-US","VoiceType":"StandardVoice"}]}-->
+<!--ID=FCB40C2B-1F9F-4C26-B1A1-CF8E67BE07D1;Version=1|{"Files":{}}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-US-ElizabethNeural"><mstts:express-as role="OlderAdultFemale">
+<prosody rate="medium" pitch="low">You may write me down in </prosody><prosody rate="medium" volume="+10dB" pitch="low" contour="(20%, +12%) (83%, -44%)">history</prosody>
+<prosody rate="medium" pitch="low">With your<phoneme alphabet="ipa" ph="ˈbɪttə"> bitter</phoneme>twisted lies,</prosody>
+<prosody rate="medium" volume="+15dB" pitch="low">You may trod me in the very</prosody><prosody rate="medium" volume="+20dB" pitch="low" contour="(21%, +85%)"> dirt</prosody>
+<prosody rate="medium" pitch="low">But still, like </prosody><prosody rate="medium" volume="+30dB" pitch="low" contour="(33%, +79%)">dust</prosody><break time="400ms" /><prosody rate="slow" volume="+100.00%" pitch="low"> I'll rise </prosody>
+<prosody rate="medium" volume="+10dB" pitch="low"> </prosody><prosody rate="medium" volume="+10dB" pitch="low" contour="(34%, +78%)">Does my</prosody><prosody rate="medium" volume="+10dB" pitch="low" contour="(30%, +78%)"> sassiness</prosody><prosody rate="medium" volume="+100.00%" pitch="low" contour="(49%, -23%) (89%, +83%)"> upset you?</prosody>
+<prosody rate="medium" pitch="low" contour="(31%, +89%)">Why</prosody><prosody rate="medium" pitch="low" contour="(24%, -32%)"> are</prosody><prosody rate="medium" pitch="low" contour="(25%, +33%) (60%, -11%)"> you</prosody><prosody rate="medium" pitch="low"> beset with gloom?
+Just ’cause I walk <break time="50ms" />as if I have<break time="50ms" /></prosody><prosody rate="medium" pitch="low" contour="(11%, +65%) (61%, -13%)">oil wells</prosody>
+<prosody rate="medium" pitch="low">Pumping in my living room.</prosody>
+</mstts:express-as>
+</voice></speak>
