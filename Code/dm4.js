@@ -26,13 +26,6 @@ const settings = {
   locale: "en-US",
   ttsDefaultVoice: "en-US-DavisNeural",
 };
-        
-
-//Defining our NLU intents, will we need these tho???
-const intents = {
-  celebrityInfo: "WhoIsX",
-  BookMeeting: "CreateMeeting"
-}
 
 /* Helper functions */
 function isInGrammar(utterance) {
@@ -66,12 +59,11 @@ const dmMachine = setup({
   }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwA2RQFYuADgAsergEYuagOwAaEAE9EJkxfQaVp41wsaTAZl8Bffxs0dAB1AnFqQXIxIjFiAGEAGQBJBIBpbj4kECFRCWlZBQQTTXVdFQNFEwMfHz1FG3sEbQaXCu8fAy1tesDgjBxBAFs8MVIpCFJYAGssbBGx4nJMFnT6BIB5VEwkpmomLNk88UkZHOLtDR90Cx03PwsfCwM1JsQNVvQDB6cGrsc-RAISGo3Gk2mcySIlgYjAUmIzC2AHEAHIpchMZBHHInArnUDFPROdCKZ4VEwaPTPEx6d4tV7oDxcXpGLwaCwmIEghZgiZTWboaGw+HLVakdZbHZ7A44gTCU6FC4OLyktyONR6O53NQGekGXwuB4WE1cV7PbkYZDSMCJVIZOW5BX4ooqjRqlQarWKHV6uyIXqKcqVK6KNT6M2BIIgKSCCBwWRoY7Os6uhAAWg09Mzlvm+CIYGT+VTyoQVXpxPQPnVPk0pS4rgsufCkWisWwYiLioJ8gD1n9LTaFgq1LUai6Y58udBY35kK7LtLij07sUilelh6Bm0a6zA+6QYqXFrO+0XjM2mnvNnEMFM87uJTSsJiDqBlJ67HXh02939Ou2joGYKgmlqag7rqV6LOCApQjCcI9niJYvggXjvkepj6Bydz-roQEVF0dRoSYii5taUiFo+xbPr2LSNPupSktS9R6A0JjaKUZ5Rv4QA */
   context: {
-    count: 0,
+    meeting_name: "",
   },
   id: "DM",
   initial: "Prepare",
   states: {
-    initial: "Prepare",
     Prepare: {
       entry: [
         assign({
@@ -97,9 +89,9 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
         on: {
           RECOGNISED: [
-            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) === true,
+            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) === true, //checking which path to take, meeting or celeb
             target: "MeetingPersonSpeak"},
-            {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent) === true,
+            {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent) === true, //or celeb
             target: "StartTellingAboutACelebrity"}],
           },
         },
@@ -115,9 +107,9 @@ const dmMachine = setup({
     MeetingPersonListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED : { 
-          actions: assign({meeting_name: ({context, event}) => event.nluValue.topEntity}),   //check from this point forward...
-          target: "MeetingDaySpeak" },
+        RECOGNISED : {
+          actions: assign({meeting_name: ({context, event}) => event.nluValue.entity}),   //problem here!! check from this point forward...
+          target: "MeetingDateTimeSpeak" },
     
         ASR_NOINPUT : {
           target: "ReRaiseMeetingPerson"
@@ -133,97 +125,51 @@ const dmMachine = setup({
           }
         },
     
-    MeetingDaySpeak: {
+    MeetingDateTimeSpeak: {
       entry: [{ type: "speakToTheUser", 
-              params: `On which day is your meeting?`}],
+              params: `On which day and at what time is your meeting?`}],
       on: { 
-          SPEAK_COMPLETE : "MeetingDayListen"
+          SPEAK_COMPLETE : "MeetingDateTimeListen"
            },
           },
     
-    MeetingDayListen: {
+    MeetingDateTimeListen: {
       entry: "listenForUsersAnswer",
         on: {
           RECOGNISED : [{ 
             guard: ({event}) => isInGrammar(event.value[0].utterance) === true, 
-            actions: assign({meeting_date: ({context, event}) => event.value[0].utterance}),
-            target: "MeetingDurSpeak" },
-              {actions: [{ type: "speakToTheUser", params: `I'm sorry, this date is not in my grammar. Please re-check my grammar.` }],
-              target: "WaitToStart"}],
+            actions: assign({DateTime: ({context, event}) => event.value[0].utterance}),
+            target: "ExtraInformationSpeak" },],
           ASR_NOINPUT : {
-              target: "ReRaiseMeetingDay"
+              target: "ReRaiseMeetingDateTime"
                 },
               },
             },
     
-    ReRaiseMeetingDay: {
+    ReRaiseMeetingDateTime: {
       entry: [{ type: "speakToTheUser", 
             params: `I didn't hear you.`}],
       on: {
-          SPEAK_COMPLETE: "MeetingDaySpeak"
+          SPEAK_COMPLETE: "MeetingDateTimeSpeak"
               }
             },
+  
+    ExtraInformationSpeak: {
+      entry: [{ type: "speakToTheUser",
+    params: `Is there anything else you'd like me to note down?.` }],
+    on:  {
+      SPEAK_COMPLETE: "ExtraInformationListen"
+    }
+    },
     
-    
-    MeetingDurSpeak: {
-          entry: [{ type: "speakToTheUser", 
-          params: `Will it take the whole day?`,
-              }],
-          on: { SPEAK_COMPLETE : "MeetingDurListen"
-         },
-        },
-    
-    MeetingDurListen: {
-          entry: "listenForUsersAnswer",
-          on: { 
-            RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "VerificationWholeDaySpeak" },
-                            { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingTimeSpeak" }],
-            ASR_NOINPUT : {
-              target: "ReRaiseMeetingDur"
-                },
-            },
-        },
-    
-    ReRaiseMeetingDur: {
-          entry: [{ type: "speakToTheUser", 
-          params: `I didn't hear you.`}],
-          on: {
-            SPEAK_COMPLETE: "MeetingDurSpeak"
-          }
-        },
-    
-    MeetingTimeSpeak: {
-          entry: [{ type: "speakToTheUser", 
-          params: `What time is your meeting?`,
-              }],
-          on: { SPEAK_COMPLETE: "MeetingTimeListen" 
-        },
-      },
-    
-    MeetingTimeListen: {
-          entry: "listenForUsersAnswer",
-          on: {
-            RECOGNISED : [{ 
-              guard: ({event}) => isInGrammar(event.value[0].utterance) === true, 
-              actions: assign({meeting_time: ({context, event}) => event.value[0].utterance}),
-              target: "VerificationNotWholeDaySpeak" },
-              {
-              actions: [{ type: "speakToTheUser", params: `I'm sorry, this time is not in my grammar. Please re-check my grammar.` }],
-              target: "WaitToStart"}],
-            ASR_NOINPUT : {
-              target: "ReRaiseMeetingTime"
-              },
-            },
-          },
-    
-    ReRaiseMeetingTime: {
-            entry: [{ type: "speakToTheUser", 
-            params: `I didn't hear you.`,
-              }],
-            on: {
-              SPEAK_COMPLETE: "MeetingTimeSpeak"
-            }
-          },
+    ExtraInformationListen: {
+      entry: "listenForUsersAnswer",
+      on: {
+        RECOGNISED: {
+          actions: assign({ExtraInformation: ({context, event}) => event.nluValue.entity})
+        }
+      }
+    },
     
     VerificationNotWholeDaySpeak: {
           entry: [{ type: "speakToTheUser", 
@@ -284,7 +230,7 @@ const dmMachine = setup({
       },
 
     StartTellingAboutACelebrity: {
-        entry: [{type: "speakToTheUser"}]
+        entry: [{type: "speakToTheUser", params: `Here is some information about that person.`}]
       },
 
     Done: {
