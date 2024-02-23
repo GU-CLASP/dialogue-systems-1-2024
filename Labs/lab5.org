@@ -1,0 +1,59 @@
+#+OPTIONS: toc:t num:nil
+#+TITLE: Lab V. Advanced dialogue management
+
+* Part 1. Improving your voice interface
+In this part of the lab you will need to improve your application from
+Labs II and IV. Copy =dm4.js= to new file =dm5.js= and 're-route' =main.js= to
+it. Now you will need to implement some improvements.
+
+*Note:* try not to copy and paste the same code, use functions to abstract
+certain blocks.
+
+1. Make sure that system handles unexpected input (out-of-grammar situations). 
+2. A opportunity to say "help" at any point when system is recognising
+   something. You should provide a help message (anything you like)
+   and return the user to the state where they were before asking for
+   help.
+3. In a stepwise fashion change the formulations for your re-prompts
+   in case of noinput (ASR sends ~NOINPUT~) event and out-of-grammar
+   situations. See example below. 
+4. If the user is silent and not reacting to 3 reprompts, go to
+   the =Done= state.
+
+#+begin_example
+   S> Will it take the whole day?
+   U> (NOINPUT)
+   S> Sorry, I didn't hear you. Will the meeting take the whole day?
+   U> (NOT in the grammar)
+   S> Sorry, I didn't understand. Will the meeting take the whole day, please say "yes" or "no". 
+#+end_example
+
+* Part 2. Confidence threshold
+1. Implement confidence threshold for *speech recognition* of user
+   inputs.
+   - If :: the confidence for the top-ranked recognition hypothesis is
+     higher than threshold X
+   - then ::  assume that the speech recogniton is correct 
+     and proceed
+   - else :: ask the user whether the top-ranked recognition
+     hypothesis is what the user wants.  
+
+2. Test the system and adjust the threshold.
+
+3. Can you implement a similar threshold for *natural language
+   understanding*? How can it be combined with the ASR threshold?
+   Justify your choice (as a comment in your code) and provide a
+   sketch implementation.
+
+   #+begin_quote
+   *Note*: The system's grounding question can to be perceptual ("Did you say 'create a meeting'?") or semantic ("You want to create a meeting, is that correct?").
+   #+end_quote
+  
+
+* Submission
+*Commit* your changes (new file =dm5.js=) and *push* them to your repository
+  (your fork of this repository). This will update your pull request. Rename the pull request to e.g. "Labs 2,3,4,5 submission".
+
+Submit:
+- link to your pull request
+  
