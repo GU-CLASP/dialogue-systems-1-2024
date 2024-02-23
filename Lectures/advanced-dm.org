@@ -142,7 +142,7 @@ reenter: entry and exit actions
 
 state hierarchy and events
 
-Custom events (next time!)
+Custom events 
 
 ** Abstraction over SPEAK
 
@@ -199,3 +199,56 @@ Homework:
     entry: { type: "say", params: "hcih" },
   },
 #+end_src
+
+** Custom events from the buttons on the page
+in =dm.js=:
+#+begin_src javascript
+export function setupSelect(element) {
+  const options = [
+    { emoji: "🦆", name: "a wild duck" },
+    { emoji: "🚘", name: "a volvo car" },
+  ];
+  for (const option of options) {
+    const optionButton = document.createElement("button");
+    optionButton.type = "button";
+    optionButton.innerHTML = option.emoji;
+    optionButton.addEventListener("click", () => {
+      dmActor.send({ type: "SELECT", value: option.name });
+    });
+
+    element.appendChild(optionButton);
+  }
+}
+#+end_src
+
+=main.js=:
+#+begin_src javascript
+import "./style.css";
+import { setupButton, setupSelect } from "./dm.js";
+
+document.querySelector("#app").innerHTML = `
+  <div>
+    <div class="card" id="select">
+    </div>
+    <div class="card">
+      <button id="counter" type="button"></button>
+    </div>
+  </div>
+`;
+
+setupSelect(document.querySelector("#select"));
+setupButton(document.querySelector("#counter"));
+#+end_src
+
+
+** Dynamic buttons (advanced)
+You might need this if you want to dynamically show or change your
+buttons. This is a bit more tricky, because the buttons need to
+communicate back to the agent (to the state chart). I recommend the following:
+- move =setupSelect= logic to a *callback actor* (https://stately.ai/docs/callback-actors)
+- *invoke* this actor from some specific state (when you want to show the buttons)
+- to hide the buttons again you can have a simple action that clear up
+  the contents (=innerHTML= of the element) which you execute on =SELECT=
+  event.
+
+
