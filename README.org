@@ -9,4 +9,4 @@ Practice:
 - [[Labs/lab2.org][Lab II]]
 - [[Labs/lab3.org][Lab III]]
 - [[Labs/lab4.org][Lab IV]]
-- Lab V
+- [[Labs/lab5.org][Lab V]]
