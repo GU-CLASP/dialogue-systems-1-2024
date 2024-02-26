@@ -1,0 +1,19 @@
+Original performance: https://www.youtube.com/watch?v=VjMoRb5f-EQ
+
+
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"b5f86142-ce84-4483-8142-45db0d778add","Name":"Microsoft Server Speech Text to Speech Voice (en-US, DavisNeural)","ShortName":"en-US-DavisNeural","Locale":"en-US","VoiceType":"StandardVoice"}]}-->
+<!--ID=FCB40C2B-1F9F-4C26-B1A1-CF8E67BE07D1;Version=1|{"Files":{}}-->
+<!--ID=5B95B1CC-2C7B-494F-B746-CF22A0E779B7;Version=1|{"Locales":{"en-US":{"AutoApplyCustomLexiconFiles":[{}]}}}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-US-DavisNeural"><s /><mstts:express-as style="hopeful"><prosody rate="-30.00%" pitch="low">I celebrate myself, and sing myself, </prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful"><prosody rate="-30.00%" pitch="low">And </prosody><break strength="weak" /><prosody rate="-30.00%" pitch="low">what I assume you shall assume,</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-DavisNeural" sentenceboundarysilence="50ms"><s /><mstts:express-as style="hopeful"><prosody rate="-30.00%" pitch="low">For every atom belonging to me as good belongs to you.</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-DavisNeural"><s /><mstts:express-as style="hopeful"><break strength="strong" /><prosody rate="-30.00%" pitch="low">I loafe and invite my soul,</prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful"><break strength="strong" /><prosody rate="-30.00%" pitch="low">I lean and loafe at my ease observing a spear of summer grass.</prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful"><break strength="strong" /><prosody rate="-30.00%" pitch="low">My tongue, every atom of my blood, form’d from this soil, this air,</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-DavisNeural" sentenceboundarysilence="50ms"><s /><mstts:express-as style="hopeful"><prosody rate="-30.00%" pitch="low">Born here of parents </prosody><break strength="medium" /><prosody rate="-30.00%" pitch="low">born here from parents the same, and their parents the same,</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-DavisNeural" sentenceboundarysilence="50ms"><s /><mstts:express-as style="hopeful"><prosody rate="-30.00%" pitch="low">I, now thirty-seven years old in perfect health begin,</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-DavisNeural" sentenceboundarysilence="50ms"><s /><mstts:express-as style="hopeful"><prosody rate="-30.00%" pitch="low">Hoping to cease not till death.</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-DavisNeural"><s /><mstts:express-as style="hopeful"><break strength="x-strong" /><prosody rate="-30.00%" pitch="low">Creeds and schools in abeyance,</prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful"><break strength="strong" /><prosody rate="-30.00%" pitch="low">Retiring back a while sufficed at what they are, but never forgotten,</prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful"><break strength="strong" /><prosody rate="-30.00%" pitch="low">I harbor for good or bad, I permit to speak at every hazard,</prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful"><break strength="strong" /><prosody rate="-30.00%" pitch="low">Nature</prosody><break strength="weak" /><prosody rate="-30.00%" pitch="low"> without check with original energy.</prosody></mstts:express-as><s /></voice></speak>
