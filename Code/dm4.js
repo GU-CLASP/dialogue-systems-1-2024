@@ -43,6 +43,14 @@ function checkIfWhoIsIntent(event){
   return (event === "WhoIsX");
 }
 
+function checkIfYes(event) {
+  return (event === "yes");    //the entity needs to be in the group yes
+}
+
+function checkIfNo(event) {
+  return (event === "no");    //the entity needs to be in the group no
+}
+
 const dmMachine = setup({
   actions: {
     listenForUsersAnswer : ({ context }) => 
@@ -60,6 +68,9 @@ const dmMachine = setup({
   /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwA2RQFYuADgAsergEYuagOwAaEAE9EJkxfQaVp41wsaTAZl8Bffxs0dAB1AnFqQXIxIjFiAGEAGQBJBIBpbj4kECFRCWlZBQQTTXVdFQNFEwMfHz1FG3sEbQaXCu8fAy1tesDgjBxBAFs8MVIpCFJYAGssbBGx4nJMFnT6BIB5VEwkpmomLNk88UkZHOLtDR90Cx03PwsfCwM1JsQNVvQDB6cGrsc-RAISGo3Gk2mcySIlgYjAUmIzC2AHEAHIpchMZBHHInArnUDFPROdCKZ4VEwaPTPEx6d4tV7oDxcXpGLwaCwmIEghZgiZTWboaGw+HLVakdZbHZ7A44gTCU6FC4OLyktyONR6O53NQGekGXwuB4WE1cV7PbkYZDSMCJVIZOW5BX4ooqjRqlQarWKHV6uyIXqKcqVK6KNT6M2BIIgKSCCBwWRoY7Os6uhAAWg09Mzlvm+CIYGT+VTyoQVXpxPQPnVPk0pS4rgsufCkWisWwYiLioJ8gD1n9LTaFgq1LUai6Y58udBY35kK7LtLij07sUilelh6Bm0a6zA+6QYqXFrO+0XjM2mnvNnEMFM87uJTSsJiDqBlJ67HXh02939Ou2joGYKgmlqag7rqV6LOCApQjCcI9niJYvggXjvkepj6Bydz-roQEVF0dRoSYii5taUiFo+xbPr2LSNPupSktS9R6A0JjaKUZ5Rv4QA */
   context: {
     meeting_name: "",
+    DateTime: "",
+    meeting_title: "",
+    celebrity: "",
   },
   id: "DM",
   initial: "Prepare",
@@ -89,9 +100,10 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
         on: {
           RECOGNISED: [
-            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) === true, //checking which path to take, meeting or celeb
+            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent), //checking which path to take, creating a meeting
             target: "MeetingPersonSpeak"},
-            {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent) === true, //or celeb
+            {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent),    //or celeb info
+            actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}),
             target: "StartTellingAboutACelebrity"}],
           },
         },
@@ -108,7 +120,7 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
       on: {
         RECOGNISED : {
-          actions: assign({meeting_name: ({context, event}) => event.nluValue.entity}),   //problem here!! check from this point forward...
+          actions: assign({meeting_name: ({event}) => event.nluValue.entities[0].text}),   
           target: "MeetingDateTimeSpeak" },
     
         ASR_NOINPUT : {
@@ -136,10 +148,9 @@ const dmMachine = setup({
     MeetingDateTimeListen: {
       entry: "listenForUsersAnswer",
         on: {
-          RECOGNISED : [{ 
-            guard: ({event}) => isInGrammar(event.value[0].utterance) === true, 
-            actions: assign({DateTime: ({context, event}) => event.value[0].utterance}),
-            target: "ExtraInformationSpeak" },],
+          RECOGNISED : { 
+            actions: assign({DateTime: ({event}) => event.nluValue.entities[0].text}),
+            target: "MeetingTitleYesOrNoSpeak" },
           ASR_NOINPUT : {
               target: "ReRaiseMeetingDateTime"
                 },
@@ -154,86 +165,113 @@ const dmMachine = setup({
               }
             },
   
-    ExtraInformationSpeak: {
+    MeetingTitleYesOrNoSpeak: {
       entry: [{ type: "speakToTheUser",
-    params: `Is there anything else you'd like me to note down?.` }],
+    params: `Would you like to name your meeting?` }],
     on:  {
-      SPEAK_COMPLETE: "ExtraInformationListen"
+      SPEAK_COMPLETE: "MeetingTitleYesOrNoListen"
     }
     },
     
-    ExtraInformationListen: {
+    MeetingTitleYesOrNoListen: {
+      entry: "listenForUsersAnswer",
+      on: {
+        RECOGNISED: {guard: ({event}) => checkIfYes(event.nluValue.entities[0].category),
+                    target: "MeetingTitleSpeak"},
+                    target: "VerificationSpeak",
+      }
+    },
+
+    MeetingTitleSpeak: {
+      entry: [{ type: "speakToTheUser", 
+      params: `Please name your meeting.`}],
+      on: {
+        SPEAK_COMPLETE: "MeetingTitleListen"
+      }
+
+    },
+
+    MeetingTitleListen: {
       entry: "listenForUsersAnswer",
       on: {
         RECOGNISED: {
-          actions: assign({ExtraInformation: ({context, event}) => event.nluValue.entity})
+          actions: assign({meeting_title: ({event}) => event.nluValue.entities[0].text}),
+          target: "VerificationWithTitleSpeak"
         }
       }
     },
+
+    VerificationWithTitleSpeak: {
+      entry: [{type: "speakToTheUser", params: ({ context}) => `Do you want me to create an appointment with the title of 
+      ${context.meeting_title} with ${context.meeting_name} on ${context.DateTime}?`}],
+      on: {
+        SPEAK_COMPLETE: "VerificationWithTitleListen"
+      }
+    },
+
+    VerificationWithTitleListen: {
+      entry: "listenForUsersAnswer",
+      on: { 
+        RECOGNISED : [{ guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
+                        { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "MeetingPersonSpeak" }],
+        ASR_NOINPUT : "ReRaiseVerificationWithTitleSpeak"
+        },
+      },
+
+    ReRaiseVerificationWithTitleSpeak: {
+      entry: [{ type: "speakToTheUser", 
+          params: `I didn't hear you.`,
+            }],
+          on: {
+            SPEAK_COMPLETE: "VerificationWithTitleSpeak"
+          }
+        },
     
-    VerificationNotWholeDaySpeak: {
+    VerificationSpeak: {
           entry: [{ type: "speakToTheUser", 
           params: ({ context }) => `Do you want me to create an appointment 
-          with ${getPerson(context.meeting_name)} on ${getDay(context.meeting_date)} 
-          at ${getTime(context.meeting_time)}?`,
+          with ${context.meeting_name} on ${context.DateTime}?`,
               }],
           on: { 
-            SPEAK_COMPLETE: "VerificationNotWholeDayListen",
+            SPEAK_COMPLETE: "VerificationListen",
+            ASR_NOINPUT: "ReRaiseVerificationSpeak"
         },
       },
     
-    VerificationNotWholeDayListen: {
+    VerificationListen: {
         entry: "listenForUsersAnswer",
         on: { 
-          RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "Done" },
-                          { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingPersonSpeak" }],
-          ASR_NOINPUT : { target: "ReRaiseVerificationNotWholeDay" }
+          RECOGNISED : [{ guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
+                          { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "MeetingPersonSpeak" }],
+          ASR_NOINPUT : "ReRaiseVerificationSpeak"
           },
         },
     
-    ReRaiseVerificationNotWholeDay: {
+    ReRaiseVerificationSpeak: {
           entry: [{ type: "speakToTheUser", 
           params: `I didn't hear you.`,
             }],
           on: {
-            SPEAK_COMPLETE: "VerificationNotWholeDaySpeak"
+            SPEAK_COMPLETE: "VerificationSpeak"
           }
         },
-    
-    
-    VerificationWholeDaySpeak: {
-        entry: [{ type: "speakToTheUser", 
-          params: ({ context }) => `Do you want me to create an appointment 
-          with ${getPerson(context.meeting_name)} on ${getDay(context.meeting_date)} 
-          for the whole day?`,
-              }],
-          on: { SPEAK_COMPLETE: "VerificationWholeDayListen" 
-        },
-      },
-    
-    VerificationWholeDayListen: {
-        entry: "listenForUsersAnswer",
-        on: { 
-          RECOGNISED : [{ guard: ({event}) => isTheAnswerYes(event.value[0].utterance) === true, target: "Done" },
-                          { guard: ({event}) => isTheAnswerNo(event.value[0].utterance) === true, target: "MeetingPersonSpeak" }],
-          ASR_NOINPUT : {target: "ReRaiseVerificationWholeDay"}
-          },
-      },
-    
-    ReRaiseVerificationWholeDay: {
-        entry: [{ type: "speakToTheUser", 
-        params: `I didn't hear you.`,
-          }],
+
+    StartTellingAboutACelebrity: {
+        entry: [{type: "speakToTheUser", params: `Here is some information about that person.`}],
         on: {
-          SPEAK_COMPLETE: "VerificationWholeDaySpeak"
+          SPEAK_COMPLETE: "CelebrityInformationSpeak",
         }
       },
 
-    StartTellingAboutACelebrity: {
-        entry: [{type: "speakToTheUser", params: `Here is some information about that person.`}]
-      },
+    CelebrityInformationSpeak: {
+      entry: [{ type: "speakToTheUser", params: ({context}) => `${context.celebrity}`}],
+      on: {
+        SPEAK_COMPLETE: "Done"
+      }
+    },
 
     Done: {
+      entry: [{ type: "speakToTheUser", params: `Done!`}],
       on: {
         CLICK: "Prompt",
       },
