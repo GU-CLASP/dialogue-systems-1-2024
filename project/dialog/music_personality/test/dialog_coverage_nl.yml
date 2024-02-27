@@ -1,0 +1,579 @@
+prediction_introverted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+
+prediction_extraverted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: 0.6
+    turns:
+      - S I think this person is extraverted.
+
+explanation_for_introverted_with_positive_coefficient:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.2
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+
+explanation_for_introverted_with_negative_coefficient:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+      danceability_mean: 0
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: -0.6
+      danceability_mean: 0
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music with high energy.
+
+explanation_for_extraverted_with_positive_coefficient:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: 0
+      danceability_mean: 0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: 0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes danceable music.
+
+explanation_for_extraverted_with_negative_coefficient:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+      danceability_mean: 0
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0.6
+      danceability_mean: 0
+      valence_mean: 0
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes music with low energy.
+
+explanation_for_feature_value_judgement_introverted_with_positive_coefficient:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U I don't understand
+      - S Generally, listening to music that is not danceable correlates with being introverted.
+      - U why?
+      - S I don't know.
+
+explanation_for_feature_value_judgement_introverted_with_negative_coefficient:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+      danceability_mean: 0
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: -0.6
+      danceability_mean: 0
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music with high energy.
+      - U I don't understand
+      - S Generally, listening to music with high energy correlates with being introverted.
+      - U why?
+      - S I don't know.
+
+explanation_for_feature_value_judgement_extraverted_with_positive_coefficient:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: 0
+      danceability_mean: 0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: 0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes danceable music.
+      - U I don't understand
+      - S Generally, listening to danceable music correlates with being extraverted.
+      - U why?
+      - S I don't know.
+
+explanation_for_feature_value_judgement_extraverted_with_negative_coefficient:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+      danceability_mean: 0
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0.06
+      danceability_mean: 0
+      valence_mean: 0
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes music with low energy.
+      - U I don't understand
+      - S Generally, listening to music with low energy correlates with being extraverted.
+      - U why?
+      - S I don't know.
+
+negative_understanding:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+      - U sdf
+      - S Sorry, I don't understand.
+
+explicitly_ask_why_introverted_when_this_is_predicted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S I think this person is introverted.
+      - U why do you think this person is introverted?
+      - S The person likes music that is not danceable.
+
+explicitly_ask_why_extraverted_when_this_is_not_predicted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S I think this person is introverted.
+      - U why do you think this person is extraverted?
+      - S I don't think this person is extraverted.
+
+explicitly_ask_why_extraverted_when_this_is_predicted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      danceability_mean: 0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: 0.01
+    turns:
+      - S I think this person is extraverted.
+      - U why do you think this person is extraverted?
+      - S The person likes danceable music.
+
+explicitly_ask_why_extraverted_when_this_is_not_predicted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S I think this person is introverted.
+      - U why do you think this person is extraverted?
+      - S I don't think this person is extraverted.
+
+explicitly_ask_how_something_explains_something_when_this_is_the_case:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U how does liking music that is not danceable explain being introverted?
+      - S Generally, listening to music that is not danceable correlates with being introverted.
+
+explicitly_ask_how_something_explains_something_when_this_is_not_the_case:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U how does liking music that is not danceable explain being extraverted?
+      - S No, listening to music that is not danceable does not correlate with being extraverted.
+
+asking_why_system_does_not_know_why_etc:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U so what
+      - S Generally, listening to music that is not danceable correlates with being introverted.
+      - U why
+      - S I don't know.
+      - U why
+      - S I don't know.
+      - U why
+      - S I don't know.
+      - U why
+
+implicitly_ask_why_concerning_high_feature_value:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      danceability_mean: 0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: 0.01
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes danceable music.
+      - U why do you think so?
+      - S Music heard by the person has a higher average score for danceability than music in general.
+
+explicitly_ask_why_concerning_factual_high_feature_value:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      danceability_mean: 0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: 0.01
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes danceable music.
+      - U why do you think this person likes danceable music?
+      - S Music heard by the person has a higher average score for danceability than music in general.
+
+explicitly_ask_why_concerning_unfactual_high_feature_value:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      danceability_mean: 0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: 0.01
+    turns:
+      - S I think this person is extraverted.
+      - U why?
+      - S The person likes danceable music.
+      - U why do you think this person likes music that is not danceable?
+      - S No, I don't think this person likes music that is not danceable.
+
+implicitly_ask_why_concerning_low_feature_value:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U why do you think so?
+      - S Music heard by the person has a lower average score for danceability than music in general.
+
+explicitly_ask_why_concerning_factual_low_feature_value:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U why do you think this person likes music that is not danceable?
+      - S Music heard by the person has a lower average score for danceability than music in general.
+
+explicitly_ask_why_concerning_unfactual_low_feature_value:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music that is not danceable.
+      - U why do you think this person likes danceable music?
+      - S No, I don't think this person likes danceable music.
+
+ignore_acknowledgement_from_user:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+      - U OK
+      - S
+      - U why?
+      - S The person likes music with high energy.
+
+user_question_about_factual_support_for_prediction:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: -0.6
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S I think this person is introverted.
+      - U why?
+      - S The person likes music with high energy.
+      - U does the the fact that the person likes music that is not danceable support the assessment that the person is introverted?
+      - S Yes.
+
+user_question_about_unfactual_support_for_prediction:
+  predicted_extraversion_prob: 0.4
+  feature_values:
+    energy_mean: 0.1
+    danceability_mean: -0.1
+    valence_mean: 0
+  global_coefficients:
+    energy_mean: -0.6
+    danceability_mean: 0.1
+    valence_mean: 0.2
+  local_contributions:
+    energy_mean: -0.6
+    danceability_mean: -0.01
+    valence_mean: 0
+  turns:
+    - S I think this person is introverted.
+    - U why?
+    - S The person likes music with high energy.
+    - U does the the fact that the person likes music that is not danceable support the assessment that the person is extraverted?
+    - S No.
+
+user_question_about_factors_considered:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+      - U Which factors do you consider?
+      - "S I consider music heard by the person in terms of the following audio features: energy, mode, loudness, speechiness, instrumentalness, valence and danceability."
+
+user_question_whether_extraverted_when_extraverted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is extraverted.
+      - U Do you think this person is extraverted?
+      - S Yes, I think so.
+
+user_question_whether_extraverted_when_introverted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+      - U Do you think this person is extraverted?
+      - S No, I don't think so.
+
+user_question_whether_introverted_when_extraverted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is extraverted.
+      - U Do you think this person is introverted?
+      - S No, I don't think so.
+
+user_question_whether_introverted_when_introverted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+      - U Do you think this person is introverted?
+      - S Yes, I think so.
+
+acknowledge_user_assertions:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I think this person is introverted.
+      - U I think the person is extraverted.
+      - S OK.
+      - U I think the person is introverted.
+      - S OK.
+
+prediction_introverted_strong_hedge:
+    predicted_extraversion_prob: 0.05
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S I'm quite confident that this person is introverted.
+
+prediction_introverted_weak_hedge:
+    predicted_extraversion_prob: 0.45
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S If I had to guess, I'd say that this person is introverted.

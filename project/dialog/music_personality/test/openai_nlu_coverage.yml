@@ -1,0 +1,19 @@
+coverage:
+  -
+    u: why?
+    p: Ask(Why())
+  -
+    u: I don't understand
+    p: ICM(understanding, negative)
+  -
+    u: why do you think this person is extraverted?
+    p: Ask(Why(Extraverted()))
+  -
+    u: why do you think this person is introverted?
+    p: Ask(Why(Not(Extraverted())))
+  -
+    u: how does liking music that is not danceable explain being introverted?
+    p: Ask(Why(Explains(Not(HighValue(F.danceability_mean)), Not(Extraverted()))))
+  -
+    u: how does liking loud music explain being extraverted?
+    p: Ask(Why(Explains(HighValue(F.loudness_mean), Extraverted())))

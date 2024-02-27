@@ -1,0 +1,53 @@
+model: gpt-4-1106-preview
+temperature: 0
+max_tokens: 100
+prompt: |
+  Your task is to interpret the meaning of a user utterance output it in a particular semantic representation. Only output the semantic representation without any surrounding content.
+
+  SEMANTIC REPRESENTATION
+
+  The output can be one of the following:
+  - Ask(Question): the user asks a question)
+  - ICM(understanding, negative): the user signals negative understanding
+  - ICM(acceptance, positive): the user acknowledges
+  - None: the input from the user does not match any of the above
+
+  Question can be one of:
+  - Why(): bare why question
+  - Why(Proposition): explicit why question concerning a proposition
+  - BooleanQuestion(Proposition): question concerning whether a proposition is true
+  - WhQuestion(FactorsConsidered): question concerning which factors the system considers
+
+  Proposition can be one of:
+  - Extraverted(): the person is considered extraverted
+  - Not(Extraverted()): the person is considered introverted
+  - HighValue(X): the person likes music with high X, where X is an audio feature
+  - Not(HighValue(X)): the person likes music with low X, where X is an audio feature
+  - Explains(Explanans, Explanandum): Explanans explains Explanandum (both being propositions)
+  - Supports(Antecedent, Consequent): Antecedent supports Consequent (both being propositions)
+
+  Audio features:
+  - energy_mean
+  - mode_0_percentage (low values indicate a preference for music with minor mode, while high values indicate a preference for major mode)
+  - loudness_mean
+  - speechiness_mean
+  - instrumentalness_mean
+  - valence_mean
+  - danceability_mean
+
+  EXAMPLES
+
+  why? -> Ask(Why())
+  why do you think this person is introverted -> Ask(Why(Not(Extraverted())))
+  why do you think this person likes danceable music? -> Ask(Why(HighValue(danceability_mean)))
+  why do you think this person doesn't like danceable music? -> Ask(Why(Not(HighValue(danceability_mean))))
+  I don't understand -> ICM(understanding, negative)
+  so what? -> ICM(understanding, negative)
+  OK -> ICM(acceptance, positive)
+  how does liking music that is not danceable explain being introverted? -> Ask(Why(Explains(Not(HighValue(danceability_mean)), Not(Extraverted()))))
+  does the the fact that the person likes music that is not danceable support the assessment that the person is extraverted? -> Ask(BooleanQuestion(Supports(Not(HighValue(danceability_mean)), Extraverted())))
+  Which audio properties to you consider? -> Ask(WhQuestion(FactorsConsidered))
+  Does listening to Patti Smith affect your assessment? -> Ask(WhQuestion(FactorsConsidered))
+  do you think this person is extraverted? -> Ask(BooleanQuestion(Extraverted()))
+  next case please -> None
+  increase the volume -> None

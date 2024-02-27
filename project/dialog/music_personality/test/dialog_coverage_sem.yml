@@ -1,0 +1,293 @@
+prediction_introverted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+
+prediction_extraverted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: 0.6
+    turns:
+      - S Assert(Extraverted(), medium)
+
+explanation_for_introverted_with_positive_coefficient:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.2
+      valence_mean: 0
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(Why())
+      - S Assert(Not(HighValue(danceability_mean)))
+
+
+explanation_for_feature_value_judgement_introverted_with_positive_coefficient:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(Why())
+      - S Assert(Not(HighValue(danceability_mean)))
+      - U ICM(understanding, negative)
+      - S Assert(Supports(Not(HighValue(danceability_mean)), Not(Extraverted())))
+      - U Ask(Why())
+      - S ICM(acceptance, negative, LackKnowledge())
+
+negative_understanding:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U None
+      - S ICM(understanding, negative)
+
+explicitly_ask_why_introverted_when_this_is_predicted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      danceability_mean: -0.1
+    global_coefficients:
+      danceability_mean: 0.1
+    local_contributions:
+      danceability_mean: -0.01
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(Why(Not(Extraverted())))
+      - S Assert(Not(HighValue(danceability_mean)))
+
+explicitly_ask_how_something_explains_something_when_this_is_the_case:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0
+      danceability_mean: -0.1
+      valence_mean: 0
+    global_coefficients:
+      energy_mean: -0.6
+      danceability_mean: 0.1
+      valence_mean: 0.2
+    local_contributions:
+      energy_mean: 0
+      danceability_mean: -0.01
+      valence_mean: 0
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(Why())
+      - S Assert(Not(HighValue(danceability_mean)))
+      - U Ask(Why(Explains(Not(HighValue(danceability_mean)), Not(Extraverted()))))
+      - S Assert(Supports(Not(HighValue(danceability_mean)), Not(Extraverted())))
+
+ignore_acknowledgement_from_user:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U ICM(acceptance, positive)
+      - S
+      - U Ask(Why())
+      - S Assert(HighValue(energy_mean))
+
+user_question_about_factual_support_for_prediction:
+  predicted_extraversion_prob: 0.4
+  feature_values:
+    energy_mean: 0.1
+    danceability_mean: -0.1
+    valence_mean: 0
+  global_coefficients:
+    energy_mean: -0.6
+    danceability_mean: 0.1
+    valence_mean: 0.2
+  local_contributions:
+    energy_mean: -0.6
+    danceability_mean: -0.01
+    valence_mean: 0
+  turns:
+    - S Assert(Not(Extraverted()), medium)
+    - U Ask(Why())
+    - S Assert(HighValue(energy_mean))
+    - U Ask(BooleanQuestion(Supports(Not(HighValue(danceability_mean)), Not(Extraverted()))))
+    - S Assert(True)
+
+user_question_about_unfactual_support_for_prediction:
+  predicted_extraversion_prob: 0.4
+  feature_values:
+    energy_mean: 0.1
+    danceability_mean: -0.1
+    valence_mean: 0
+  global_coefficients:
+    energy_mean: -0.6
+    danceability_mean: 0.1
+    valence_mean: 0.2
+  local_contributions:
+    energy_mean: -0.6
+    danceability_mean: -0.01
+    valence_mean: 0
+  turns:
+    - S Assert(Not(Extraverted()), medium)
+    - U Ask(Why())
+    - S Assert(HighValue(energy_mean))
+    - U Ask(BooleanQuestion(Supports(Not(HighValue(danceability_mean)), Extraverted())))
+    - S Assert(False)
+
+consecutive_user_questions_about_support_for_prediction:
+  predicted_extraversion_prob: 0.4
+  feature_values:
+    energy_mean: 0.1
+    danceability_mean: -0.1
+    valence_mean: 0
+  global_coefficients:
+    energy_mean: -0.6
+    danceability_mean: 0.1
+    valence_mean: 0.2
+  local_contributions:
+    energy_mean: -0.6
+    danceability_mean: -0.01
+    valence_mean: 0
+  turns:
+    - S Assert(Not(Extraverted()), medium)
+    - U Ask(Why())
+    - S Assert(HighValue(energy_mean))
+    - U Ask(BooleanQuestion(Supports(Not(HighValue(danceability_mean)), Extraverted())))
+    - S Assert(False)
+    - U Ask(BooleanQuestion(Supports(Not(HighValue(danceability_mean)), Not(Extraverted()))))
+    - S Assert(True)
+
+user_question_about_factors_considered:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(WhQuestion(FactorsConsidered))
+      - S Assert(FactorsConsidered(audio_features))
+
+user_question_whether_extraverted_when_extraverted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Extraverted(), medium)
+      - U Ask(BooleanQuestion(Extraverted()))
+      - S Assert(True, medium)
+
+user_question_whether_extraverted_when_introverted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(BooleanQuestion(Extraverted()))
+      - S Assert(False, medium)
+
+user_question_whether_introverted_when_extraverted:
+    predicted_extraversion_prob: 0.6
+    feature_values:
+      energy_mean: -0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Extraverted(), medium)
+      - U Ask(BooleanQuestion(Not(Extraverted())))
+      - S Assert(False, medium)
+
+user_question_whether_introverted_when_introverted:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Ask(BooleanQuestion(Not(Extraverted())))
+      - S Assert(True, medium)
+
+acknowledge_user_assertions:
+    predicted_extraversion_prob: 0.4
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), medium)
+      - U Assert(Extraverted())
+      - S ICM(acceptance, positive)
+      - U Assert(Not(Extraverted()))
+      - S ICM(acceptance, positive)
+
+prediction_introverted_strong_hedge:
+    predicted_extraversion_prob: 0.05
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), strong)
+
+prediction_introverted_weak_hedge:
+    predicted_extraversion_prob: 0.45
+    feature_values:
+      energy_mean: 0.1
+    global_coefficients:
+      energy_mean: -0.6
+    local_contributions:
+      energy_mean: -0.6
+    turns:
+      - S Assert(Not(Extraverted()), weak)

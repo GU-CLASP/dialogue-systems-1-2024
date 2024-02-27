@@ -1,0 +1,4 @@
+pyyaml
+structlog
+openai==0.28
+pytest
