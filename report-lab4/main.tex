@@ -3,6 +3,25 @@
 \usepackage{graphicx} % Required for inserting images
 \usepackage[authordate]{biblatex-chicago}
 \addbibresource{bib.bib}
+\usepackage{listings}
+
+\lstnewenvironment{listing}{%
+    \lstset{
+      language={},
+      basicstyle=\ttfamily,
+      extendedchars=true,
+        breaklines=true,
+        breakatwhitespace=true,
+        breakindent=0pt,
+        % border:
+        frame=single,
+        framerule=0.25pt,
+        framesep=5pt,
+        xleftmargin=6pt,
+        xrightmargin=6pt,
+        caption={Description of formal language for conveying meaning of user utterances in the domain at hand.},captionpos=b,label={listing:L}
+    }
+}{}
 
 \title{LLM-Based NLU for Explanatory Dialogue}
 \author{alexander.berman@gu.se}
@@ -17,8 +36,19 @@ This report presents and discusses the integration of a large language model (LL
 \section{Motivation}
 One of the reasons for opting for an LLM-based NLU component is to be able to interpret user utterances in a more accurate and robust way than with a simple keyword- or rule-based component. Furthermore, it was hypothesized that an LLM-based solution would require less effort in terms of development time than a more conventional machine-learning based approach (such as logistic regression or support vector machine for intent classification) due to the ability to use zero- or few-shot learning, which in principle can drastically reduce the amount of required training data. Finally, it was deemed that the fine-grained semantics underpinning the dialogue modeling in the project would not be supported well by a more conventional approach based on intent classification and entity extraction. In contrast, with an LLM the problem can be approached as a sequence-to-sequence task, i.e. as a transformation from natural language to an expression in formal language whose syntax and semantics is fed to the LLM in the prompt.
 
-\section{Technical framing}
-In conventional approaches, NLU for dialogue systems is typically divided into two ``tasks'': intent classification and entity extraction. For example, the user utterance ``I need a ticket to Paris'' can be understood as expressing the intent \texttt{BookTicket} and the entity \texttt{Paris} (possibly assigned to the role \texttt{Destination}). In contrast, here the task as framed as a matter of transforming the natural-language utterance into a formal language for representing dialogue moves. For example, the meaning of the utterance above might be expressed as a sequence of (potentially nested) logical propositions, each of which denotes a dialogue move, such as [\texttt{request(BookTicket)}, \texttt{answer(dest\_city(Paris))}].
+\section{Problem formulation}
+In conventional approaches, NLU for dialogue systems is typically divided into two ``tasks'': intent classification and entity extraction. For example, the user utterance ``I need a ticket to Paris'' can be understood as expressing the intent \texttt{BookTicket} and the entity \texttt{Paris} (possibly assigned to the role \texttt{Destination}). In contrast, here the task as framed as a matter of expressing the meaning of a given natural-language utterance in a formal language. For example, the meaning of the utterance above might be expressed as a sequence of dialogue moves such as [\texttt{request(BookTicket)}, \texttt{answer(dest\_city(Paris))}].
+
+In general formal terms, given a user utterance $U$ and a description $L$ of a formal language, the NLU component should return an expression $E$ in $L$ that conveys the meaning of $U$. The value of $L$ in the context of the specific domain is provided in Listing \ref{listing:L}.
+
+\include{L}
+
+\section{Implementation}
+OpenAI's chat completion API is used as follows: Given the user utterance $U$, a prompt describing the task is provided as an initial system message, with $L$ embedded into the prompt. $U$ is then fed as a user message. As completion, an assistant message $M$ is obtained as output. Ideally, $M$ is a syntactically valid expression in the formal language described by $L$. However, this cannot be guaranteed. In initial experiments with GPT 3.5, the LLM would in at least one case not close all parentheses; however, no such problem has occurred with GPT 4 (see \ref{sec:evaluation}).
+
+In order for the output $M$ to be used as input to the dialogue manager, it also needs to be parsed into a semantic object (in this case a dialogue move). The dialogue system at hand is implemented in Python and uses custom types and classes to denote dialogue moves and their content. For example, instances of the class \texttt{Ask} denote ask-moves, and contain an instance of the class \texttt{Question}. To streamline the process of parsing semantic expressions, $L$ literally reflects the syntax of the internal semantics of the dialogue system. Hence, output from the LLM can in principle be parsed by passing it to the built-in Python function \texttt{eval}. However, such a solution would not be secure since the output from LLM cannot be guaranteed to abide to the instructed syntax. Instead, a secure parser has been implemented. This parser uses Python's \texttt{ast} module,
+
+\section{Evaluation}
 
 
 Specifically, GPT 4 (ref OpenAI) is prompted to parse user utterances
