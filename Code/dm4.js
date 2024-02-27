@@ -27,19 +27,34 @@ const settings = {
   ttsDefaultVoice: "en-US-DavisNeural",
 };
 
+const celebrityDatabase = {
+  "käärijä" : {information : "Jere Pöyhönen, born 21 October 1993, known professionally as Käärijä, is a Finnish rapper, singer and songwriter. He represented Finland in the Eurovision Song Contest 2023 with the song 'Cha Cha Cha', placing second with 526 points and finishing first in the public vote."},
+  "beyoncé" : {information : "Beyoncé Giselle Knowles-Carter, born September 4, 1981, is an American singer, songwriter and businesswoman. Dubbed as 'Queen Bey' and a prominent cultural figure of the 21st century, she has been recognized for her artistry and performances, with Rolling Stone naming her one of the greatest vocalists of all time."},
+  "alexander stubb" : {information: "Cai-Göran Alexander Stubb, born 1 April 1968, is a Finnish politician who is the president-elect of Finland, having won the 2024 presidential election. He previously served as Prime Minister of Finland from 2014 to 2015."},
+  "britney spears" : {information: "Britney Jean Spears, born December 2, 1981, is an American singer, often referred to as the 'Princess of Pop'. Spears has sold over 150 million records worldwide, making her one of the world's best-selling music artists."},
+  "loreen" : {information: "Lorine Zineb Nora Talhaoui, born 16 October 1983, known professionally as Loreen, is a Swedish singer and songwriter. Representing Sweden, she has won the Eurovision Song Contest twice, in 2012 and 2023, with the songs 'Euphoria' and 'Tattoo'."},
+  "angélique kidjo" : {information: "Angélique Kpasseloko Hinto Hounsinou Kandjo Manta Zogbin Kidjo, born July 14, 1960, is a Beninese-French singer-songwriter, actress and activist noted for her diverse musical influences and creative music videos. Angélique Kidjo has won five Grammy Awards."},
+  "lady gaga" : {information: "Stefani Joanne Angelina Germanotta, born March 28, 1986, known professionally as Lady Gaga, is an American singer, songwriter and actress."},
+  "ulf kristersson" : {information: "Ulf Hjalmar Kristersson, born 29 December 1963, is a Swedish politician who has been serving as Prime Minister of Sweden since 2022."},
+  "brad pitt": {information: "William Bradley Pitt, born December 18, 1963, is an American actor and film producer. He is the recipient of various accolades, including two Academy Awards, two British Academy Film Awards, two Golden Globe Awards, and a Primetime Emmy Award. "},
+  "barack obama" : {information: "Barack Hussein Obama II, born August 4, 1961, is an American politician who served as the 44th president of the United States from 2009 to 2017. A member of the Democratic Party, he was the first African-American president in U.S. history."},
+  "sauli niinistö" : {information: "Sauli Väinämö Niinistö,born 24 August 1948,is a Finnish politician who has been the 12th president of Finland since 1 March 2012."},
+  "Carl Gustaf XVI" : {information: "Carl XVI Gustaf, Carl Gustaf Folke Hubertus,born 30 April 1946, is King of Sweden."},
+};
+
 /* Helper functions */
-function isInGrammar(utterance) {
-  return utterance.toLowerCase() in grammar;
+function isInCelebrityDatabase(utterance) {
+  return utterance.toLowerCase() in celebrityDatabase;
 }
 
-function getPerson(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).person;
+function getCelebrityInfo(utterance) {
+  return (celebrityDatabase[utterance.toLowerCase()] || {}).information;
 }
 
-function checkIfMeetingIntent(event) {
+function checkIfMeetingIntent(event) {   //for checking the intent
   return (event === "CreateMeeting");
 }
-function checkIfWhoIsIntent(event){
+function checkIfWhoIsIntent(event){       //for checking the intent
   return (event === "WhoIsX");
 }
 
@@ -93,9 +108,11 @@ const dmMachine = setup({
 
     Prompt: {
       entry: [{ type: "speakToTheUser", params: `How can I help you today?`}],
-        on: { SPEAK_COMPLETE: "Listen" },
-        },
-
+      on: {
+        SPEAK_COMPLETE: "Listen",
+      },
+    },
+    
     Listen: {
       entry: "listenForUsersAnswer",
         on: {
@@ -103,10 +120,17 @@ const dmMachine = setup({
             {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent), //checking which path to take, creating a meeting
             target: "MeetingPersonSpeak"},
             {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent),    //or celeb info
-            actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}),
+            actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}), //assigning the celebrity in the context
             target: "StartTellingAboutACelebrity"}],
-          },
+          ASR_NOINPUT: "ReRaisePrompt"
         },
+      },
+
+    ReRaisePrompt: {
+      entry: [{type: "speakToTheUser", params: `Are you there?`}],
+      on: { SPEAK_COMPLETE: 
+        "Prompt"}
+    },
 
     MeetingPersonSpeak: {
       entry: [{ type: "speakToTheUser", 
@@ -257,14 +281,22 @@ const dmMachine = setup({
         },
 
     StartTellingAboutACelebrity: {
-        entry: [{type: "speakToTheUser", params: `Here is some information about that person.`}],
-        on: {
-          SPEAK_COMPLETE: "CelebrityInformationSpeak",
-        }
+        entry: [{ type: "speakToTheUser", params: `I'm checking to see if I have information about that person.` }],
+        on: { 
+          SPEAK_COMPLETE: [
+          {guard: ({ context }) => isInCelebrityDatabase(context.celebrity),
+            target: "CelebrityInformationSpeak"},
+          {guard: ({ context }) => isInCelebrityDatabase(context.celebrity) === false,
+            actions: [{type: "speakToTheUser",
+            params: `I'm sorry. I don't have any information of that particular person.`}],
+            target: "Done"}
+          ],
+        },
       },
+        
 
     CelebrityInformationSpeak: {
-      entry: [{ type: "speakToTheUser", params: ({context}) => `${context.celebrity}`}],
+      entry: [{ type: "speakToTheUser", params: ({context}) => `${getCelebrityInfo(context.celebrity)}`}],
       on: {
         SPEAK_COMPLETE: "Done"
       }
