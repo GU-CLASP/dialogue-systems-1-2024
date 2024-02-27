@@ -1106,9 +1106,9 @@
   integrity sha512-T1QyPSDCyMXaO3pzBkF96E8xMkiRYbUEZADd29SyPGabqxMViNoii+NcK7eWJAEoU6RZyEm5lVSIjTmcdoB9HA==
 
 "@jridgewell/gen-mapping@^0.3.0", "@jridgewell/gen-mapping@^0.3.2":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.3.tgz#7e02e6eb5df901aaedb08514203b096614024098"
-  integrity sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.4.tgz#9b18145d26cf33d08576cf4c7665b28554480ed7"
+  integrity sha512-Oud2QPM5dHviZNn4y/WhhYKSXksv+1xLEIsNrAbGcFzUN3ubqWRFT5gwPchNc5NuzILOU4tPBDTZ4VwhL8Y7cw==
   dependencies:
     "@jridgewell/set-array" "^1.0.1"
     "@jridgewell/sourcemap-codec" "^1.4.10"
@@ -1130,9 +1130,9 @@
   integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
 
 "@jridgewell/trace-mapping@^0.3.17", "@jridgewell/trace-mapping@^0.3.9":
-  version "0.3.22"
-  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.22.tgz#72a621e5de59f5f1ef792d0793a82ee20f645e4c"
-  integrity sha512-Wf963MzWtA2sjrNt+g18IAln9lKnlRp+K2eH4jjIoF1wYeq3aMREpG09xhlhdzS0EjwU7qmUJYangWa+151vZw==
+  version "0.3.23"
+  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.23.tgz#afc96847f3f07841477f303eed687707a5aacd80"
+  integrity sha512-9/4foRoUKp8s96tSkh8DlAAc5A0Ty8vLXld+l9gjKKY6ckwI8G15f0hskGmuLZu78ZlGa1vtsfOa+lnB4vG6Jg==
   dependencies:
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
@@ -1207,10 +1207,22 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.11.0.tgz#a59158f78d07cd3ac15092ffca2f0319f3bb69f6"
   integrity sha512-f3I7h9oTg79UitEco9/2bzwdciYkWr8pITs3meSDSlr1TdvQ7IxkQaaYN2YqZXX5uZhiYL+VuYDmHwNzhx+HOg==
 
-"@statelyai/inspect@^0.2.2", "@statelyai/inspect@^0.2.3":
+"@statelyai/inspect@^0.2.2":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@statelyai/inspect/-/inspect-0.2.3.tgz#58666552b9bdcf7a9a280be710efe8537e48a2f8"
   integrity sha512-3EgAJ89VTKjwLM+RzocU0V2UhRhxtCbtcRJs7TQVZSWDHzsvMbBz9b7M4kHI5irMK8JjIyq+3KBtaBPSdgH3uQ==
+  dependencies:
+    fast-safe-stringify "^2.1.1"
+    isomorphic-ws "^5.0.0"
+    partysocket "^0.0.25"
+    safe-stable-stringify "^2.4.3"
+    superjson "^1"
+    uuid "^9.0.1"
+
+"@statelyai/inspect@^0.2.3":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@statelyai/inspect/-/inspect-0.2.4.tgz#361ff7efbed78234f1b7a262d3e89787a47c633e"
+  integrity sha512-efzWSPV+x4lslO58qlsa1+UaW7MGEvL5tzSvVz9MhZBMYQLz/SuoOoYzEBd1xipnV88cSK9CGQYRUnxwE6PnwQ==
   dependencies:
     fast-safe-stringify "^2.1.1"
     isomorphic-ws "^5.0.0"
@@ -1340,9 +1352,9 @@ bytesish@^0.4.1:
   integrity sha512-i4uu6M4zuMUiyfZN4RU2+i9+peJh//pXhd9x1oSe1LBkZ3LEbCoygu8W0bXTukU1Jme2txKuotpCZRaC3FLxcQ==
 
 caniuse-lite@^1.0.30001587:
-  version "1.0.30001587"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001587.tgz#a0bce920155fa56a1885a69c74e1163fc34b4881"
-  integrity sha512-HMFNotUmLXn71BQxg8cijvqxnIAofforZOwGsxyXJ0qugTdspUF4sPSJ2vhgprHCB996tIDzEq1ubumPDV8ULA==
+  version "1.0.30001589"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001589.tgz#7ad6dba4c9bf6561aec8291976402339dc157dfb"
+  integrity sha512-vNQWS6kI+q6sBlHbh71IIeC+sRwK2N3EDySc/updIGhIee2x5z00J4c1242/5/d6EpEMdOnk/m+6tuk4/tcsqg==
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1427,9 +1439,9 @@ debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1:
     ms "2.1.2"
 
 electron-to-chromium@^1.4.668:
-  version "1.4.670"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.670.tgz#0fc5ac92ada8371e898ea72d577ffc888167a017"
-  integrity sha512-hcijYOWjOtjKrKPtNA6tuLlA/bTLO3heFG8pQA6mLpq7dRydSWicXova5lyxDzp1iVJaYhK7J2OQlGE52KYn7A==
+  version "1.4.681"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.681.tgz#5f23fad8aa7e1f64cbb7dd9d15c7e39a1cd7e6e3"
+  integrity sha512-1PpuqJUFWoXZ1E54m8bsLPVYwIVCRzvaL+n5cjigGga4z854abDnFRc+cTa2th4S79kyGqya/1xoR7h+Y5G5lg==
 
 error-ex@^1.3.1:
   version "1.3.2"
@@ -2172,9 +2184,9 @@ spdx-license-ids@^3.0.0:
   integrity sha512-sh8PWc/ftMqAAdFiBu6Fy6JUOYjqDJBJvIhpfDMyHrr0Rbp5liZqd4TjtQ/RgfLjKFZb+LMx5hpml5qOWy0qvg==
 
 speechstate@^2.0.0-beta.4:
-  version "2.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/speechstate/-/speechstate-2.0.0-beta.6.tgz#340f2c44525abff39f361c47937b4713bc156f19"
-  integrity sha512-813RKrKkyYj9ZCR97oN2l2uX912UjS6rGZKdZihjuuOm+GL5cDjRqz7JOGCqZZaZg9XcO2BkIQZYDkDuFHHkOg==
+  version "2.0.0-beta.9"
+  resolved "https://registry.yarnpkg.com/speechstate/-/speechstate-2.0.0-beta.9.tgz#ec3d0ff336ee3432b41c159ae9f5cf360f3813c2"
+  integrity sha512-1jXM8Hn5SuGNgKwLxSWQiwT/xz51cXunYeiIKXICr7N1IE0skw6qBwWJNiPse5QNYO8v40ATTOCjSwaHFTD0MA==
   dependencies:
     "@statelyai/inspect" "^0.2.3"
     microsoft-cognitiveservices-speech-sdk "^1.31.0"

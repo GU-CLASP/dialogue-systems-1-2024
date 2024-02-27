@@ -1,0 +1,429 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "appointment",
+        "multilingual": false,
+        "description": "",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "who is X"
+            },
+            {
+                "category": "create a meeting"
+            }
+        ],
+        "entities": [
+            {
+                "category": "meeting title",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "meeting time",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "celebrity",
+                "compositionSetting": "combineComponents",
+                "prebuilts": [
+                    {
+                        "category": "Person.Name"
+                    }
+                ]
+            }
+        ],
+        "utterances": [
+            {
+                "text": "Who is Mahatma Gandhi?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me, who is Amelia Earhart?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Stephen King?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you inform me about who Ada Lovelace is?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Martin Luther King Jr.?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me about who William Faulkner is.",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Frida Kahlo?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm not familiar, who is Maya Angelou?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you provide information on who Alexander the Great was?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Sir Isaac Newton?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me, who is Malala Yousafzai?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you give me some insights on who J.K. Rowling is?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Steve Wozniak?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you enlighten me on who Nelson Mandela was?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Do you know who Marie Antoinette is",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "who is Elon Musk?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you inform me about who Albert Camus is?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "\"Who is Oprah Winfrey?\"",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me about who Mark Zuckerberg is.",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Leonardo DiCaprio?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who's Taylor Swift?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm not familiar, who is Steve Jobs?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me, who is Mahatma Gandhi?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you give me some information on who Jane Austen is?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Stephen Hawking?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I've heard the name, but who is Nelson Mandela?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you inform me about who William Shakespeare was?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Do you know who Marie Curie is?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm curious, who is Elon Musk?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you tell me who Leonardo da Vinci is?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Albert Einstein?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to book a meeting with you",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could we meet to discuss the agenda for the upcoming conference?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 25,
+                        "length": 38
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to schedule a meeting to go over the budget. Are you available next week?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 40,
+                        "length": 10
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 70,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's set up a meeting to iron out the details of the project.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 35,
+                        "length": 26
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Is it possible to arrange a meeting to finalize the proposal?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 39,
+                        "length": 21
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to book a meeting with the team to discuss our strategy.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 52,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can we have a meeting to brainstorm ideas for the upcoming campaign?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 25,
+                        "length": 42
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I need to schedule a meeting to review our progress. What times work for you?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 32,
+                        "length": 19
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's plan a meeting to talk about the upcoming event.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 35,
+                        "length": 18
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm interested in meeting to go over the details. When is a good time for you?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 37,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could we arrange a meeting to discuss our project?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 38,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to set up a meeting with you. Are you available?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can we schedule a meeting for later this week?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting time",
+                        "offset": 30,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
