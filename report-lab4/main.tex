@@ -12,6 +12,15 @@
 \maketitle
 
 \section{Introduction}
-This report presents and discusses the integration of a large language model (LLM) based natural-language understanding (NLU) component into an explanatory dialogue system.
+This report presents and discusses the integration of a large language model (LLM) based natural-language understanding (NLU) component into an explanatory dialogue system. The dialogue system is a chatbot that assists users in a game that revolves around assessing whether people are introverted or extraverted based on their music preferences. This chatbot is embedded in an interactive web page together with other elements of the game such as visualizations of music preferences, audio controls and navigation buttons. (The game will be further elaborated in the course project report.)
+
+\section{Motivation}
+One of the reasons for opting for an LLM-based NLU component is to be able to interpret user utterances in a more accurate and robust way than with a simple keyword- or rule-based component. Furthermore, it was hypothesized that an LLM-based solution would require less effort in terms of development time than a more conventional machine-learning based approach (such as logistic regression or support vector machine for intent classification) due to the ability to use zero- or few-shot learning, which in principle can drastically reduce the amount of required training data. Finally, it was deemed that the fine-grained semantics underpinning the dialogue modeling in the project would not be supported well by a more conventional approach based on intent classification and entity extraction. In contrast, with an LLM the problem can be approached as a sequence-to-sequence task, i.e. as a transformation from natural language to an expression in formal language whose syntax and semantics is fed to the LLM in the prompt.
+
+\section{Technical framing}
+In conventional approaches, NLU for dialogue systems is typically divided into two ``tasks'': intent classification and entity extraction. For example, the user utterance ``I need a ticket to Paris'' can be understood as expressing the intent \texttt{BookTicket} and the entity \texttt{Paris} (possibly assigned to the role \texttt{Destination}). In contrast, here the task as framed as a matter of transforming the natural-language utterance into a formal language for representing dialogue moves. For example, the meaning of the utterance above might be expressed as a sequence of (potentially nested) logical propositions, each of which denotes a dialogue move, such as [\texttt{request(BookTicket)}, \texttt{answer(dest\_city(Paris))}].
+
+
+Specifically, GPT 4 (ref OpenAI) is prompted to parse user utterances
 
 \end{document}
