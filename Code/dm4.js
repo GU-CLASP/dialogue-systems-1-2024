@@ -30,29 +30,6 @@ const settings = {
 };
 
 /* Grammar definition */
-const grammar = {
-  // vlad: { person: "Vladislav Maraev" },
-  // aya: { person: "Nayat Astaiza Soriano" },
-  // rasmus: { person: "Rasmus Blanck" },
-  // staffan: { person: "Staffan Larsson" },
-  // chris: { person: "Christine Howes" },
-  // monday: { day: "Monday" },
-  // tuesday: { day: "Tuesday" },
-  // wednesday: { day: "Wednesday" },
-  // thursday: { day: "Thursday" },
-  // friday: { day: "Friday" },
-  // "8": { time: "8:00" },
-  // "9": { time: "9:00" },
-  // "10": { time: "10:00" },
-  // "11": { time: "11:00" },
-  // "12": { time: "12:00" },
-  // "noon": { time: "12 pm" },
-  // "1": { time: "1 pm" },
-  // "2": { time: "2 pm" },
-  // "3": { time: "3 pm" },
-  // "4": { time: "4 pm" },
-};
-
 const confirm = {
   yes: { bool: true },
   sure: { bool: true },
@@ -76,18 +53,6 @@ const infobox = {
 };
 
 /* Helper functions */
-function isInGrammar(utterance) {
-  return utterance.toLowerCase() in grammar;
-}
-
-function getPerson(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).person;
-}
-
-function getTime(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).time;
-}
-
 function asBoolean(utterance) {
   return (confirm[utterance.toLowerCase()] || {}).bool;
 }
@@ -95,8 +60,6 @@ function asBoolean(utterance) {
 function hasBoolean(utterance) {
   return utterance.toLowerCase() in confirm;
 }
-
-
 
 function isFamousPerson(utterance) {
   return utterance in infobox;
@@ -106,9 +69,6 @@ function getInfoOn(utterance) {
   return (infobox[utterance] || {}).info;
 }
 
-
-/// cont here 
-
 function fetchCategoryEntity(entityArray, categ) {
   for (let i in entityArray) {
     if (entityArray[i].category == categ) {
@@ -117,41 +77,10 @@ function fetchCategoryEntity(entityArray, categ) {
   }
 }
 
-
 const dmMachine = setup({
-  guards: { //somehow pass last utterance value, store in context.input?; always updated
-    isPerson: ({ event }) => {
-      return (isInGrammar(event.value[0].utterance) && getPerson(event.value[0].utterance));
-    },
-
-    isDay: ({ event }) => {
-      //return true;
-      return (isInGrammar(event.value[0].utterance) && (grammar[event.value[0].utterance.toLowerCase()] || {}).day);
-    },
-
-    isTime: ({ event }) => {
-      //return true;
-      return (isInGrammar(event.value[0].utterance) && (grammar[event.value[0].utterance.toLowerCase()] || {}).time);
-    },
-
+  guards: {
     isNegation: ({ event }) => {
       return hasBoolean(event.value[0].utterance);
-    },
-
-    
-  // guards tbd: intent is meeting, intent is whoisX, entities recognised: 1 or more?; type of entity match
-
-
-    whosIsXIntent: ({ event }) => {
-      return event.nluValue.topIntent == "Who is X";
-    },
-
-    isFamous: ({ event }) => {
-      return isFamousPerson(event.nluValue.entities[0].text);
-    },
-
-    hasEntity: ({ event }) => {
-      return isFamousPerson(event.nluValue.entities[0].text)==false;
     },
 
     meetingIntent: ({ event }) => {
@@ -159,14 +88,14 @@ const dmMachine = setup({
     },
     
     whosIsX_FamousPerson: ({ event }) => {
-      return ((event.nluValue.topIntent == "Who is X") && isFamousPerson(event.nluValue.entities[0].text));
+      return ((event.nluValue.topIntent == "Who is X")
+      && isFamousPerson(event.nluValue.entities[0].text));
     },
 
     whoIsXIntent_noEntity: ({ event }) => {
-      return ((event.nluValue.topIntent == "Who is X") && (event.nluValue.entities == (0)));
+      return ((event.nluValue.topIntent == "Who is X")
+      && (event.nluValue.entities == (0)));
     },
-
-
 
     hasCategory: ({ event }, params) => {
       const categs = [];
@@ -179,18 +108,6 @@ const dmMachine = setup({
           return false;
         }
     },
-    //return ((event.nluValue.entities !== (0)) && (event.nluValue.entities[0].category == "Meeting Person"));
-
-
-    MeetingDay: ({ event }) => {
-            ///iterate over entities in nlu value
-
-      return ((event.nluValue.entities !== (0)) && (event.nluValue.entities[0].category == "Meeting Day"));
-    },
-
-    // isUnassigned: ({ context }, params) => {
-    //   return (typeof(context.params) === undefined);
-    // },
 
     meetingIntent_noEntity: ({ event }) => {
       return ((event.nluValue.topIntent == "Create a meeting") && (event.nluValue.entities == (0)));
@@ -242,9 +159,6 @@ const dmMachine = setup({
   id: "DM",
   initial: "Prepare",
   on: { ASR_NOINPUT: ".NoInputState" },
-
-
-
   states: {
     NoInputState: {
       entry: [{
@@ -253,7 +167,6 @@ const dmMachine = setup({
       }],
       on: { SPEAK_COMPLETE: "#DM.PromptAndAsk.hist" }
     },
-
     Prepare: {
       entry: [
         assign({
@@ -271,14 +184,12 @@ const dmMachine = setup({
         CLICK: "PromptAndAsk",
       },
     },
-
     PromptAndAsk: {
       initial: "Prompt",
       states: {
         hist: {
           type: "history",
         },
-
         Prompt: {
           entry: [{
             type: "say",
@@ -289,7 +200,6 @@ const dmMachine = setup({
         GetIntent: {
           initial: "AskIntent",
           states: {
-
             AskIntent: {
               entry: [{
                 type: "say",
@@ -297,58 +207,56 @@ const dmMachine = setup({
               }],
               on: { SPEAK_COMPLETE: "ListenForIntent" },
             },
-
-            ListenForIntent: { //TBD: guard for no entity so it doesnt break
+            ListenForIntent: {
               entry: "nluListen",
-                on: {
-                  RECOGNISED: [{
-                    guard: "whoIsXIntent_noEntity",
-                    target: "#DM.PromptAndAsk.IntentConfusion",
-                  }, {
-                    guard: "whosIsX_FamousPerson", //works fine now
-                    target: "#DM.PromptAndAsk.WhoIsX", // who is X branch
-                    actions:
-                      assign({
-                        infotext: ({ event }) => getInfoOn(event.nluValue.entities[0].text),
-                      }),
-                    }, {
-                      guard: "meetingIntent_noEntity",
-                      target: "#DM.PromptAndAsk.CheckMeetingStatus",
-                      
-                    }, {
-                    guard: "meetingIntent",
-                    target: "#DM.PromptAndAsk.CheckMeetingStatus",
-                    actions: [
-                      enqueueActions(({ enqueue, check, event }) => {
+              on: {
+                RECOGNISED: [{
+                  guard: "whoIsXIntent_noEntity",
+                  target: "#DM.PromptAndAsk.IntentConfusion",
+                }, {
+                  guard: "whosIsX_FamousPerson",
+                  target: "#DM.PromptAndAsk.WhoIsX",
+                  actions: assign({
+                    infotext: ({ event }) => getInfoOn(event.nluValue.entities[0].text),
+                  }),
+                }, {
+                  guard: "meetingIntent_noEntity",
+                  target: "#DM.PromptAndAsk.CheckMeetingStatus",
+                }, {
+                  guard: "meetingIntent",
+                  target: "#DM.PromptAndAsk.CheckMeetingStatus",
+                  actions: [
+                    enqueueActions(({ enqueue, check, event }) => {
                       if (check({ type: "hasCategory", params: "Meeting Person" })) {
                         enqueue.assign({
-                          who: fetchCategoryEntity(event.nluValue.entities, "Meeting Person").extraInformation[0].key
+                          who: fetchCategoryEntity(event.nluValue.entities,
+                            "Meeting Person").extraInformation[0].key
                         });
                       }
                     }),
                     enqueueActions(({ enqueue, check, event }) => {
                       if (check({ type: "hasCategory", params: "Meeting Day" })) {
                         enqueue.assign({
-                          day: fetchCategoryEntity(event.nluValue.entities, "Meeting Day").text
+                          day: fetchCategoryEntity(event.nluValue.entities,
+                            "Meeting Day").text
                         });
                       }
                     }),
                     enqueueActions(({ enqueue, check, event }) => {
                       if (check({ type: "hasCategory", params: "Meeting Time" })) {
                         enqueue.assign({
-                          time: fetchCategoryEntity(event.nluValue.entities, "Meeting Time").text
-                        });
-                      }})
-                    ]
-                  }, {
+                        time: fetchCategoryEntity(event.nluValue.entities,
+                          "Meeting Time").extraInformation[0].key
+                      });
+                    }})
+                  ]
+                }, {
                   target: "#DM.PromptAndAsk.IntentConfusion",
                 }],
-
-                },
               },
             },
           },
-
+        },
         WhoIsX: {
           entry: [{
             type: "say",
@@ -356,18 +264,17 @@ const dmMachine = setup({
               return `Here's what I know: ${ context.infotext } `;
             }
           }],
-          on: { SPEAK_COMPLETE: "#DM.Done"},
+          on: { SPEAK_COMPLETE: "#DM.Done" },
         },
-          
-        
         IntentConfusion: {
           entry:[{
             type: "say",
-            params: `Sorry, I'm unsure what you want to do. You can book an appointment or ask about one of these famous people: Billie Eilish, Christopher Nolan, Rosa Parks`
+            params: `Sorry, I'm unsure what you want to do. 
+            You can either book an appointment with Christine Howes, Rasmus Blanck, Vladislav Maraev;
+            or ask about one of these famous people: Billie Eilish, Christopher Nolan, Rosa Parks`
           }],
-          on: { SPEAK_COMPLETE: "#DM.Done" }
+          on: { SPEAK_COMPLETE: "#DM.PromptAndAsk.GetIntent" }
         },
-        
         CheckMeetingStatus: {
           entry: [{
             type: "say",
@@ -388,11 +295,9 @@ const dmMachine = setup({
             }]
           }
         },
-
         AskPerson: {
           initial: "AskWho",
           states: {
-
             AskWho: {
               entry: [{
                 type: "say",
@@ -400,33 +305,30 @@ const dmMachine = setup({
               }],
               on: { SPEAK_COMPLETE: "ListenWho" },
             },
-
             ListenWho: {
               entry: "nluListen",
               on: {
                 RECOGNISED: [{
                   guard: { type: "hasCategory", params: "Meeting Person" },
-                  target: "#DM.PromptAndAsk.GetDay",
+                  target: "#DM.PromptAndAsk.CheckMeetingStatus",
                   actions: assign({
                     who: ({ event }) => fetchCategoryEntity(event.nluValue.entities,
                       "Meeting Person").extraInformation[0].key
-                    }),
-                  }, {
-                    target: "#DM.PromptAndAsk.NotAvailable",
-                  }],
-                }},
+                  }),
+                }, {
+                  target: "#DM.PromptAndAsk.NotAvailable",
+                }],
               },
             },
-
-          NotAvailable: { //later: make sure it asks who to meet with again?
-            entry: [{
-              type: "notInGrammar",
-              params: "not available",
-            }],
-            on : { SPEAK_COMPLETE: "#DM.PromptAndAsk.AskPerson" }
           },
-          
-       //// 
+        },
+        NotAvailable: {
+          entry: [{
+            type: "notInGrammar",
+            params: "not available",
+          }],
+          on : { SPEAK_COMPLETE: "#DM.PromptAndAsk.AskPerson" }
+        },
         GetDay: {
           initial: "AskWhichDay",
           states: {
@@ -450,19 +352,19 @@ const dmMachine = setup({
                       "Meeting Day").text
                     }),
                 }, {
-                  target: "AskWhichDay", //re-raise?
-                  actions:[{
+                  target: "AskWhichDay",
+                  actions:{
                     type: "notInGrammar",
                     params: "not a valid day",
-                  }],
+                  },
                 }],
               },
             },
           },
         },
-            GetWholeDay: {
-              initial : "AskWholeDay",
-              states: {
+        GetWholeDay: {
+          initial : "AskWholeDay",
+          states: {
             AskWholeDay: {
               entry: [{
                 type: "say",
@@ -484,21 +386,15 @@ const dmMachine = setup({
                   guard: "isNegation",
                   target: "#DM.PromptAndAsk.GetTime",
                 }, {
-                  target: "AskWholeDay", //re-raise?
-                  actions:[{
-                    type: "notInGrammar",
-                    params: "not a clear confirmation nor negation",
-                  }],
+                  target: "AskWholeDay",
                 }],
               },
             },
           },
         },
-      
-    
-          GetTime: {
-            initial: "AskTime",
-            states: {
+        GetTime: {
+          initial: "AskTime",
+          states: {
             AskTime: {
               entry: [{
                 type: "say",
@@ -514,10 +410,10 @@ const dmMachine = setup({
                   target: "#DM.PromptAndAsk.CreateTimeAppt",
                   actions:  assign({
                     time: ({ event }) => fetchCategoryEntity(event.nluValue.entities,
-                      "Meeting Time").text
+                      "Meeting Time").extraInformation[0].key
                     }),
                 }, {
-                  target: "AskTime", // re-raise?
+                  target: "AskTime",
                   actions: [{
                     type: "notInGrammar",
                     params: "not an available timeslot",
@@ -535,7 +431,7 @@ const dmMachine = setup({
                 context.who
               } on ${
                 context.day
-              } for the whole day?`;
+              } for the whole day? `;
             },
           }],
             on: { SPEAK_COMPLETE: "ListenApptConfirm" },
@@ -550,7 +446,7 @@ const dmMachine = setup({
                 context.day
               } at ${
                 context.time
-              } ?`;
+              } ? `;
             },
           }],
             on: { SPEAK_COMPLETE: "ListenApptConfirm" }
@@ -567,23 +463,29 @@ const dmMachine = setup({
                 }],
             }, {
               guard: "isNegation",
-              target: "#DM.PromptAndAsk.AskPerson",
+              target: "#DM.PromptAndAsk.GetIntent",
               reenter: true,
+              actions: [
+                assign({ who: '' }),
+                assign({ day: '' }),
+                assign({ time: '' }),
+              ]
             }, {
-              target: "#DM.PromptAndAsk.hist",
-              reenter: true,
-              actions: [{
-                type: "notInGrammar",
-                params: "not a clear confirmation nor negation",
-              }]
+              target: "ConfirmationUnclear",
             }],
           },
         },
-       
+        ConfirmationUnclear: {
+          entry: [{
+            type: "say",
+            params: ({ event }) => { 
+              return `Sorry, ${ event.value[0].utterance 
+              } is not a clear confirmation nor negation. Please answer with Yes or No. `;
+          }}],
+          on: {SPEAK_COMPLETE: "ListenApptConfirm"}
+        },
      },
-
     },
-  
     Done: {
       on: {
         CLICK: "PromptAndAsk",
