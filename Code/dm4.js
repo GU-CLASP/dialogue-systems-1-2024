@@ -1,4 +1,4 @@
-import { assign, createActor, setup } from "xstate";
+import { assign, createActor, enqueueActions, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY } from "./azure.js";
@@ -69,6 +69,12 @@ const confirm = {
   "no way": { bool: false},
 };
 
+const infobox = {
+  "Christopher Nolan": {info: "Christopher Nolan is a British-American filmmaker."},
+  "Billie Eilish" : {info : "Billie Eilish is an American singer and songwriter."},
+  "Rosa Parks" : {info : "Rosa Parks was an integral activist in the civil rights movement in America"}
+};
+
 /* Helper functions */
 function isInGrammar(utterance) {
   return utterance.toLowerCase() in grammar;
@@ -88,8 +94,29 @@ function asBoolean(utterance) {
 
 function hasBoolean(utterance) {
   return utterance.toLowerCase() in confirm;
-
 }
+
+
+
+function isFamousPerson(utterance) {
+  return utterance in infobox;
+}
+
+function getInfoOn(utterance) {
+  return (infobox[utterance] || {}).info;
+}
+
+
+/// cont here 
+
+function fetchCategoryEntity(entityArray, categ) {
+  for (let i in entityArray) {
+    if (entityArray[i].category == categ) {
+      return entityArray[i];
+    }
+  }
+}
+
 
 const dmMachine = setup({
   guards: { //somehow pass last utterance value, store in context.input?; always updated
@@ -110,6 +137,65 @@ const dmMachine = setup({
     isNegation: ({ event }) => {
       return hasBoolean(event.value[0].utterance);
     },
+
+    
+  // guards tbd: intent is meeting, intent is whoisX, entities recognised: 1 or more?; type of entity match
+
+
+    whosIsXIntent: ({ event }) => {
+      return event.nluValue.topIntent == "Who is X";
+    },
+
+    isFamous: ({ event }) => {
+      return isFamousPerson(event.nluValue.entities[0].text);
+    },
+
+    hasEntity: ({ event }) => {
+      return isFamousPerson(event.nluValue.entities[0].text)==false;
+    },
+
+    meetingIntent: ({ event }) => {
+      return event.nluValue.topIntent == "Create a meeting";
+    },
+    
+    whosIsX_FamousPerson: ({ event }) => {
+      return ((event.nluValue.topIntent == "Who is X") && isFamousPerson(event.nluValue.entities[0].text));
+    },
+
+    whoIsXIntent_noEntity: ({ event }) => {
+      return ((event.nluValue.topIntent == "Who is X") && (event.nluValue.entities == (0)));
+    },
+
+
+
+    hasCategory: ({ event }, params) => {
+      const categs = [];
+        for (let i in event.nluValue.entities) {
+          categs.push(event.nluValue.entities[i].category)
+        };
+        if (categs.includes(params)) {
+          return true;
+        } else {
+          return false;
+        }
+    },
+    //return ((event.nluValue.entities !== (0)) && (event.nluValue.entities[0].category == "Meeting Person"));
+
+
+    MeetingDay: ({ event }) => {
+            ///iterate over entities in nlu value
+
+      return ((event.nluValue.entities !== (0)) && (event.nluValue.entities[0].category == "Meeting Day"));
+    },
+
+    // isUnassigned: ({ context }, params) => {
+    //   return (typeof(context.params) === undefined);
+    // },
+
+    meetingIntent_noEntity: ({ event }) => {
+      return ((event.nluValue.topIntent == "Create a meeting") && (event.nluValue.entities == (0)));
+    },
+
   },
 
   actions: {
@@ -145,16 +231,29 @@ const dmMachine = setup({
   },
 
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwBWAMwBGRVsUaALADYTAdhOKANCACeiHTvPoNKlfq4muixUY0AvgG2aOgA6gTi1ILkYkRixADCADIAkokA0tx8SCBCohLSsgoIGoo66DqaigAc5npGOlratg4IThVcNVo9RjUqphoaJkEhGBFRMXHYCXKwcWJg6AQAZovYABQ67lwAlMShE2LRsfHZsvnikjK5JWUVVWV1DU0t9o4mFRrdPYpWGjozJpRiBQjhBABbPBiUhSCCkWAAazIVHoADkAPKpNGYACq1HOuUuhRuoBK23MrSUNW66BqjXKNUZny0RhBYOwkOhsPhSJRlHRWJx+I4OhyAmEVyKtyURnKdOaNTUijUNJ6Gip7XM2kqWn6Xh6ejU5jZwVBGHBUJhcIRiKwnKtxHImBYGXoiQxqEwySY1CYhIlBWuxVlRnQJj6Rl+XC0XFMqs1ZS0rh+im1aZpn3ZFod3JtSPQAHEwGJUlJFuX0LayxWEs7Xe7Pd7ff7eBdJSSQwgDGpw5GrDHLF4TFpNb56q4jaqfOYmTVs-audbeXbi6Xy2BK8kRPNNwAxQTYGubhLMD2FtGpchMZABvId4MyhAmmroOMmOpDHTfAE6TXOFR0EaHR-HpGkuHMNQF0tPMVyLEtjy3HcKwPI8N3LYgzwxC8rxvUVxXvINpTJRBtVfd9PwBH8nDHFVFDpOo1CY0xIxA6Dc2XW14PXWt0G3XcpFQxDTyYc9L2vW9FAI4lHxI59vjfUxKO-Gpf3-ZVXz1SC1AsEw1C6EYzQ5JceS4sIAAtBFSWAAA0qwAI0EABXMQbKdF1SDdD0vR9P07xk4j5FleVum+ZVVR+DV3nafpkxHfpDFnKodG6diTPzO1hMSaQVic0RpHQYS0UEMRKDAABjQQoCkHdIHchtvObPy2yJB9ApKPwQsVcK1WadSP3DLRtJ0qMnDlNKrVMgtbUwMBsFgArbQswR6s8xsfJbfy2tJIL2j8DQUzCjpWWNGox2aOK9RUcwht8CkJtgriZrmhapD45DN2WzDROw8S8JawMpR2koX0Uj9tSo1SaOivwzF1foqmNb8jCgoyc3SuDnvmgr+IrL6sJwiT8PbIjgY+RpXAgpkVRNQFAXOrRez1fUIxA5QmgeziC2KmEADdIgAGwIeyBbAVavKbXzW2k7au22Kx1CGvoLH8Lh5bHECKmZjwAXqRpDLGRdJoy7jkAIOwqyRCyRHK8yzbscX1qa6WSaBrtY3oxn6UaVUzDjGxorG1Q5R0-TtRjYE0aNx6CzXe33oE63bYgc3vrE3DbwBwi3afMj0BuqN+nuNWNEpQPtjDGMI2GbQvC4VHDZgrnVxLePcc+8ybfMlOHYJv7bzFV3OyfD30C9owfZqP25X-ONk2NExhj0ienGaTmppbsR46WyzRftx3GqlrbSa7KeXAjrxan8QEAU1TRz5+OVtiZMxFHXk24-NhO8d3sB977jOx8c5yQAsmWoeh9BMRLnUTU3QTBjx6KyD8Hg15RybhvU2X925SGWnvVOACiaD1aifXOCkC5XWLt+MubQ9BOHhjOKMukuCBDQRxDBn8LbYNwX-fBP1CZ4SkkPWSu087kKLuUEu1DHDXRTIgtMfgDCWHfnBDhltETUBEBCMW9Y1qH02lnAKZM9qskqPUVSOkDDdBgYHccb5jB6TcJ8RhppG5sI-q3LBH0pAaK0WnX6gCDGyyfKA9A4DfCM30ipKR7QqiqDMCBbw9Ib7KK4qo7BPixYELwkQwGw8QH6DDM4FKGgLG1C0v+JocTJF6C-MYecrCMZcUSLgAgixuH21IHgaEB9Jb6JliQuS5RvChJRiNLovwoptDgQg3oyCfAXRSQWZpYBWlgAyZ07pOiJYbWav04Bu1ygqjpFGeo+khpq30P+col0Eomi0Ew8wiy7TYI2WIbKUgVgiGwBCPx-DM57LyQcp+Cowoql6pMpQ3hexT0GIzT4XQG7mmjs3b+m5XnvM+d835-dibEP2SDPoYNlLUT-DDVkyZtYpTUMjEcTzUVSHRTlL5PysmSQBcIkGCkKIQxUmpGG2pkwlNod8CM+gFzIGkGLFI6QsiBIGbtMompdAQSAsaa+jNzD12NEEM0UhBAQDgLINAQj2qIAALQmE1Ba9i+AiBgBNUYme0UahfB2FUF1cZAQGyRUcE40wxAOvdi6kZ5RlRDTUP4Uc5cXBMVjXUNWmq-D1NcY0pEganymE1I0ZM4zfhez0JYFhKbjZwU7vMdNICYz0SZDGeuKhGY3zHNSiodRLBKm-GmLQdKm4Vt2saRMgFviIJOdSvSXaGkltSQhdCAa8WAvJKyDWnw3yVJ8EqfoY66VrmEmo4SvbyRMlooSgEsY4yMQ6Fu6dvFsFCRnfuxA2gKgFJ9uYV9zhF5HtfCegY56nB0uWtZGy96EAL3DKc4wyMdJnUDovZMTQErDBSi6qe-7LKAYcs5VywHth+DA48RoxgoP-hNHEq6aYSm+x8HSrKOU8rCMMXLNWYYa2GCaKySCJp-yqVfPBgYJ7mjDGozOjFdGCpFRKmVSq1VaoQGw5fOkyhWO9A40YdS-hBosxRlGJGdKsavTkyjRWL4VZuHVjDBR9CIFyn8IYXTSJZrYzejvQQcnjRGeViaUzXgGakYRnKApEa7OIgc69ely1sMTxcEUsCqlYwWGg20fQsYNNMfCVpulPNSD8xEELEW9q50cscKO0JLrDARisOOAOiXR5I1ZMMIwXR66Xq3ubYDEbYF6VkayC55hfCmGa9vK2ndbb2wi1Vxw2wviVO-EMY0d0BueMTsN7urWCumtKK+0xKVtRGBNECaJTg4wrtjDNkpvXygLYts5vBbRcmFfaFTcMfgmLOFM+mWeTIUua3HF0N+E6Y6bzbl49pq27vrdLvRaLO29t6WiUxc+9d23OCns0FxSL0HuJa1dpEGS5P9FcBDl12hF4o4qTSSzqpNWWHuZd+luO1tGO-F0dQNm1C6GUPpCeFT9JfcpxBEc3rjKTqWS0tpv8OldNnWDxnEbez6SsHTQwJSPywKaDMnoYa5R6iLejtxcFlmrPWZL7Dmh4H3PqJ8NwcZjDc982rPn1PEVC4B-SxlHzmXYYMGOG6kPlSvrqyOFU4rJXAbTEdhrVgUZdHMaSmhOl4HxWYTdCB6odUBCAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBECyBiAggZQEoH0A5AeQElCAFAVQBUBtABgF1FQAHAe1gEsAXbjgDtWIAB6IAjAHYAnAwB0EhgFYAbAGYALFO3rVADhkAaEAE9E6iZtWL1y9TI2b1DKRIC+7k2nTYKAUUwAaXwAYWJUCgAZfxp-RhYkEE4efiERcQRlKRNzBH0JeWUGEokNACYGLVUZT29UeQoAJzA2AEMWrDwaGmx8XEDkAE0EkRS+AWEkzPKJZXkZewlygok7dXKcs0ltef1lGTsJfVVVZ0O6kDR5AHU2vhoObF4O3nRQqNJQoNGk8bSpqBMvYbBJFlpylopKp7MZtggrOp1PJNqoGEprJVHJdrncHk8Xk03qJYC9eGB5G0AGbkpoACiUJQYAEp0Lj7rxHs9Xr92FwJulpogQYpwZpIdoYQ5cjt9MipND0apNgrsuUcQ1mhwALZsXiYQQQTCwADWjSaOr1vgCwTCEWisXizDG-IBGUQ+2RmisDBkMgkc3RehlCG95UUpwMUgYml95RhGvNlv1huNZoA4mBeKRBOTc-I0zm828-IEQuFIjE4rzkq7Ju6EZDw2d9JpDL6rPoQ5plOHvad1FJW0Oyj3E1rdSmjab5Jns7mwPmotxSYuAGIcJpFxdvAbhdOEUjYfzIGv-etChGnQox6O+mTizQhvSFP1v5XlbQMcqLccWycGtOGZZtuS4rnmG5bguuboHuxAHkeJ50BIiR8qkF5ApI17yLeJR+o+3Y-vImixgwnokfoUgrJof7JoBaaziB0G8PIy6roIkGgbu-j7oex6nuUqG1uhgqYVeyg3l+94EfC+zhlRpzfqoawGDGtEAamM5zlxrHgeum5cbBPHwXxSHqEJ56iWIWHKThUn4Z+IbRuGehUeUsKUYi6l6vRWlMcWunsZxzFGbxiGnpoFl1lZmRlBJdl3g5T7wpYhSaG+hyOAU37eVODE3AAFhwpCwAAGtaZZ2pWjpntFgLWQgSJtiiMhuDGlhkfo+jlCG7nRsRGwuAcGxzKouW+WaXGhEIVIAK48EIFW2hWDrVs6fx1Q2TX6C1bXOEoXXdb1EkyAsGybKOsZrOo42aWaoQFWAADGJqoGAWbcIIUDcrw81LeW9pVk6UUifVMyfjYOiQqcrVuJUqghtkyJlKcyjpf6h23UB8gPc9r3vfwX0-X9pbLYDNUoS6oMNuUEPyFDeg1AqywMAj8IBicCyKQU+xggctReFcmr-j5d0449L1vR9RNkiTNoA9V1aCVTApg4gtNqPT4qM7DLNs3kAZ6MRimyAc9gHFjDG45LBOfd9suwP9VWrfE5kq26l7QvMXswjDKiuCGZT+kU8botCLaWzOaYUGATSwEIBamoVHBOytQO1dTl6IgoKxdRJNQHDoWx5JscryAYtNSENmXxpHZrR7H8eCIFebJ6FJnhRnqsNlIyje77ag1P7xfq5+p1Uf6fcuK1ZR14nJox3HCdsa3RXtwh-HISD3dZ91NizGR9jQpR0LJSX0Knc4le3mj3o3YL1wTqL2OEBw+oAG73AANm0ABGX9gFTuTNa28PZiW2rtDEHVDo9XhKiS+51oy7BIuqB+ws6JiznMgNoph56FW4E9Aq2DTBAMVsDd2GEGoqkKG4AMElvxQ3jIHMiUgcIT2hq2MMqD6hJg0tjLBOCW6LnwYQiAOD16mVPOtNCO8xIa0htrGGzN4YhgKJocukY1RtjbP6OeAjcEr2EQVAhBUxEkLghvJClMNqZzkczemAY5hKE2NrEMfoFDKVaq2BwVRur6D0VmYheCioAOIaQl2XcwFUPsbQpxDDxRMPZhKHC7kZBykHKjKQATeBBMMYIZOoTxEWMkZEyhmRe79zUIPOQxRVAjwQLMFYCxZB8wDKzMi2Tcl6XySEsAYTimd2sTIqJ5S+70wHn7Wp9TjhnBDmiKoVdLB2G4ULXhz8GL6KET0jghTzHGUsQJUBZT1YxMcfQlxtN9aSDWKwtUnCyLxk2ALHhT88p+U5NwbUFI0w0E+YA0mCsInSOErIhqyxmouDbLfTY6xA5eJRD+OYQ1Upo2yb8r5Wz0WAIGZvYFlk1YIirqdds+hXBtR5oHQwrCajxlodYaQaK-mYr+RIwZRyYqSE-DtSF+wUFV3sJSgo9NFSVBPvDZQc9QgtDaOSApfScGYDYFaAFzt054s2lnRp9MtBImjESsiVyGnLB2q1f0iw2lon8WgtZbz7rSvJFixVyr5aqpquq2xVDKjIjOL6dGyw4UqCKPsLq3oqLHxota15E0tlOt4NNQQVJuBNG1Ky3F7KCUQJ-HtaBXVYF5BcNIcu3VBy+nUIYKMc88mxvjYm5NqarHpobA+eS6NPwkQVKzCQvVe47SvvGewrhYSVu6dWmaSaU04qQsrGxoLMjNq1n6Nt2hozKV6pRZEixsgkWqO4rJ1rkBCEAR8L4Px3WzsQHUhQPtqnD0DrTFExQw4UTOIszwgtBAcAgHAEQaAKEcoQHCPIABaMakaWjtBaH+gl2RA7nHkPsQ4vZi1yAfImPEnICSvCg1tRwKIEklCebCM+OxoTyDsIhmZZwHD3xeSLW12HLwwlYdeyZAc4GfhwkyTtlQOE0dWVGsWxjSQMbEssQtvYjiyB7ZCLscDy2KG6lmzdlg920YwdjV5ImGrRkqb7IexR6lltOijDQD4urHADNkriWnYoLM4yUDYzhXAbGUM+b0CwUbDRkLMGofHH50ejdpZi89rMzpGZIQ+9mqifhcFXdyhFL4o20J+BzPYI1qb4Rs-yO4tnBWLDZnYWgURaG0Ihnz8X4TikS6cZLpEtCorA+p-KRUSqlQKw0-2ihpD1b0GjOpxHQxEX7C+lLVQ0tzymjNealD8U0xKKwww+xmZDh7FXZ8kIPP9bUI8vrkqJb42lvbGV812tevUXUyoV0qIqVk3kNR5cr5gkRDCNSjXMtR1NIvJu7XlhFZ9VUyi6JpC3fVnU5GimHxokHD2CVb31kfYXo3BOaZk4-ZWM2WMAPowBiHN2tERbabdR7GUJQqn+MBbFg3Jezc8mo7C8cq8lh4M6E3a2GEcoQcNMVAT9HxPlKuDnq-D+38-4ANO4yBYrZUSYlS926wA1IR6AKI8vz6D3vARyTg07ahkZnD6mRf0VQ3FVC66amE4oJKyE6YIlHxjCHENO8pQolgLqhzkNYZhMYcJrHRFPZSyprcGO6SI0xWv6f-shTYbRSMqKs1c+zEoNgJIFr92UFZ-mmvvKCbbnZ8q8jDIZ-GAMEYLfRkMEodQgdAxczRL3QnsYycZ-V4xTXQf2Jyod+HjNMZjO+h1+lWMBQq-2GNrX3s1EBdw9tS3rFP3bzlzUGGAjbPA6yHUaidElFDiMlhxl+HGusXz1n13hsShFgL7OCzb8K-2aGHmEHFYeuqL1cZRivJx+C--rmBt1wcoVDDU7WmSpQ0W8xOHFGf2cElXtTAA7wVSVV4Dn2-DIxqWyAkjbS7TgSUHmFNSsAqSHGVEbzV33xxmgMdXgNOyqAUFHHcgNXFAu0FXDGUGDUQzODSQTCn2jSrXgJrXHXa17ivQmX0zYxLnXTOkhFZk-FmAkitR4QPUEDAHa3I3UW81mDBG-BcUWGOhqC5lJX-1OA1jfXcCAA */
   context: {
     noInputCount: 0,
     who: '',
     day: '',
     time: '',
+    infotext: '',
   },
   id: "DM",
   initial: "Prepare",
+  on: { ASR_NOINPUT: ".NoInputState" },
+
+
+
   states: {
+    NoInputState: {
+      entry: [{
+        type: "say",
+        params: "I didn't hear you.",
+      }],
+      on: { SPEAK_COMPLETE: "#DM.PromptAndAsk.hist" }
+    },
+
     Prepare: {
       entry: [
         assign({
@@ -166,30 +265,15 @@ const dmMachine = setup({
     },
     WaitToStart: {
       after: {
-        10000:  "PromptAndAsk",
+        7000:  "PromptAndAsk",
       },
       on: {
         CLICK: "PromptAndAsk",
       },
     },
+
     PromptAndAsk: {
       initial: "Prompt",
-      on: {
-        ASR_NOINPUT: [{
-          target: "PromptAndAsk.hist",
-          guard: ({ context }) => context.noInputCount < 4,
-          actions: [ assign(({ context }) => {
-            return {
-              noInputCount: context.noInputCount + 1,
-            };
-          }), {
-            type: "say",
-            params: "I didn't hear you",
-          }]
-        }, { target: "#DM.Done" 
-      }]
-    },
-      
       states: {
         hist: {
           type: "history",
@@ -214,71 +298,95 @@ const dmMachine = setup({
               on: { SPEAK_COMPLETE: "ListenForIntent" },
             },
 
-            //check for intent here??:   how.
-            ListenForIntent: {
+            ListenForIntent: { //TBD: guard for no entity so it doesnt break
               entry: "nluListen",
                 on: {
-                  RECOGNISED: [{ //for appointment
-
-          // can acces entities and intents from event directly!
-          // go for topintent (is own array element)
-          // entities will just give you an array
-
-                    guard: { // for Who is X intent
-                      WhoIsXIntent: ({ context, event }) => {
-                        return event.topintent == "Who Is X" //access topintent here
-                      },
-                    }, //intent is who is X -> go to info 
-                    target: "#DM.PromptAndAsk.WhoIsX", // who is X branch
-                    actions: assign({
-                      who: ({ event }) => getPerson(event.value[0].utterance),
-                    }),                      // still assign who
-                  }, {
-                    guard: { // for meeting intent
-                      MeetingIntent: ({ context, event }) => {
-                        return event.topintent == "Create a meeting"
-                      },
-                    },
-                    target: "#DM.PromptAndAsk.AskPerson",
-                    // check for entities in utterance, assign those ggf
-                    // maybe do this as initial check in AskPerson or sth?
-                    // idk if the event transfers post transition
-                  }, {
-                    // default: for intent is unclear
+                  RECOGNISED: [{
+                    guard: "whoIsXIntent_noEntity",
                     target: "#DM.PromptAndAsk.IntentConfusion",
-                  }],
+                  }, {
+                    guard: "whosIsX_FamousPerson", //works fine now
+                    target: "#DM.PromptAndAsk.WhoIsX", // who is X branch
+                    actions:
+                      assign({
+                        infotext: ({ event }) => getInfoOn(event.nluValue.entities[0].text),
+                      }),
+                    }, {
+                      guard: "meetingIntent_noEntity",
+                      target: "#DM.PromptAndAsk.CheckMeetingStatus",
+                      
+                    }, {
+                    guard: "meetingIntent",
+                    target: "#DM.PromptAndAsk.CheckMeetingStatus",
+                    actions: [
+                      enqueueActions(({ enqueue, check, event }) => {
+                      if (check({ type: "hasCategory", params: "Meeting Person" })) {
+                        enqueue.assign({
+                          who: fetchCategoryEntity(event.nluValue.entities, "Meeting Person").extraInformation[0].key
+                        });
+                      }
+                    }),
+                    enqueueActions(({ enqueue, check, event }) => {
+                      if (check({ type: "hasCategory", params: "Meeting Day" })) {
+                        enqueue.assign({
+                          day: fetchCategoryEntity(event.nluValue.entities, "Meeting Day").text
+                        });
+                      }
+                    }),
+                    enqueueActions(({ enqueue, check, event }) => {
+                      if (check({ type: "hasCategory", params: "Meeting Time" })) {
+                        enqueue.assign({
+                          time: fetchCategoryEntity(event.nluValue.entities, "Meeting Time").text
+                        });
+                      }})
+                    ]
+                  }, {
+                  target: "#DM.PromptAndAsk.IntentConfusion",
+                }],
+
                 },
               },
             },
           },
 
         WhoIsX: {
-          initial: "AboutX",
-          states: {
-            AboutX: {
-              entry:  [{
-                type: "say",
-                params:``, //how to get Info from NLU
-              }],
-              on: { SPEAK_COMPLETE: "#DM.Done"},
-            },
-          },
+          entry: [{
+            type: "say",
+            params: ({ context }) => {
+              return `Here's what I know: ${ context.infotext } `;
+            }
+          }],
+          on: { SPEAK_COMPLETE: "#DM.Done"},
         },
-    // next tue
+          
+        
         IntentConfusion: {
-          initial: "IntentNotRecognised",
-          states: {
-            IntentNotRecognised: {
-              entry:[{
-                type: "say",
-                params: ({ context }) => { 
-                  return `Sorry, I'm unsure what you want to do. You can
-                  book an appointment or ask about a famous person.`;
-                },
-              }],
-              on: { SPEAK_COMPLETE: "#DM.Done" },
-            },
-          },
+          entry:[{
+            type: "say",
+            params: `Sorry, I'm unsure what you want to do. You can book an appointment or ask about one of these famous people: Billie Eilish, Christopher Nolan, Rosa Parks`
+          }],
+          on: { SPEAK_COMPLETE: "#DM.Done" }
+        },
+        
+        CheckMeetingStatus: {
+          entry: [{
+            type: "say",
+            params: "Let's see:",
+          }],
+          on: {
+            SPEAK_COMPLETE: [{
+              guard: ({ context }) => context.who === '',
+              target: '#DM.PromptAndAsk.AskPerson',
+            }, {
+              guard: ({ context}) => context.day === '',
+              target:"GetDay",
+            }, {
+              guard: ({ context }) => context.time === '',
+              target: "#DM.PromptAndAsk.GetWholeDay",
+            }, {
+              target: "CreateTimeAppt",
+            }]
+          }
         },
 
         AskPerson: {
@@ -294,33 +402,30 @@ const dmMachine = setup({
             },
 
             ListenWho: {
-              entry: "listen",
+              entry: "nluListen",
               on: {
                 RECOGNISED: [{
-                  guard: "isPerson",
+                  guard: { type: "hasCategory", params: "Meeting Person" },
                   target: "#DM.PromptAndAsk.GetDay",
-                  actions: assign ({
-                    who: ({ event }) => getPerson(event.value[0].utterance)
-                  }),
-                }, {
-                  target: "#DM.PromptAndAsk.NotAvailable",
-                }],
-              }},
-
+                  actions: assign({
+                    who: ({ event }) => fetchCategoryEntity(event.nluValue.entities,
+                      "Meeting Person").extraInformation[0].key
+                    }),
+                  }, {
+                    target: "#DM.PromptAndAsk.NotAvailable",
+                  }],
+                }},
+              },
             },
-          },
 
           NotAvailable: { //later: make sure it asks who to meet with again?
             entry: [{
               type: "notInGrammar",
               params: "not available",
             }],
-            on : { SPEAK_COMPLETE: "AskPerson" }
+            on : { SPEAK_COMPLETE: "#DM.PromptAndAsk.AskPerson" }
           },
           
-          
-
-
        //// 
         GetDay: {
           initial: "AskWhichDay",
@@ -335,14 +440,15 @@ const dmMachine = setup({
               on: { SPEAK_COMPLETE: "ListenWhichday" },
             },
             ListenWhichday: {
-              entry: "listen",
+              entry: "nluListen",
               on: {
                 RECOGNISED: [{
-                  guard: "isDay",
-                  target: "AskWholeDay",
-                  actions: assign ({
-                    day: ({ event }) => event.value[0].utterance,
-                  }),
+                  guard: { type: "hasCategory", params: "Meeting Day" },
+                  target: "#DM.PromptAndAsk.CheckMeetingStatus",
+                  actions: assign({
+                    day: ({ event }) => fetchCategoryEntity(event.nluValue.entities,
+                      "Meeting Day").text
+                    }),
                 }, {
                   target: "AskWhichDay", //re-raise?
                   actions:[{
@@ -352,6 +458,11 @@ const dmMachine = setup({
                 }],
               },
             },
+          },
+        },
+            GetWholeDay: {
+              initial : "AskWholeDay",
+              states: {
             AskWholeDay: {
               entry: [{
                 type: "say",
@@ -371,7 +482,7 @@ const dmMachine = setup({
                   target: "#DM.PromptAndAsk.CreateWholeDayAppt",
                 }, {
                   guard: "isNegation",
-                  target: "AskTime",
+                  target: "#DM.PromptAndAsk.GetTime",
                 }, {
                   target: "AskWholeDay", //re-raise?
                   actions:[{
@@ -381,6 +492,13 @@ const dmMachine = setup({
                 }],
               },
             },
+          },
+        },
+      
+    
+          GetTime: {
+            initial: "AskTime",
+            states: {
             AskTime: {
               entry: [{
                 type: "say",
@@ -389,14 +507,15 @@ const dmMachine = setup({
                 on: { SPEAK_COMPLETE: "ListenTime" },
             },    
             ListenTime: {
-              entry: "listen",
+              entry: "nluListen",
               on: {
                 RECOGNISED: [{
-                  guard: "isTime",
+                  guard: { type: "hasCategory", params: "Meeting Time" },
                   target: "#DM.PromptAndAsk.CreateTimeAppt",
-                  actions: assign ({
-                    time: ({ event }) => getTime(event.value[0].utterance),
-                  }),
+                  actions:  assign({
+                    time: ({ event }) => fetchCategoryEntity(event.nluValue.entities,
+                      "Meeting Time").text
+                    }),
                 }, {
                   target: "AskTime", // re-raise?
                   actions: [{
