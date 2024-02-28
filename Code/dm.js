@@ -29,7 +29,6 @@ const grammar = {
     eleni: {person:"Eleni Dochtsi"},
     rasmus: { person: "Rasmus Blanck" },
     victoria: {person: "Victoria Daniilidou"},
-    george: {person: "George Daniilidis"},
     ivan: {person:"Ivan Kostov"},
     monday: { day: "Monday" },
     tuesday: { day: "Tuesday" },
