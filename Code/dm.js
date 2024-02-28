@@ -6,54 +6,52 @@ import { KEY } from "./azure.js";
 const inspector = createBrowserInspector();
 
 const azureCredentials = {
-  endpoint:
+endpoint:
     "https://northeurope.api.cognitive.microsoft.com/sts/v1.0/issuetoken",
-  key: KEY,
+key: KEY,
 };
 
 const settings = {
-  azureCredentials: azureCredentials,
-  asrDefaultCompleteTimeout: 0,
-  asrDefaultNoInputTimeout: 5000,
-  locale: "en-US",
-  ttsDefaultVoice: "en-US-DavisNeural",
+    azureCredentials: azureCredentials,
+    asrDefaultCompleteTimeout: 0,
+    asrDefaultNoInputTimeout: 5000,
+    locale: "en-US",
+    ttsDefaultVoice: "en-US-DavisNeural",
 };
 
 /* Grammar definition */
 const grammar = {
-  vlad: { person: "Vladislav Maraev" },
-  aya: { person: "Nayat Astaiza Soriano" },
-  manos: {person:"Manos Belantakis"},
-  vasilis: {person: "Vasilis Daniilidis"},
-  eva: {person:"Evaggelia Deligianni"},
-  eleni: {person:"Eleni Dochtsi"},
-  minas: {person: "Minas Daskalakis"},
-  george: {person: "George Mariolos"},
-  rasmus: { person: "Rasmus Blanck" },
-  victoria: {person: "Victoria Daniilidou"},
-  //george: {person: "George Daniilidis"},
-  ivan: {person:"Ivan Kostov"},
-  monday: { day: "Monday" },
-  tuesday: { day: "Tuesday" },
-  wednesday: {day: "Wednesday"},
-  thursday: {day: "Thursday"},
-  friday: {day:"Friday"},
-  "10": { time: "10:00" },
-  "11": { time: "11:00" },
-  agree: ["yes", "yeah", "yup","of course"],
-  disagree: ["no", "nope"]
-  
+    vlad: { person: "Vladislav Maraev" },
+    aya: { person: "Nayat Astaiza Soriano" },
+    manos: {person:"Manos Belantakis"},
+    vasilis: {person: "Vasilis Daniilidis"},
+    eva: {person:"Evaggelia Deligianni"},
+    eleni: {person:"Eleni Dochtsi"},
+    rasmus: { person: "Rasmus Blanck" },
+    victoria: {person: "Victoria Daniilidou"},
+    george: {person: "George Daniilidis"},
+    ivan: {person:"Ivan Kostov"},
+    monday: { day: "Monday" },
+    tuesday: { day: "Tuesday" },
+    wednesday: {day: "Wednesday"},
+    thursday: {day: "Thursday"},
+    friday: {day:"Friday"},
+    "10": { time: "10:00" },
+    "11": { time: "11:00" },
+    agree: ["yes", "yeah", "yup","of course"],
+    disagree: ["no", "nope"]
+
 };
 
 const dearClient = ["Are you there", "talk to me"];
 function randomRepeat(myarray){
   const randomIndex =  Math.floor(Math.random() * myarray.length);
-  return myarray[randomIndex];
+    return myarray[randomIndex];
 }
 
 /* Helper functions */
 function isInGrammar(utterance) {
-  return utterance.toLowerCase() in grammar;
+return utterance.toLowerCase() in grammar;
   //this gives back the nickname, key returns a boolean
 }
 
@@ -151,13 +149,20 @@ const dmMachine = setup({
               target: "Asktheday",
               actions: assign({
                 MeetingWithwhom: ({event}) => getPerson(event.value[0].utterance),
-            })},  //function
-              
-            {target : "#DM.Done"},
+              })},  //function
+                
+              {target : "#DM.PromptAndAsk.Askwithwhom",
+              actions:[
+              {
+                type: "say",
+                params: `Say something else. It is not in the grammar`,
+              },
             ],
-            ASR_NOINPUT : "Canthear",
-            },
           },
+              ],
+              ASR_NOINPUT : "Canthear",
+              },
+            },
           Canthear : {
             entry: ({context}) =>
             context.ssRef.send({
@@ -220,15 +225,27 @@ const dmMachine = setup({
               RECOGNISED:[ 
               {
                 guard: ({event}) => isTheAnswerYes(event.value[0].utterance),
-              target: "Verifyappointment"},
+              target: "Verifyappointment2"},
               
               {target: "AskTheTime"},
               
             ],
-            //ASR_NOINPUT : "Canthear",
+            ASR_NOINPUT : "Canthear2",
           },
       }, 
-      
+      Canthear2 : {
+        entry: ({context}) =>
+        context.ssRef.send({
+            type: "SPEAK",
+            value: {
+                utterance: randomRepeat(dearClient),
+            },
+        }),
+        on: {
+            SPEAK_COMPLETE: "#DM.PromptAndAsk.Askwholeday"
+        },
+    
+    },
 
         AskTheTime: {
           entry: [{
@@ -258,6 +275,18 @@ const dmMachine = setup({
           //ASR_NOINPUT : "Canthear",
         },
       },
+      
+      Verifyappointment2: {
+        entry: ({ context }) =>
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                  utterance: `Do you want to create an appointment with ${context.MeetingWithwhom} on ${context.Dayofmeeting}?`,
+                    },
+                  }),
+          on: {SPEAK_COMPLETE: "NegPosVerif"},
+        },
+
 
         Verifyappointment: {
           entry: ({ context }) =>
@@ -290,9 +319,9 @@ const dmMachine = setup({
           entry: [{
             type: "say",
             params: `Your appointment has been created.`,
-          }],   
+        }],   
                 
-          on: {SPEAK_COMPLETE: "#DM.Done"},     //LIsten nlu:value=true 
+          on: {SPEAK_COMPLETE: "#DM.Done"},
           },},},
           Done:{
             on:{
