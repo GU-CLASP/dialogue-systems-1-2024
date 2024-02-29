@@ -1,0 +1,651 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "appointment",
+        "multilingual": false,
+        "description": "",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "CreateMeeting"
+            },
+            {
+                "category": "WhoIsX"
+            }
+        ],
+        "entities": [
+            {
+                "category": "meeting_name",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "Nayat Astaiza Soriano",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Nayat Astaiza Soriano",
+                                        "aya",
+                                        "nayat",
+                                        "ta aya",
+                                        "ta nayat",
+                                        "ms soriano"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Vladislav Maraev",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Vladislav Maraev",
+                                        "vlad",
+                                        "mr maraev",
+                                        "teacher vlad",
+                                        "vlad m",
+                                        "vladislav"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Rasmus Blanck",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Rasmus Blanck",
+                                        "rasmus",
+                                        "rasmus b",
+                                        "teacher rasmus",
+                                        "professor rasmus",
+                                        "mr blanck"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "requiredComponents": [
+                    "list"
+                ]
+            },
+            {
+                "category": "meeting_date",
+                "compositionSetting": "combineComponents",
+                "prebuilts": [
+                    {
+                        "category": "DateTime"
+                    }
+                ],
+                "requiredComponents": [
+                    "prebuilts"
+                ]
+            },
+            {
+                "category": "yes",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "yes",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "yes",
+                                        "yep",
+                                        "yeap",
+                                        "yeah",
+                                        "yes please",
+                                        "absolutely",
+                                        "of course"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "requiredComponents": [
+                    "list"
+                ]
+            },
+            {
+                "category": "meeting_title",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "meeting",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "meeting",
+                                        "brainstorming",
+                                        "office hour",
+                                        "one on one",
+                                        "discussion",
+                                        "weekly meeting",
+                                        "group discussion",
+                                        "teams meeting",
+                                        "session",
+                                        "talk",
+                                        "quick chat",
+                                        "chat",
+                                        "brainstorming session",
+                                        "morning meeting"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "celebrity",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "no",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "no",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "no",
+                                        "nope",
+                                        "no thanks",
+                                        "not this time",
+                                        "negative",
+                                        "nah"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "utterances": [
+            {
+                "text": "What can you tell me about Britney Spears?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 27,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me about Beyoncé.",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 14,
+                        "length": 7
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me something about Loreen.",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 24,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's schedule a brainstorming session with vlad.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 15,
+                        "length": 23
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 44,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Is it possible to meet nayat in two days?",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_name",
+                        "offset": 23,
+                        "length": 5
+                    },
+                    {
+                        "category": "meeting_date",
+                        "offset": 29,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "On monday at 2pm, I want to meet professor rasmus blanck.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_date",
+                        "offset": 3,
+                        "length": 13
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 33,
+                        "length": 23
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Help me schedule a meeting with my teacher on friday.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 17,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 32,
+                        "length": 10
+                    },
+                    {
+                        "category": "meeting_date",
+                        "offset": 43,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to meet ta aya for a discussion tomorrow.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_name",
+                        "offset": 15,
+                        "length": 6
+                    },
+                    {
+                        "category": "meeting_title",
+                        "offset": 26,
+                        "length": 12
+                    },
+                    {
+                        "category": "meeting_date",
+                        "offset": 39,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Book me a one on one with Vlad on Monday at 10.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 10,
+                        "length": 10
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 26,
+                        "length": 4
+                    },
+                    {
+                        "category": "meeting_date",
+                        "offset": 31,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Angélique Kidjo?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "What can you tell me about Lady Gaga?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 27,
+                        "length": 10
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Ulf Kristersson?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "What can you tell me about Brad Pitt?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 27,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Barack Obama?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Sauli Niinistö?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Carl Gustaf XVI?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Käärijä?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 7
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to have a meeting with rasmus.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 15,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 30,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to book a meeting with teacher vlad.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 15,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 30,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I need to book a meeting with ta aya.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 15,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 30,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Book a meeting with vlad.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 5,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 20,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's schedule a meeting with mr blanck.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 15,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 30,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's create a meeting with mr maraev.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 13,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 28,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Alexander Stubb?",
+                "language": "en-us",
+                "intent": "WhoIsX",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Book an appointment with my colleague.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 5,
+                        "length": 14
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 25,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to schedule a meeting with my teacher.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 19,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 34,
+                        "length": 10
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Schedule a meeting for me with nayat.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 9,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 31,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to create a meeting with rasmus b.",
+                "language": "en-us",
+                "intent": "CreateMeeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 19,
+                        "length": 9
+                    },
+                    {
+                        "category": "meeting_name",
+                        "offset": 34,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
