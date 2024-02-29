@@ -1,0 +1,44 @@
+\lstnewenvironment{prompt}{%
+    \lstset{
+      language={},
+      basicstyle=\ttfamily,
+      extendedchars=true,
+        breaklines=true,
+        breakatwhitespace=true,
+        breakindent=0pt,
+        % border:
+        frame=single,
+        framerule=0.25pt,
+        framesep=5pt,
+        xleftmargin=6pt,
+        xrightmargin=6pt,
+        caption={Most recent version of the prompt. (L) is a slot for the description of the formal language (see Listing \ref{listing:L}).},captionpos=b,label={listing:prompt}
+    }
+}{}
+
+\begin{prompt}
+Your task is to interpret the meaning of a user utterance and output it in a particular semantic representation. Only output the semantic representation without any surrounding content.
+
+SEMANTIC REPRESENTATION
+
+(L)
+
+EXAMPLES
+
+why? -> Ask(Why())
+why do you think this person is introverted -> Ask(Why(Not(Extraverted())))
+why do you think this person likes danceable music? -> Ask(Why(HighValue(danceability_mean)))
+why do you think this person likes music that is not danceable? -> Ask(Why(Not(HighValue(danceability_mean))))
+why do you think this person likes loud music? -> Ask(Why(HighValue(loudness_mean)))
+why do you think this person likes silent music? -> Ask(Why(Not(HighValue(loudness_mean))))
+I don't understand -> ICM(understanding, negative)
+so what? -> ICM(understanding, negative)
+OK -> ICM(acceptance, positive)
+how does liking music that is not danceable explain being introverted? -> Ask(Why(Explains(Not(HighValue(danceability_mean)), Not(Extraverted()))))
+does the the fact that the person likes music that is not danceable support the assessment that the person is extraverted? -> Ask(BooleanQuestion(Supports(Not(HighValue(danceability_mean)), Extraverted())))
+Which audio properties do you consider? -> Ask(WhQuestion(FactorsConsidered))
+Does listening to Patti Smith affect your assessment? -> Ask(WhQuestion(FactorsConsidered))
+do you think this person is extraverted? -> Ask(BooleanQuestion(Extraverted()))
+next case please -> None
+increase the volume -> None
+\end{prompt}
