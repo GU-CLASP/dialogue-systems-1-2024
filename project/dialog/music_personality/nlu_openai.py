@@ -7,7 +7,7 @@ from dialog import semantic_serialization
 from dialog.logger import logger
 
 
-semantic_serialization.register_module(dialog.music_personality.types)
+semantic_serialization.register_module(dialog.music_personality.ontology)
 config = yaml.load(open('dialog/music_personality/nlu_openai_config.yml'), yaml.Loader)
 
 

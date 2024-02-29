@@ -5,18 +5,9 @@ from dataclasses import dataclass, field
 
 SemanticType = TypeVar('SemanticClass')
 
+
 class SemanticClass:
     pass
-
-
-# class Sort(SemanticClass):
-#     name: str
-#
-#
-# @dataclass
-# class Individual(SemanticClass):
-#     sort: Sort
-#     name: str
 
 
 @dataclass

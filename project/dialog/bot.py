@@ -1,3 +1,5 @@
+from dataclass_wizard import asdict
+
 from dialog.ontology import DialogState
 from dialog import dm
 from dialog.logger import logger
@@ -20,7 +22,7 @@ def get_response(resources, state):
 
 
 def get_system_move(state):
-    logger.info('bot.get_system_move', state=state)
+    logger.info('bot.get_system_move', state_serialized=str(state), state_dict=asdict(state))
     state.next_system_move = None
     dm.update_and_select(state)
     system_move = state.next_system_move
