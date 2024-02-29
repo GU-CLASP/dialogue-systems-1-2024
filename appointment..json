@@ -1,0 +1,625 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "appointment.",
+        "multilingual": false,
+        "description": "",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "create a meeting"
+            },
+            {
+                "category": "who is X"
+            }
+        ],
+        "entities": [
+            {
+                "category": "time",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "11:00",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "11:00",
+                                        "11",
+                                        "eleven",
+                                        "eleven o'clock"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "10:00",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "10:00",
+                                        "ten o'clock",
+                                        "ten",
+                                        "10"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "day",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "sunday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "sunday"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "saturday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "saturday"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "friday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "friday"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "thursday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "thursday"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "wednesday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "wednesday"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "tuesday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "tuesday"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "monday",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "monday"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "accept",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "yes",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "yes",
+                                        "yeah",
+                                        "sure",
+                                        "of course",
+                                        "absolutely"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "decline",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "no",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "no",
+                                        "nope",
+                                        "no way",
+                                        "nah",
+                                        "not",
+                                        "isn't"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "meeting",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "name",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "Alice",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Alice"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Rasmus Blanck",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Rasmus Blanck",
+                                        "rasmus"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Nayat Astaiza Soriano",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Nayat Astaiza Soriano",
+                                        "aya"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Vladislav Maraev",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Vladislav Maraev",
+                                        "vlad"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "prebuilts": [
+                    {
+                        "category": "Person.Name"
+                    }
+                ]
+            },
+            {
+                "category": "name2",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "knowwho",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "detail",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "age",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "age",
+                                        "how old",
+                                        "born"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Representative works",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Representative works",
+                                        "work",
+                                        "works",
+                                        "famous",
+                                        "popular",
+                                        "favorite",
+                                        "recommend",
+                                        "song",
+                                        "songs",
+                                        "film",
+                                        "films"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "utterances": [
+            {
+                "text": "I want to know more about Taylor Swift",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 10,
+                        "length": 4
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 26,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you give me any information about Jackie chan",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 22,
+                        "length": 11
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 40,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is BTS",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 0,
+                        "length": 3
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 7,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "How much do you know about Jackie chan",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 16,
+                        "length": 4
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 27,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to know about Jackie chan",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 10,
+                        "length": 4
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 21,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you tell me more about BTS",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 10,
+                        "length": 4
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 29,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "How much do you know about BTS",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 16,
+                        "length": 4
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 27,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to know about BTS",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 10,
+                        "length": 4
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 21,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Jackie chan",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 0,
+                        "length": 3
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 7,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you give me some information about Taylor Swift",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "knowwho",
+                        "offset": 23,
+                        "length": 11
+                    },
+                    {
+                        "category": "name2",
+                        "offset": 41,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Create a meeting",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 7,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you help me create an appointment",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 23,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you help me create an appointment",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 25,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to make a meeting",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 15,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Schedule a meeting",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 9,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to schedule a meeting",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 19,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's create an appointment",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 13,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I want to make an appointmet",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 15,
+                        "length": 13
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I need to make an appointment",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 15,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Make an appointment",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting",
+                        "offset": 5,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
