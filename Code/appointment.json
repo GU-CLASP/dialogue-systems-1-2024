@@ -1,0 +1,409 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "appointment",
+        "multilingual": false,
+        "description": "Lab4 project",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "create a meeting"
+            },
+            {
+                "category": "who is X"
+            }
+        ],
+        "entities": [
+            {
+                "category": "name",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "nayat astaiza soriano",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "nayat astaiza soriano",
+                                        "aya",
+                                        "nayat"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "rasmus blanck",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "rasmus blanck",
+                                        "rasmus"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Vladislav Maraev",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "vlad",
+                                        "vladislav maraev",
+                                        "vladislav"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "prebuilts": [
+                    {
+                        "category": "Person.Name"
+                    }
+                ]
+            },
+            {
+                "category": "DayAndTime",
+                "compositionSetting": "combineComponents",
+                "prebuilts": [
+                    {
+                        "category": "DateTime"
+                    }
+                ]
+            },
+            {
+                "category": "negative",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "negative",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "negative",
+                                        "No",
+                                        "no",
+                                        "Nope",
+                                        "nope",
+                                        "No way",
+                                        "no way",
+                                        "I will not",
+                                        "i will not",
+                                        "It will not",
+                                        "it will not"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "affirmative",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "affirmative",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "affirmative",
+                                        "Yes",
+                                        "yes",
+                                        "Of course",
+                                        "of course",
+                                        "It will",
+                                        "it will",
+                                        "Yes please",
+                                        "yes please"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "utterances": [
+            {
+                "text": "I'd like to know about Ursula Leguin, please",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 23,
+                        "length": 13
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "tell me about Ursula Leguin",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 14,
+                        "length": 13
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I don't know who Adrian Tchaikovsky is, can you tell me about him?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 17,
+                        "length": 18
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like information about who Bruce Dickinson is",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 31,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "tell me what you know about Octavia Butler",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 28,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "what do you know about JRR Tolkien",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 23,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I need to know something about Adrian Tchaikovsky",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 31,
+                        "length": 18
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "explain who Bruce Dickinson is",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 12,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "please tell me who Octavia Butler is ",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 19,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "who is JRR Tolkien?",
+                "language": "en-us",
+                "intent": "who is X",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 7,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Book my afternoon slot for an appointment with rasmus on friday at 15",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 47,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Create an appointment at 13 on monday with vlad",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 43,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm meeting up with rasmus at 12",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 20,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I have a meeting with vlad on tuesday at 10",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 22,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to book an appointment with rasmus",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 37,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I have an appointment to book with aya",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 35,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'm meeting vlad",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 12,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Schedule a meeting with aya",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 24,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Create a meeting with vlad",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 22,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Book me a meeting with rasmus",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "name",
+                        "offset": 23,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
