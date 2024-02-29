@@ -200,10 +200,16 @@ const dmMachine = setup({
     MeetingTitleYesOrNoListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED: {guard: ({event}) => checkIfYes(event.nluValue.entities[0].category),
+        RECOGNISED: [{guard: ({event}) => checkIfYes(event.nluValue.entities[0].category),
                     target: "MeetingTitleSpeak"},
-                    target: "VerificationSpeak",
+                    {guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "VerificationSpeak"}],
+        ASR_NOINPUT: "ReraiseMeetingTitleYesOrNo"
       }
+    },
+
+    ReraiseMeetingTitleYesOrNo: {
+      entry: [{ type: "speakToTheUser", params: `Sorry, I didn't catch that.`}],
+      on: { SPEAK_COMPLETE: "MeetingTitleYesOrNoSpeak"}
     },
 
     MeetingTitleSpeak: {
@@ -221,13 +227,23 @@ const dmMachine = setup({
         RECOGNISED: {
           actions: assign({meeting_title: ({event}) => event.nluValue.entities[0].text}),
           target: "VerificationWithTitleSpeak"
-        }
+        },
+        ASR_NOINPUT: "ReRaiseMeetingTitle"
       }
     },
 
+    ReRaiseMeetingTitle: {
+      entry: [{ type: "speakToTheUser", 
+    params: `Sorry, didn't hear you.`}],
+    on: {
+      SPEAK_COMPLETE: "MeetingTitleSpeak"
+    }
+  },
+
+
     VerificationWithTitleSpeak: {
-      entry: [{type: "speakToTheUser", params: ({ context}) => `Do you want me to create an appointment with the title of 
-      ${context.meeting_title} with ${context.meeting_name} on ${context.DateTime}?`}],
+      entry: [{type: "speakToTheUser", params: ({ context}) => `Do you want me to create a 
+      ${context.meeting_title} with ${context.meeting_name} ${context.DateTime}?`}],
       on: {
         SPEAK_COMPLETE: "VerificationWithTitleListen"
       }
