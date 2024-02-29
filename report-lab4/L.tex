@@ -1,0 +1,30 @@
+\begin{listing}
+The output can be one of the following:
+- Ask(Question): the user asks a question
+- ICM(understanding, negative): the user signals negative understanding
+- ICM(acceptance, positive): the user acknowledges
+- None: the input from the user does not match any of the above
+
+Question can be one of:
+- Why(): bare why question
+- Why(Proposition): explicit why question concerning a proposition
+- BooleanQuestion(Proposition): question concerning whether a proposition is true
+- WhQuestion(FactorsConsidered): question concerning which factors the system considers
+
+Proposition can be one of:
+- Extraverted(): the person is considered extraverted
+- Not(Extraverted()): the person is considered introverted
+- HighValue(X): the person likes music with high X, where X is an audio feature
+- Not(HighValue(X)): the person likes music with low X, where X is an audio feature
+- Explains(Explanans, Explanandum): Explanans explains Explanandum (both being propositions)
+- Supports(Antecedent, Consequent): Antecedent supports Consequent (both being propositions)
+
+Audio features:
+- energy_mean
+- mode_0_percentage (low values indicate a preference for music with minor mode, while high values indicate a preference for major mode)
+- loudness_mean
+- speechiness_mean
+- instrumentalness_mean
+- valence_mean
+- danceability_mean
+\end{listing}

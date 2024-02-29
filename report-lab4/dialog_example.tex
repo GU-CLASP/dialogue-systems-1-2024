@@ -1,0 +1,48 @@
+\lstnewenvironment{dialogexample}{%
+    \lstset{
+      language={},
+      basicstyle=\ttfamily,
+      extendedchars=true,
+        breaklines=true,
+        breakatwhitespace=true,
+        breakindent=0pt,
+        % border:
+        frame=single,
+        framerule=0.25pt,
+        framesep=5pt,
+        xleftmargin=6pt,
+        xrightmargin=6pt,
+        caption={Example of dialog between user (U) and assistant (A), with NLU interpretations in square brackets.},captionpos=b,label={listing:dialogexample}
+    }
+}{}
+
+\begin{dialogexample}
+A: If I had to guess, I'd say that this person is extraverted.
+U: which variables to you look at?
+  [Ask(WhQuestion(FactorsConsidered))]
+A: I consider music heard by the person in terms of the following audio features: energy, mode, loudness, speechiness, instrumentalness, valence and danceability.
+U: why
+  [Ask(Why())]
+A: I don't know.
+U: ok
+  [ICM(acceptance, positive)]
+(A: no response)
+U: so you do think this person is extraverted?
+  [Ask(BooleanQuestion(Extraverted()))]
+A: Yes, but I'm very uncertain.
+U: sorry, I meant: why  do think this person is extraverted?
+  [Ask(Why(Extraverted()))]
+A: The person likes music with low energy.
+U: hmm, ok
+  [ICM(acceptance, positive)]
+(A: no response)
+U: so low energy is associated with being introverted?
+  [Ask(BooleanQuestion(Supports(Not(HighValue(energy_mean)), Not(Extraverted()))))]
+A: No.
+U: right, my bad, low energy is associated with extraversion?
+  [Ask(BooleanQuestion(Supports(Not(HighValue(energy_mean)), Extraverted())))]
+A: Yes.
+U: gotcha
+  [ICM(acceptance, positive)]
+(A: no response)
+\end{dialogexample}
