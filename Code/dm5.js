@@ -1,4 +1,4 @@
-import { assign, createActor, setup } from "xstate";
+import { and, assign, createActor, or, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js";
@@ -70,6 +70,10 @@ function checkIfHelp(event) {   //checking if user needs help
     return (event === "help");
 }
 
+function checkThreshold(event) {
+   return (event > 0.99);
+}
+
 const dmMachine = setup({
   actions: {
     listenForUsersAnswer : ({ context }) => 
@@ -111,8 +115,7 @@ const dmMachine = setup({
     },
 
     Prompt: {
-      entry: [{ type: "speakToTheUser", params: `How can I help you today? 
-      I can either help you with booking a meeting or tell you about the celebrity of your choice. For help, say help.`}],
+      entry: [{ type: "speakToTheUser", params: `How can I help you today? I can either help you with booking a meeting or tell you about the celebrity of your choice. For help, say help.`}],
       on: {
         SPEAK_COMPLETE: "Listen",
       },
@@ -122,12 +125,15 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
         on: {
           RECOGNISED: [
-            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent), //checking which path to take, creating a meeting
+            {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]), //checking which path to take, creating a meeting
             target: "MeetingPersonSpeak"},
+
             {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent),    //or celeb info
             actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}), //assigning the celebrity in the context
             target: "StartTellingAboutACelebrity"},
-            {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "Prompt"}
+
+            {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), 
+            actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "Prompt"}
             ],
           ASR_NOINPUT: "ReRaisePrompt"
         },
@@ -150,9 +156,13 @@ const dmMachine = setup({
     MeetingPersonListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED : {
-          actions: assign({meeting_name: ({event}) => event.nluValue.entities[0].text}),   
+        RECOGNISED : [
+          {guard: ({event}) => event.nluValue.entities.length !== 0, actions: assign({meeting_name: ({event}) => event.nluValue.entities[0].text}),   
           target: "MeetingDateTimeSpeak" },
+          {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot create a meeting with this person, sorry.`, target: "Done"}]},
+          {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), 
+          actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "MeetingPersonSpeak"}
+        ],
     
         ASR_NOINPUT : {
           target: "ReRaiseMeetingPerson"
@@ -231,12 +241,12 @@ const dmMachine = setup({
     MeetingTitleListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED: {
-          actions: assign({meeting_title: ({event}) => event.nluValue.entities[0].text}),
-          target: "VerificationWithTitleSpeak"
-        },
+        RECOGNISED: [
+          {guard: ({event}) => event.nluValue.entities.length !== 0, actions: assign({meeting_title: ({event}) => event.nluValue.entities[0].text}),   
+          target: "MeetingDateTimeSpeak" },
+          {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot name the meeting title as that, sorry.`, target: "Done"}]}],
         ASR_NOINPUT: "ReRaiseMeetingTitle"
-      }
+      },
     },
 
     ReRaiseMeetingTitle: {
