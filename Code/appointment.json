@@ -1,0 +1,467 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "appointment",
+        "multilingual": false,
+        "description": "",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "create a meeting"
+            },
+            {
+                "category": "who is Adam Lambert "
+            },
+            {
+                "category": "who is adam lambert"
+            }
+        ],
+        "entities": [
+            {
+                "category": "meeting time",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "Week",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Week",
+                                        "Friday",
+                                        "Monday",
+                                        "Tuesday",
+                                        "Thursday",
+                                        "Wednesday"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "category": "meeting title",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "Match",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Match",
+                                        "Football",
+                                        "Volleyball",
+                                        "Computer Game"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "Dinner",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Dinner",
+                                        "hot pot",
+                                        "soup",
+                                        "Chinese Food",
+                                        "Indian Food",
+                                        "Thailand Food",
+                                        "Swedish Food"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "prebuilts": [
+                    {
+                        "category": "General.Event"
+                    }
+                ]
+            },
+            {
+                "category": "yesorno",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "no",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "no",
+                                        "no way"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "listKey": "yes",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "yes",
+                                        "of course",
+                                        "yeah"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "prebuilts": [
+                    {
+                        "category": "Choice.Boolean"
+                    }
+                ]
+            },
+            {
+                "category": "Age",
+                "compositionSetting": "combineComponents",
+                "prebuilts": [
+                    {
+                        "category": "Quantity.Age"
+                    }
+                ]
+            },
+            {
+                "category": "BirthDay",
+                "compositionSetting": "combineComponents",
+                "prebuilts": [
+                    {
+                        "category": "DateTime"
+                    }
+                ]
+            },
+            {
+                "category": "Info",
+                "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "Career",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "Career",
+                                        "singer",
+                                        "artist"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "utterances": [
+            {
+                "text": "Adam Lambert is born in Jan 29th.",
+                "language": "en-us",
+                "intent": "who is adam lambert",
+                "entities": [
+                    {
+                        "category": "BirthDay",
+                        "offset": 24,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Adam Lambert is a Singer and Artist",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [
+                    {
+                        "category": "Info",
+                        "offset": 18,
+                        "length": 6
+                    },
+                    {
+                        "category": "Info",
+                        "offset": 29,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Adam Lambert is born on Jan 29th.",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [
+                    {
+                        "category": "BirthDay",
+                        "offset": 24,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Adam Lambert is 42 years old",
+                "language": "en-us",
+                "intent": "who is adam lambert",
+                "entities": [
+                    {
+                        "category": "Age",
+                        "offset": 16,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is the individual named Adam Lambert?",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "What can you tell me about Adam Lambert?",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Could you give me some background on Adam Lambert?",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who exactly is Adam Lambert?",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me about the person known as Adam Lambert.",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "What details do you have about Adam Lambert?",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you provide information on Adam Lambert?",
+                "language": "en-us",
+                "intent": "who is Adam Lambert ",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "It would be beneficial to schedule a meeting next Friday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 37,
+                        "length": 7
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 50,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to propose a weekly check-in meeting on Monday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 29,
+                        "length": 16
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 49,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's organize a special meeting next Wednesday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 17,
+                        "length": 15
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 38,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I recommend we convene a cross-functional meeting next Tuesday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 25,
+                        "length": 24
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 55,
+                        "length": 7
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's plan a departmental meeting next Friday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 13,
+                        "length": 20
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 39,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "How about setting up a conference call for Thursday?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 23,
+                        "length": 15
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 43,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I suggest creating a meeting on Wednesday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 21,
+                        "length": 7
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 32,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's schedule a virtual meeting for next Thursday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 17,
+                        "length": 15
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 42,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can we organize a brief team meeting this Friday?",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 24,
+                        "length": 12
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 42,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I propose we set up a meeting next Monday.",
+                "language": "en-us",
+                "intent": "create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting title",
+                        "offset": 22,
+                        "length": 7
+                    },
+                    {
+                        "category": "meeting time",
+                        "offset": 35,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
