@@ -71,8 +71,20 @@ function checkIfHelp(event) {   //checking if user needs help
 }
 
 function checkThreshold(event) {
-   return (event > 0.99);
+   return (event > 0.60);
 }
+
+function randomRepeat(myArray) {
+  const randomIndex = Math.floor(Math.random()*myArray.length);
+  return myArray[randomIndex]
+}
+
+function checkNumberOfRepetitions(repetition) {
+  return (repetition ===3 );
+  }
+
+
+const repetitionphrases = ["Sorry, I didn't catch that.", "Sorry, can you please repeat that?", "I beg your pardon?", "Didn't quite understand. Could you please repeat?"]
 
 const dmMachine = setup({
   actions: {
@@ -85,7 +97,9 @@ const dmMachine = setup({
        type: "SPEAK",
       value: {
         utterance: params}
-      })
+      }),
+
+    increaseRepetitions : ({ context }) => {context.repetition = context.repetition+1;}
     }
   }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwA2RQFYuADgAsergEYuagOwAaEAE9EJkxfQaVp41wsaTAZl8Bffxs0dAB1AnFqQXIxIjFiAGEAGQBJBIBpbj4kECFRCWlZBQQTTXVdFQNFEwMfHz1FG3sEbQaXCu8fAy1tesDgjBxBAFs8MVIpCFJYAGssbBGx4nJMFnT6BIB5VEwkpmomLNk88UkZHOLtDR90Cx03PwsfCwM1JsQNVvQDB6cGrsc-RAISGo3Gk2mcySIlgYjAUmIzC2AHEAHIpchMZBHHInArnUDFPROdCKZ4VEwaPTPEx6d4tV7oDxcXpGLwaCwmIEghZgiZTWboaGw+HLVakdZbHZ7A44gTCU6FC4OLyktyONR6O53NQGekGXwuB4WE1cV7PbkYZDSMCJVIZOW5BX4ooqjRqlQarWKHV6uyIXqKcqVK6KNT6M2BIIgKSCCBwWRoY7Os6uhAAWg09Mzlvm+CIYGT+VTyoQVXpxPQPnVPk0pS4rgsufCkWisWwYiLioJ8gD1n9LTaFgq1LUai6Y58udBY35kK7LtLij07sUilelh6Bm0a6zA+6QYqXFrO+0XjM2mnvNnEMFM87uJTSsJiDqBlJ67HXh02939Ou2joGYKgmlqag7rqV6LOCApQjCcI9niJYvggXjvkepj6Bydz-roQEVF0dRoSYii5taUiFo+xbPr2LSNPupSktS9R6A0JjaKUZ5Rv4QA */
@@ -94,6 +108,7 @@ const dmMachine = setup({
     DateTime: "",
     meeting_title: "",
     celebrity: "",
+    repetition : 0,
   },
   id: "DM",
   initial: "Prepare",
@@ -115,7 +130,7 @@ const dmMachine = setup({
     },
 
     Prompt: {
-      entry: [{ type: "speakToTheUser", params: `How can I help you today? I can either help you with booking a meeting or tell you about the celebrity of your choice. For help, say help.`}],
+      entry: [{ type: "speakToTheUser", params: `How can I help you today? Book a meeting or hear about a celebrity. For help, say help.`}],
       on: {
         SPEAK_COMPLETE: "Listen",
       },
@@ -128,22 +143,29 @@ const dmMachine = setup({
             {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]), //checking which path to take, creating a meeting
             target: "MeetingPersonSpeak"},
 
-            {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent),    //or celeb info
+            {guard: and([({event}) => checkIfWhoIsIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]),    //or celeb info
             actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}), //assigning the celebrity in the context
             target: "StartTellingAboutACelebrity"},
 
             {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), 
-            actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "Prompt"}
+            actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "Prompt"},
+
+            {guard: ({ event }) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: [{type : "speakToTheUser", params: `I'm not sure what to do now, so I'm starting over.`}]}
             ],
-          ASR_NOINPUT: "ReRaisePrompt"
+          ASR_NOINPUT: [
+            {guard: ({ context }) => context.repetition < 3, target: "ReRaisePrompt"}, 
+            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
         },
       },
 
     ReRaisePrompt: {
-      entry: [{type: "speakToTheUser", params: `Are you there?`}],
-      on: { SPEAK_COMPLETE: 
-        "Prompt"}
+      entry: [{type: "speakToTheUser", params: randomRepeat(repetitionphrases)}],
+      on: { 
+        SPEAK_COMPLETE: {
+        actions: "increaseRepetitions", 
+        target: "Prompt"}
     },
+  },
 
     MeetingPersonSpeak: {
       entry: [{ type: "speakToTheUser", 
@@ -161,22 +183,23 @@ const dmMachine = setup({
           target: "MeetingDateTimeSpeak" },
           {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot create a meeting with this person, sorry.`, target: "Done"}]},
           {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), 
-          actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "MeetingPersonSpeak"}
+          actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "MeetingPersonSpeak"},
         ],
     
-        ASR_NOINPUT : {
-          target: "ReRaiseMeetingPerson"
-           },
-          },
+        ASR_NOINPUT : [
+            {guard: ({ context }) => context.repetition < 3, target: "ReRaiseMeetingPerson"}, 
+            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
         },
+      },
     
     ReRaiseMeetingPerson: {
-      entry: [{ type: "speakToTheUser", 
-      params: `I didn't hear you.`}],
-      on: {
-        SPEAK_COMPLETE: "MeetingPersonSpeak"
-          }
-        },
+      entry: [{type: "speakToTheUser", params: randomRepeat(repetitionphrases)}],
+      on: { 
+        SPEAK_COMPLETE: {
+        actions: "increaseRepetitions", 
+        target: "MeetingPersonSpeak"}
+    },
+  },
     
     MeetingDateTimeSpeak: {
       entry: [{ type: "speakToTheUser", 
@@ -192,17 +215,19 @@ const dmMachine = setup({
           RECOGNISED : { 
             actions: assign({DateTime: ({event}) => event.nluValue.entities[0].text}),
             target: "MeetingTitleYesOrNoSpeak" },
-          ASR_NOINPUT : {
-              target: "ReRaiseMeetingDateTime"
-                },
+          ASR_NOINPUT : [
+            {guard: ({ context }) => context.repetition < 3, target: "ReRaiseMeetingDateTime"}, 
+            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
               },
             },
     
     ReRaiseMeetingDateTime: {
       entry: [{ type: "speakToTheUser", 
-            params: `I didn't hear you.`}],
+            params: randomRepeat(repetitionphrases)}],
       on: {
-          SPEAK_COMPLETE: "MeetingDateTimeSpeak"
+          SPEAK_COMPLETE: {
+            actions: "increaseRepetitions", 
+            target: "MeetingDateTimeSpeak"}
               }
             },
   
@@ -220,13 +245,17 @@ const dmMachine = setup({
         RECOGNISED: [{guard: ({event}) => checkIfYes(event.nluValue.entities[0].category),
                     target: "MeetingTitleSpeak"},
                     {guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "VerificationSpeak"}],
-        ASR_NOINPUT: "ReraiseMeetingTitleYesOrNo"
+        ASR_NOINPUT: [
+          {guard: ({ context }) => context.repetition < 3, target: "ReraiseMeetingTitleYesOrNo"}, 
+          {guard: ({ context }) => context.repetition === 3, target: "Done"}]
       }
     },
 
     ReraiseMeetingTitleYesOrNo: {
-      entry: [{ type: "speakToTheUser", params: `Sorry, I didn't catch that.`}],
-      on: { SPEAK_COMPLETE: "MeetingTitleYesOrNoSpeak"}
+      entry: [{ type: "speakToTheUser", params: randomRepeat(repetitionphrases)}],
+      on: { SPEAK_COMPLETE: 
+        {actions: "increaseRepetitions", target:"MeetingTitleYesOrNoSpeak"}
+      }
     },
 
     MeetingTitleSpeak: {
@@ -245,15 +274,19 @@ const dmMachine = setup({
           {guard: ({event}) => event.nluValue.entities.length !== 0, actions: assign({meeting_title: ({event}) => event.nluValue.entities[0].text}),   
           target: "MeetingDateTimeSpeak" },
           {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot name the meeting title as that, sorry.`, target: "Done"}]}],
-        ASR_NOINPUT: "ReRaiseMeetingTitle"
+        ASR_NOINPUT:  [
+          {guard: ({ context }) => context.repetition < 3, target: "ReRaiseMeetingTitle"}, 
+          {guard: ({ context }) => context.repetition === 3, target: "Done"}]
       },
     },
 
     ReRaiseMeetingTitle: {
       entry: [{ type: "speakToTheUser", 
-    params: `Sorry, didn't hear you.`}],
+    params: randomRepeat(repetitionphrases)}],
     on: {
-      SPEAK_COMPLETE: "MeetingTitleSpeak"
+      SPEAK_COMPLETE: {
+        actions: "increaseRepetitions", 
+        target: "MeetingTitleSpeak"}
     }
   },
 
@@ -271,16 +304,20 @@ const dmMachine = setup({
       on: { 
         RECOGNISED : [{ guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
                         { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "MeetingPersonSpeak" }],
-        ASR_NOINPUT : "ReRaiseVerificationWithTitleSpeak"
+        ASR_NOINPUT : [
+          {guard: ({ context }) => context.repetition < 3, target: "ReRaiseVerificationWithTitleSpeak"}, 
+          {guard: ({ context }) => context.repetition === 3, target: "Done"}]
         },
       },
 
     ReRaiseVerificationWithTitleSpeak: {
       entry: [{ type: "speakToTheUser", 
-          params: `I didn't hear you.`,
+          params: randomRepeat(repetitionphrases),
             }],
           on: {
-            SPEAK_COMPLETE: "VerificationWithTitleSpeak"
+            SPEAK_COMPLETE: {
+              actions: "increaseRepetitions", 
+              target: "VerificationWithTitleSpeak"}
           }
         },
     
@@ -300,16 +337,20 @@ const dmMachine = setup({
         on: { 
           RECOGNISED : [{ guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
                           { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "MeetingPersonSpeak" }],
-          ASR_NOINPUT : "ReRaiseVerificationSpeak"
+          ASR_NOINPUT : [
+            {guard: ({ context }) => context.repetition < 3, target: "ReRaiseVerificationSpeak"}, 
+            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
           },
         },
     
     ReRaiseVerificationSpeak: {
           entry: [{ type: "speakToTheUser", 
-          params: `I didn't hear you.`,
+          params: randomRepeat(repetitionphrases),
             }],
           on: {
-            SPEAK_COMPLETE: "VerificationSpeak"
+            SPEAK_COMPLETE: {
+              actions: "increaseRepetitions", 
+              target: "VerificationSpeak"}
           }
         },
 
