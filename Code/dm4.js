@@ -1,7 +1,7 @@
-import { assign, createActor, setup } from "xstate";
+import { and, assign, createActor, setup } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
-import { KEY } from "./azure.js";
+import { NLU_KEY, KEY } from "./azure.js";
 
 const inspector = createBrowserInspector();
 
@@ -11,35 +11,36 @@ endpoint:
 key: KEY,
 };
 
+const azureLanguageCredentials = {
+  endpoint: "https://languageresource26.cognitiveservices.azure.com/language/:analyze-conversations?api-version=2022-10-01-preview" /** your Azure CLU prediction URL */,
+  key: NLU_KEY /** reference to your Azure CLU key */,
+  deploymentName: "appointment" /** your Azure CLU deployment */,
+  projectName: "appointment" /** your Azure CLU project name */,
+};
+
+
 const settings = {
-    azureCredentials: azureCredentials,
-    asrDefaultCompleteTimeout: 0,
-    asrDefaultNoInputTimeout: 5000,
-    locale: "en-US",
-    ttsDefaultVoice: "en-US-DavisNeural",
+  azureLanguageCredentials: azureLanguageCredentials /** global activation of NLU */,
+  azureCredentials: azureCredentials,
+  asrDefaultCompleteTimeout: 0,
+  asrDefaultNoInputTimeout: 5000,
+  locale: "en-US",
+  ttsDefaultVoice: "en-US-DavisNeural",
 };
 
 /* Grammar definition */
 const grammar = {
-    vlad: { person: "Vladislav Maraev" },
-    aya: { person: "Nayat Astaiza Soriano" },
-    manos: {person:"Manos Belantakis"},
-    vasilis: {person: "Vasilis Daniilidis"},
-    eva: {person:"Evaggelia Deligianni"},
-    eleni: {person:"Eleni Dochtsi"},
-    rasmus: { person: "Rasmus Blanck" },
-    victoria: {person: "Victoria Daniilidou"},
-    george: {person: "George Daniilidis"},
-    ivan: {person:"Ivan Kostov"},
-    monday: { day: "Monday" },
-    tuesday: { day: "Tuesday" },
-    wednesday: {day: "Wednesday"},
-    thursday: {day: "Thursday"},
-    friday: {day:"Friday"},
-    "10": { time: "10:00" },
-    "11": { time: "11:00" },
-    agree: ["yes", "yeah", "yup","of course"],
-    disagree: ["no", "nope"]
+    "rihanna" : {info: "Rihanna is a Barbadian singer, businesswoman, and actress. She is widely regarded as one of the most prominent recording artists of the 21st century"},
+    "adele":  {info: 'Adele is an English singer-songwriter. She is known for her mezzo-soprano vocals and sentimental songwriting. Adele has received numerous accolades including 16 Grammy Awards, 12 Brit Awards (including three for British Album of the Year), an Academy Award, a Primetime Emmy Award, and a Golden Globe Award'},
+    "lady gaga":{info: "Lady Gaga is an American singer, songwriter and actress. Known for reinventing her image and showcasing versatility in entertainment, she started performing as a teenager by singing at open mic nights and acting in school plays"},
+    "madonna":{info: "Madonna is an American singer, songwriter, and actress. Known as the Queen of Pop, she has been widely recognized for her continual reinvention and versatility in music production, songwriting and visual presentation"},
+    "leonardo dicaprio": {info:"Leonardo dicaprio is an American actor and film producer. Known for his work in biographical and period films, he is the recipient of numerous accolades, including an Academy Award, a British Academy Film Award, and three Golden Globe Awards"},
+    "sam smith": {info: "Sam Smith is an English singer and songwriter. In October 2012, they performed on Disclosure's breakthrough single Latch, which peaked at number eleven on the UK Singles Chart. The following year, they performed on Naughty Boy's 2013 single La La La, which became a number one single on the chart"},
+    "taylor swift": {info: "Taylor Swift is an American singer-songwriter. Her artistry and entrepreneurship have influenced the music industry, popular culture, and politics, while her life is a subject of widespread media coverage."},
+    "elizabeth taylor": {info: "Elizabeth Taylor was a British and American actress. She began her career as a child actress in the early 1940s and was one of the most popular stars of classical Hollywood cinema in the 1950s."},
+    "beyonce": {info: "Beyonce is an American singer, songwriter and businesswoman. Dubbed as Queen Bey and a prominent cultural figure of the 21st century, she has been recognized for her artistry and performances, with Rolling Stone naming her one of the greatest vocalists of all time."},
+    "shakira": {info: "Shakira is a Colombian singer and songwriter. Born and raised in Barranquilla, she has been referred to as the Queen of Latin Music and has been praised for her musical versatility."},
+  
 
 };
 
@@ -55,27 +56,15 @@ return utterance.toLowerCase() in grammar;
   //this gives back the nickname, key returns a boolean
 }
 
-function getPerson(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).person;
-  //this gives back the full name, value of the value 
+function getInformationCelebrity(utterance) {
+  return (grammar[utterance.toLowerCase()]|| {}).info;
+}
 
-  //functions for .date, .time
+function whoisX(event){
+  return (event === "Who is X");
 }
-function getDay(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).day;
-}
-function getTime(utterance) {
-  return (grammar[utterance.toLowerCase()] || {}).time;
-}
-function isTheAnswerYes(utterance){
-  return (grammar.agree.includes(utterance.toLowerCase()));
-}
-function isTheAnswerNo(utterance){
-  return (grammar.disagree.includes(utterance.toLowerCase()));
-}
-function days(grammar){
-  return Object.keys(grammar).filter(key=> grammar[key].day);
-}
+
+
 
 const dmMachine = setup({
   actions: {
@@ -87,14 +76,20 @@ const dmMachine = setup({
       utterance: params,
     },
   }),
-  },
+  listen: ({ context }) =>
+  context.ssRef.send({
+    type: "LISTEN",
+    value: { nlu: true } /** Local activation of NLU */,
+  }),
+},
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwA2RQFYuAdi4AOACzaDexQBoQAT0QBGe3vTa1btduMBmRXrXGnAF9A6zR0AHUCcWpBcjEiMWI5WHixMHQCADM07AAKXS4ASmIwyOjY+Owxbj4kECFRCWlZBQR7TXUCrl81buNFY2s7BG1DRXQNY3cNbS8nT0Ng0IwcQQBbPDFSKQhSWABrLGx1zeJyTBYAaXoAYQB5VEwAGSZqJhrZBvFJGTrWqa86Hshj02nsXCcxg0biGiBmhnQxhUKichm0MzMSxAYVWGy2Oz2h0JAHdxAALYlk9ZnC6ka73R4vN4fOpfJq-UCtHTGdSglQacFeMHoqy2RB6Yw8pHIpHGPQzRRYnHHPHbXYHdBPEQpMBSUliClUtbEZj3ADiADkAJLkJjIFkCYTfZp-JQzFz2Aaafxjfqi4aGLgaIHIrjGQzg1z2bRKlYqzZqwma7VpPXkynU013S02u0cey1R2NH4tN3aD1e6HhgaKf2INT2HnaLpqLyGMaKMaxo4nfHqw5anVpg0Z40USj0C13K0WzAAVWoDvqTvZpYQindYMrPprdYQDabLbbHa7IWxcd7iY1NwIUgNYCINKutwez1e714nxXJdd688vIKAUuCFaMtFhfd5XQHQUQhMF7A0PQ9G7XEEwJDUAAkH2wfVDUzJhzWtW17U-VlvxdTklFGCYQW0cC1Eg6CIVgxwEKQs9lUvNDDkwogcNHMgqEnadZwXJc2R-Ci-wRDQaPA8ETHQAwUTlTtA1MZD4z7JNCXvCACBsJ86RfRl3zEsiOXkSieXowDBWFMCxTaRtg2lWCpkhYwNM4-tkyHagyUgfSTXw7NCLzEii2dCyuX-Gz+Ts0C909IwQxRLRPBkrxPPYi9VS43zU38wKDKzHMiPzQtl2LcjLL-ay+SDBKRTkuZg2bFRlEMHwfAhLy8p8wdCoCvSDPHISZ3nRcIqqqK125AD4uA+yktalwCk67rlHsPrUJ8kkqQAG2Kwz6VfJkP0q8Sapi+rbKWxKWr0BFGMUaMPB0TQdq0jVBt1IqMyOkbgoI3NiMu8y5oU+DoKAkD0Tk7w1E6DrFCFCM3C+q8BxTP6AoB47SrC+0Cy-aroqUKH0sa+74cc6MIQmda5le+w2xjHKe36pNfqkf7DuOsapwm0Tpqu8n10pmGmo0OT0UBIUOuPJEnsx-LCSK6gRDWMATuMt9mVFiHf3muLqbhhzhmh8suHWqE5QhCVVYGnHeYCzXteB0LQbMsm5tihrYeWuSZODBruS4Nx0UWDmUO+7G-LdrWdcJ72SdI33jf9u7zaSvxy2UDq3Bo1sNCd7mXY1pOBInIWRKm8GM8kk2A+l3OPCg5FFCL0ES7LjUADUwGwERMhsAg8CEEQ721u9dYZfWLtJ2bjYjFx0rktFg16FQvH0XRZi8PvDgtMAoEwYRB+HzJPbK8KG+Xpus8WnO5IbaTkTmMEsosdnlk53akwnzPhfIeI8b5EwqkvVcmdbrPyDnTNQgZ0C7x3rWeUARFQx00ljdAQDz6wEvmAwWwlJo+wfrVZu2d4HDGUP0dAoYvC7y8K2ME2U-6xxwTcXABA0ikAnoIKeYgZ6JHOM+ee50yHQKbu2REVMGzNl8FlQYjlXrAUUh-Ns3Qu7bQ5sgaQOsbhPCtDcS4kiJK1ScMGAuO8I7+ACLRRysxxj+GmIwm2hgGzBDPFIQQEA4CyDQFA8xrQAC0mhwIhODKGCOkobZbTmBpfARAwBBOuogfo4FV5d3cOGLwCE5R6B0X-MoYgYhxASKk8WZhwKjHGBKaYDY35TCPpUtcITww1LlOgQM-I2waD3s2I+-8xCtN-IwnktYCi716J6MYehwIaCFKlZEkcPH9CGSSdMRpRmSS4C1fQyyVCrP8IfLB3ly5Dj4ts9O5DWh7LpuGBErkwxhnlNoV6Qybx3gCkQHZtV7mWw0NCdRyIDBuACEMni2EtnrD+XcjeYJ6HInBNGFiKszlcw1DpYa+k4WIABUoYC4wUEQh6l3HQpcMUAJ+hXHFwxIpSP+eBWsrMJjIvSlCLqbDzzDJwftQQgNcU3MZfClRzDrLItbEGSURSeUcPyjzPmArip4oQASv8DFO6o1GO0NQGyDiV21qq9VvgzAuE7p4WxmIqVxwKrjMA7sUnCuCfi5lrYEQ9O6CYAUhSoRDMIaPcek9p66hGc6tJarwLM1UOCHeqLv46CGXgkBV9jVRt3vYREH9TAKiYZ87hvD+GCOEWmxyWUxgguAvKeCiDo5-z0VIJ1DKXUjD3AEJGnZGFdzRMKbKwQgA */
+  /** @xstate-layout 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-XRaUccSr4bNDuD4KZPQyp6MCEAA */
   context: {
     count: 0,
-    MeetingWithwhom: '',
-    Dayofmeeting: '',
-    Timeofmeeting: '',
+    celebrity: '',
+    name: '',
+    day: '',
+    time: '',
   },
   id: "DM",
   initial: "Prepare",
@@ -120,43 +115,54 @@ const dmMachine = setup({
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: `Let's create an appointment`,
-              },
-              }),
-
-          on: { SPEAK_COMPLETE: "Askwithwhom" },
-        },
-        Askwithwhom: {    //changed
           entry: [{
             type: "say",
-            params: `Who are you meeting with?`,
-          }],  
-          on: { SPEAK_COMPLETE: "Listenwithwhom" },
-          },
+            params: `How can I help you?`,
+          }],
 
-          Listenwithwhom: {
-            entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN",
-              }),
-            on: {
-              RECOGNISED: [{
-              guard: ({event}) => isInGrammar(event.value[0].utterance),
-              target: "Asktheday",
-              actions: assign({
-                MeetingWithwhom: ({event}) => getPerson(event.value[0].utterance),
-            })},  //function
-              
-            {target : "#DM.Done"},
-            ],
-            ASR_NOINPUT : "Canthear",
-            },
+          on: { SPEAK_COMPLETE: "intentchoice" },
+        },
+        intentchoice: {
+          entry: "listen",
+          on: { 
+            RECOGNISED: [
+            {guard: ({event}) => event.nluValue.topIntent === "create a meeting",
+            target: "Askwithwhom"},
+
+            {guard: ({event}) => event.nluValue.topIntent === "who is X" && isInGrammar(event.nluValue.entities[0].text),
+            actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}),
+            target: "Celebrityinfo",
           },
-          Canthear : {
+          {guard: ({event}) => event.nluValue.topIntent === "who is X", 
+          target: "DontKnowthisperson",
+          actions: assign({celebrity: ({context, event}) => event.nluValue.entities[0].text}),
+          },
+            /* {guard: ({event}) => event.nluValue.topIntent === "who is X" && isInGrammar(event.nluValue.entities[0].text),
+            target: "#DM.PromptAndAsk.Celebrityinfo",
+            actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text})
+           //({event}) => console.log(event.nluValue.entities[0].text) ] },
+            },  
+            //guard: and([({event}) => event.nluValue.topIntent === "who is X" , ({event}) => isInGrammar(event.nluValue.entities[0].text)]),*/  
+          
+          {target: "Dontunderstand"},
+      ],
+      ASR_NOINPUT : "Canthear1",
+      },
+    },
+      
+//whoisX STATE
+          DontKnowthisperson:{
+            entry: [{
+            type: "say",
+            params: `I don't know anything for this person. Ask me for someone else`,
+        }],                     
+          on: { SPEAK_COMPLETE: "#DM.PromptAndAsk.Prompt" },
+
+},
+
+
+
+            Canthear1 : {
             entry: ({context}) =>
             context.ssRef.send({
                 type: "SPEAK",
@@ -165,43 +171,114 @@ const dmMachine = setup({
                 },
             }),
             on: {
-                SPEAK_COMPLETE: "#DM.PromptAndAsk.Askwithwhom"
+                SPEAK_COMPLETE: "#DM.PromptAndAsk.Prompt"
             },
         
         },
+
+        Dontunderstand:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please ask me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "intentchoice" },
+        },
+
+        Celebrityinfo: {
+          entry: [{
+            type: "say",
+            params: ({context}) => `${getInformationCelebrity(context.celebrity)}`
+          }],  
+          on: { SPEAK_COMPLETE: "#DM.Done" },
+          },
+
+//createanappointment STATE
+
+        Askwithwhom: {
+          after: {
+            "4000": "#DM.PromptAndAsk.Prompt"
+          },    
+          entry: [{
+            type: "say",
+            params: `Who are you meeting with?`,
+          }],  
+          on: { SPEAK_COMPLETE: "Listenwithwhom" },
+          },
+
+          Listenwithwhom: {
+            entry: [{
+              type: "listen"
+            }],
+            on: {
+              ASR_NOINPUT : "Canthear2",
+              RECOGNISED: {
+                actions: 
+                assign({name: ({event}) => event.nluValue.entities[0].text
+                }),
+              target: "Asktheday",
+            },
+              //ASR_NOINPUT : "Canthear",
+            },
+          },
+            Canthear2 : {
+              entry: ({context}) =>
+              context.ssRef.send({
+                  type: "SPEAK",
+                  value: {
+                      utterance: randomRepeat(dearClient),
+                  },
+              }),
+              on: {
+                  SPEAK_COMPLETE: "#DM.PromptAndAsk.Askwithwhom"
+              },
+          
+          },
+              //function
+                
         
-            
-        Asktheday: {          //changed
+        Asktheday: {
+          after: {
+            "4000": "#DM.PromptAndAsk.Prompt"
+          },      
             entry: [{
               type: "say",
-              params: `You can have your meeting on ${days(grammar)}. Which day do you prefer?`,
+              params: `On which day is your meeting?`,
             }],                     
             
             on: { SPEAK_COMPLETE: "ListenTheday" },
           },
           ListenTheday: {
-            entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN",
-              }),
-            on: { 
-              RECOGNISED:[
-            {
-              guard: ({event}) => isInGrammar(event.value[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
-              target: "Askwholeday", 
-              actions: assign({
-                Dayofmeeting: ({event}) => getDay(event.value[0].utterance),
-            }),
-              
-          },
-          {target : "#DM.Done"},
-            ],
-            //ASR_NOINPUT : "Canthear",
-          },
+            entry: [{
+              type: "listen"
+            }],
+            on: {
+              ASR_NOINPUT : "Canthear3",
+              RECOGNISED: {
+                actions: 
+                assign({day: ({event}) => event.nluValue.entities[0].text
+                }),
+              target: "Askwholeday",
+              }},
         },
 
+        Canthear3 : {
+          entry: ({context}) =>
+          context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                  utterance: randomRepeat(dearClient),
+              },
+          }),
+          on: {
+              SPEAK_COMPLETE: "#DM.PromptAndAsk.Asktheday"
+          },
+      
+      },
         
           Askwholeday: {
+            after: {
+              "4000": "#DM.PromptAndAsk.Prompt"
+            },
             entry: [{
               type: "say",
               params: `Will it take the whole day?`,
@@ -210,25 +287,40 @@ const dmMachine = setup({
               },
 
               ListenThewholeday:{
-              entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN",
-              }),
+              entry: [{
+                type: "listen",
+              }],
+
             on: { 
               RECOGNISED:[ 
               {
-                guard: ({event}) => isTheAnswerYes(event.value[0].utterance),
-              target: "Verifyappointment"},
+                guard: ({event}) => event.nluValue.entities[0].category == "positiveanswer",
+              target: "Verifyappointment2"},
               
               {target: "AskTheTime"},
               
             ],
-            //ASR_NOINPUT : "Canthear",
+            ASR_NOINPUT : "Canthear4",
           },
       }, 
-      
+      Canthear4 : {
+        entry: ({context}) =>
+        context.ssRef.send({
+            type: "SPEAK",
+            value: {
+                utterance: randomRepeat(dearClient),
+            },
+        }),
+        on: {
+            SPEAK_COMPLETE: "#DM.PromptAndAsk.Askwholeday"
+        },
+    
+    },
 
         AskTheTime: {
+          after: {
+            "4000": "#DM.PromptAndAsk.Prompt"
+          },
           entry: [{
             type: "say",
             params: `What time is your meeting?`,
@@ -238,45 +330,64 @@ const dmMachine = setup({
           },
 
           ListenTheTime: {
-            entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN",
-              }),
+            entry: [{
+              type: "listen"
+            }],
+
             on: { 
-              RECOGNISED:[
-            {
-              guard: ({event}) => isInGrammar(event.value[0].utterance),//get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
-              target: "Verifyappointment", 
-              actions: assign({
-                Timeofmeeting: ({event}) => getTime(event.value[0].utterance),
-            }),
-          },
-          {target : "#DM.Done"},
-          ],
-          //ASR_NOINPUT : "Canthear",
+              ASR_NOINPUT : "Canthear5",
+              RECOGNISED: {
+                actions: assign({time: ({event}) => event.nluValue.entities[0].text || event.nluValue.utterance
+              }),
+              target: "Verifyappointment",
+              },
         },
       },
+      
+      Canthear5 : {
+        entry: ({context}) =>
+        context.ssRef.send({
+            type: "SPEAK",
+            value: {
+                utterance: randomRepeat(dearClient),
+            },
+        }),
+        on: {
+            SPEAK_COMPLETE: "#DM.PromptAndAsk.AskTheTime"
+        },
+    
+    },
+      Verifyappointment2: {
+        after: {
+          "4000": "#DM.PromptAndAsk.Prompt"
+        },
+        entry: [{
+          type: "say",
+          params: ({context}) => `Do you want to create an appointment with ${context.name} on ${context.day}?`,
+        }],    
+          on: {SPEAK_COMPLETE: "NegPosVerif"},
+        },
+
 
         Verifyappointment: {
-          entry: ({ context }) =>
-              context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                    utterance: `Do you want to create an appointment with ${context.MeetingWithwhom} on ${context.Dayofmeeting} at ${context.Timeofmeeting}?`,
-                      },
-                    }),
+          after: {
+            "4000": "#DM.PromptAndAsk.Prompt"
+          },
+          entry: [{
+            type: "say",
+            params: ({context}) =>`Do you want to create an appointment with ${context.name} on ${context.day} at ${context.time}?`,
+          }],    
             on: {SPEAK_COMPLETE: "NegPosVerif"},
           },
         NegPosVerif: {
-          entry: ({ context }) =>
-          context.ssRef.send({
-            type: "LISTEN",
-          }),
+          entry: [{
+            type: "listen"
+          }],
+
           on: {
               RECOGNISED:[ 
               {
-                guard: ({event}) => isTheAnswerYes(event.value[0].utterance),
-              //get//({context}) => context.result[0]utterance === 'maria', FUNCTION WHOLE DAY
+                guard: ({event}) => event.nluValue.entities[0].category == "positiveanswer",
               target: "CreateAppointment"}, 
               {target: "#DM.PromptAndAsk.Prompt"},
               ],
@@ -317,3 +428,4 @@ export function setupButton(element) {
     element.innerHTML = `${snapshot.value.AsrTtsManager.Ready}`;
   });
 }
+
