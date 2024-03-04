@@ -1,0 +1,23 @@
+It was a written poem so i don't have an original performane. I did something similar to the way I could read it.
+
+
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Id":"52c945ea-c060-4085-aef7-d9c6951f0a86","Name":"Microsoft Server Speech Text to Speech Voice (en-US, NancyNeural)","ShortName":"en-US-NancyNeural","Locale":"en-US","VoiceType":"StandardVoice"},{"Id":"58917225-b77f-4aec-8476-1a29b4ea2a75","Name":"Microsoft Server Speech Text to Speech Voice (en-US, AvaNeural)","ShortName":"en-US-AvaNeural","Locale":"en-US","VoiceType":"StandardVoice"}]}-->
+<!--ID=FCB40C2B-1F9F-4C26-B1A1-CF8E67BE07D1;Version=1|{"Files":{}}-->
+<!--ID=5B95B1CC-2C7B-494F-B746-CF22A0E779B7;Version=1|{"Locales":{"en-US":{"AutoApplyCustomLexiconFiles":[{}]}}}-->
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-US-NancyNeural"><prosody contour="(16%, -1%) (81%, +0%)">listen</prosody><break strength="strong" />,
+<s /><mstts:express-as style="hopeful"><prosody volume="-30.00%">the whispers of leaves turn colour</prosody></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful">autumn is here</mstts:express-as><s /><mstts:express-as style="Default">.<break strength="medium" /></mstts:express-as><s />
+<s /><mstts:express-as style="hopeful">now that you are gone</mstts:express-as><s />
+<s /><mstts:express-as style="hopeful">who will wake every morn to lift the sun, <break strength="x-weak" />unveil the sky, <break strength="x-weak" />etch in the clouds</mstts:express-as><s />
+<s /><mstts:express-as style="hopeful">who will paint the rainbow?<break strength="medium" /></mstts:express-as><s />
+touch,<break strength="strong" />
+<s /><mstts:express-as style="hopeful"><prosody volume="-30.00%">the echoes of the rain  waters  blossoms spring</prosody></mstts:express-as><s />.
+taste,<break strength="strong" />
+<s /><mstts:express-as style="hopeful"><prosody volume="-30.00%">uncut snow shapes crisp cold </prosody><break strength="x-weak" /><prosody volume="-30.00%">ices the wintertide.</prosody></mstts:express-as><s />
+see,<break strength="strong" />
+<s /><mstts:express-as style="hopeful"><prosody volume="-30.00%">the sand sculptures paint rekindle a childhood summer past.</prosody></mstts:express-as><s />
+smell,<break strength="strong" />
+<s /><mstts:express-as style="hopeful"><prosody volume="-30.00%">seasonal airs stimulates senses memories they deliver</prosody>.</mstts:express-as><s />
+<s /><mstts:express-as style="whispering">the moon no longer smiles</mstts:express-as><s />
+<s /><mstts:express-as style="whispering">the stars no longer wink</mstts:express-as><s /></voice>
+<voice name="en-US-AvaNeural"></voice></speak>
