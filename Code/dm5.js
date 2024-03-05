@@ -61,6 +61,51 @@ const slots = [
   {name: 'time', entity: 'time'},
 ];
 
+
+function createState(params) {
+  return {
+      initial: "Prompt",
+      states: {
+        Prompt: {
+          entry: ({ context }) => {
+            context.ssRef.send({
+              type: "SPEAK",
+              value: {
+                utterance: params.prompt,
+              },
+            });
+          },
+          on: { SPEAK_COMPLETE: "Listen" },
+        },
+        Listen: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "LISTEN",
+            }),
+          on: {
+            RECOGNISED: [
+              {
+                guard: ({ context, event }) => (getIntent(event) == 'help'),
+                target: "help",
+              },
+              {
+                target: params.nextState,
+              },
+            ],
+            ASR_NOINPUT: {
+              target: params.onNoInput
+            },
+          },
+        },
+        help: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "I'm a digital assistant that can help you book meetings." }}),
+          on: { SPEAK_COMPLETE: "Prompt" },
+        }
+      }
+    };
+}
+
 function createSlotFillingState(params) {
   function onEntry(context) {
     if(context[params.slot]) {
@@ -198,32 +243,11 @@ const dmMachine = setup({
         10000: { target: 'PromptAndAsk' },
       },
     },
-    PromptAndAsk: {
-      initial: "Prompt",
-      states: {
-        Prompt: {
-          entry: [{
-              type: "say",
-              params: `Hello!`,
-            }],
-          on: { SPEAK_COMPLETE: "AfterSystemGreeting" },
-        },
-        AfterSystemGreeting: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN",
-            }),
-          on: {
-            RECOGNISED: {
-              target: '#DM.InitiateCreateAppointment'
-            },
-            ASR_NOINPUT: {
-              target: '#DM.InitiateCreateAppointment'
-            },
-          },
-        },
-      },
-    },
+    PromptAndAsk: createState({
+      prompt: `Hello!`,
+      nextState: "#DM.InitiateCreateAppointment",
+      onNoInput: "#DM.InitiateCreateAppointment",
+    }),
     InitiateCreateAppointment: {
       initial: "Prompt",
       states: {
