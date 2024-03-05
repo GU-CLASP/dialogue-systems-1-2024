@@ -70,17 +70,25 @@ const helpState = {
 
 
 function createState(params) {
-  var entry;
-  if(params.entry) {
-    entry = params.entry;
-  } else {
-    entry = ({ context }) => {
-      context.ssRef.send({
-        type: "SPEAK",
-        value: {
-          utterance: params.prompt,
-        },
-      });
+  var onEntry = params.onEntry;
+  if(onEntry == null) {
+    onEntry = ({ context }) => {
+      if(context[params.slot]) {
+        slots.forEach((slot) => {
+          var value = context[slot.name];
+          if(!value) {
+            dmActor.send({type: "jump_to_ask_" + slot.name});
+          }
+        });
+      }
+      else {
+        context.ssRef.send({
+          type: "SPEAK",
+          value: {
+            utterance: params.prompt,
+          },
+        });
+      }
     };
   }
 
@@ -90,19 +98,45 @@ function createState(params) {
       target: "help",
     }
   ];
-  if(params.onRecognised) {
+  if(params.onRecognised != null) {
     onRecognised = onRecognised.concat(params.onRecognised);
+  } else {
+    if(params.slot != null) {
+      onRecognised = onRecognised.concat([
+        {
+          guard: ({ context, event }) => !!getEntity(event, params.entity),
+          target: params.nextState,
+          actions: ({ context, event }) => {
+            slots.forEach((slot) => {
+              var value = getEntity(event, slot.entity);
+              if(value) {
+                context[slot.name] = value;
+              }
+            });
+          },
+        },
+        {
+          guard: ({ context, event }) => (getIntent(event) == 'help'),
+          target: "help",
+        },
+        {
+          target: "nomatch",
+        },
+      ]);
+    }
   }
-  onRecognised.push({
-    target: params.nextState ? params.nextState : "nomatch"
-  });
+  if(params.slot == null) {
+    onRecognised.push({
+      target: params.nextState ? params.nextState : "nomatch"
+    });
+  }
 
   return {
       initial: "Prompt",
       entry: ({ context }) => { context.noInputCount = 0 },
       states: {
         Prompt: {
-          entry: entry,
+          entry: onEntry,
           on: { SPEAK_COMPLETE: "Listen" },
         },
         Listen: {
@@ -120,93 +154,6 @@ function createState(params) {
               {
                 target: params.onNoInput ? params.onNoInput : "heard_nothing"
               }
-            ],
-          },
-        },
-        nomatch: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: params.noMatchResponse }}),
-          on: { SPEAK_COMPLETE: "Prompt" },
-        },
-        heard_nothing: {
-          entry: ({ context }) => {
-            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }});
-            context.noInputCount += 1;
-          },
-          on: { SPEAK_COMPLETE: "Prompt" },
-        },
-        help: helpState,
-      }
-    };
-}
-
-function createSlotFillingState(params) {
-  function onEntry(context) {
-    if(context[params.slot]) {
-      slots.forEach((slot) => {
-        var value = context[slot.name];
-        if(!value) {
-          dmActor.send({type: "jump_to_ask_" + slot.name});
-        }
-      });
-    }
-    else {
-      context.ssRef.send({
-        type: "SPEAK",
-        value: {
-          utterance: params.prompt,
-        },
-      });
-    }
-  }
-
-  var onRecognised = params.onRecognised;
-  if(onRecognised == null) {
-    onRecognised = [
-      {
-        guard: ({ context, event }) => !!getEntity(event, params.entity),
-        target: params.nextState,
-        actions: ({ context, event }) => {
-          slots.forEach((slot) => {
-            var value = getEntity(event, slot.entity);
-            if(value) {
-              context[slot.name] = value;
-            }
-          });
-        },
-      },
-      {
-        guard: ({ context, event }) => (getIntent(event) == 'help'),
-        target: "help",
-      },
-      {
-        target: "nomatch",
-      },
-    ]
-  }
-  return {
-      initial: "Prompt",
-      entry: ({ context }) => { context.noInputCount = 0 },
-      states: {
-        Prompt: {
-          entry: ({ context }) => onEntry(context),
-          on: { SPEAK_COMPLETE: "Listen" },
-        },
-        Listen: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN",
-            }),
-          on: {
-            RECOGNISED: onRecognised,
-            ASR_NOINPUT: [
-              {
-                guard: ({ context, event }) => (context.noInputCount >= 3),
-                target: "#DM.Done"
-              },
-              {
-                target: "heard_nothing"
-              },
             ],
           },
         },
@@ -301,19 +248,19 @@ const dmMachine = setup({
         }
       }
     },
-    ask_person: createSlotFillingState({
+    ask_person: createState({
       prompt: `Who are you meeting with?`,
       slot: 'person',
       entity: 'person',
       noMatchResponse: "Sorry, I didn't understand. Please answer with a name.",
       nextState: '#DM.ask_day'}),
-    ask_day: createSlotFillingState({
+    ask_day: createState({
       prompt: `On which day is your meeting?`,
       slot: 'day',
       entity: 'day',
       noMatchResponse: "Sorry, I didn't understand. Please answer with a day.",
       nextState: '#DM.ask_whole_day'}),
-    ask_whole_day: createSlotFillingState({
+    ask_whole_day: createState({
       prompt: `Will it take the whole day?`,
       slot: 'whole_day',
       entity: 'boolean',
@@ -327,19 +274,16 @@ const dmMachine = setup({
             guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
             target: "#DM.ask_time",
           },
-          {
-            target: "nomatch",
-          },
         ]
     }),
-    ask_time: createSlotFillingState({
+    ask_time: createState({
       prompt: `What time is your meeting?`,
       slot: 'time',
       entity: 'time',
       noMatchResponse: "Sorry, I didn't understand. Please answer with a time.",
       nextState: '#DM.AskConfirmCreateMeeting'}),
     AskConfirmCreateMeeting: createState({
-      entry: ({ context }) => {
+      onEntry: ({ context }) => {
         context.ssRef.send({
           type: "SPEAK",
           value: {
@@ -356,9 +300,6 @@ const dmMachine = setup({
         {
           guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
           target: "#DM.ask_person",
-        },
-        {
-          target: "nomatch",
         },
       ]
     }),
