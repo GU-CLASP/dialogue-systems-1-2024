@@ -28,9 +28,7 @@ const settings = {
 };
 
 const celebrityDatabase = {
-  "käärijä" : {information : "Jere Pöyhönen, born 21 October 1993, known professionally as Käärijä, is a Finnish rapper, singer and songwriter. He represented Finland in the Eurovision Song Contest 2023 with the song 'Cha Cha Cha', placing second with 526 points and finishing first in the public vote."},
   "beyoncé" : {information : "Beyoncé Giselle Knowles-Carter, born September 4, 1981, is an American singer, songwriter and businesswoman. Dubbed as 'Queen Bey' and a prominent cultural figure of the 21st century, she has been recognized for her artistry and performances, with Rolling Stone naming her one of the greatest vocalists of all time."},
-  "alexander stubb" : {information: "Cai-Göran Alexander Stubb, born 1 April 1968, is a Finnish politician who is the president-elect of Finland, having won the 2024 presidential election. He previously served as Prime Minister of Finland from 2014 to 2015."},
   "britney spears" : {information: "Britney Jean Spears, born December 2, 1981, is an American singer, often referred to as the 'Princess of Pop'. Spears has sold over 150 million records worldwide, making her one of the world's best-selling music artists."},
   "loreen" : {information: "Lorine Zineb Nora Talhaoui, born 16 October 1983, known professionally as Loreen, is a Swedish singer and songwriter. Representing Sweden, she has won the Eurovision Song Contest twice, in 2012 and 2023, with the songs 'Euphoria' and 'Tattoo'."},
   "angélique kidjo" : {information: "Angélique Kpasseloko Hinto Hounsinou Kandjo Manta Zogbin Kidjo, born July 14, 1960, is a Beninese-French singer-songwriter, actress and activist noted for her diverse musical influences and creative music videos. Angélique Kidjo has won five Grammy Awards."},
@@ -38,7 +36,6 @@ const celebrityDatabase = {
   "ulf kristersson" : {information: "Ulf Hjalmar Kristersson, born 29 December 1963, is a Swedish politician who has been serving as Prime Minister of Sweden since 2022."},
   "brad pitt": {information: "William Bradley Pitt, born December 18, 1963, is an American actor and film producer. He is the recipient of various accolades, including two Academy Awards, two British Academy Film Awards, two Golden Globe Awards, and a Primetime Emmy Award. "},
   "barack obama" : {information: "Barack Hussein Obama II, born August 4, 1961, is an American politician who served as the 44th president of the United States from 2009 to 2017. A member of the Democratic Party, he was the first African-American president in U.S. history."},
-  "sauli niinistö" : {information: "Sauli Väinämö Niinistö,born 24 August 1948,is a Finnish politician who has been the 12th president of Finland since 1 March 2012."},
   "Carl Gustaf XVI" : {information: "Carl XVI Gustaf, Carl Gustaf Folke Hubertus,born 30 April 1946, is King of Sweden."},
 };
 
@@ -71,7 +68,7 @@ function checkIfHelp(event) {   //checking if user needs help
 }
 
 function checkThreshold(event) {
-   return (event > 0.60);
+   return (event > 0.90);
 }
 
 function randomRepeat(myArray) {
@@ -100,7 +97,10 @@ const dmMachine = setup({
       }),
 
     increaseRepetitions : ({ context }) => {context.repetition = context.repetition+1;}
-    }
+    },
+
+    setRepetitionBackToZero : ({ context }) => {context.repetition = 0;}    //probably there is a better way of doing this? for in case the user needs help at multiple states of the machine
+
   }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QBECyA6ACgJzABwENcBiAQQGUAlAFWvIH1KBRU5ATQG0AGAXUVDwB7WAEsALiMEA7fiAAeiAExcu6AJwA2RQFYuADgAsergEYuagOwAaEAE9EJkxfQaVp41wsaTAZl8Bffxs0dAB1AnFqQXIxIjFiAGEAGQBJBIBpbj4kECFRCWlZBQQTTXVdFQNFEwMfHz1FG3sEbQaXCu8fAy1tesDgjBxBAFs8MVIpCFJYAGssbBGx4nJMFnT6BIB5VEwkpmomLNk88UkZHOLtDR90Cx03PwsfCwM1JsQNVvQDB6cGrsc-RAISGo3Gk2mcySIlgYjAUmIzC2AHEAHIpchMZBHHInArnUDFPROdCKZ4VEwaPTPEx6d4tV7oDxcXpGLwaCwmIEghZgiZTWboaGw+HLVakdZbHZ7A44gTCU6FC4OLyktyONR6O53NQGekGXwuB4WE1cV7PbkYZDSMCJVIZOW5BX4ooqjRqlQarWKHV6uyIXqKcqVK6KNT6M2BIIgKSCCBwWRoY7Os6uhAAWg09Mzlvm+CIYGT+VTyoQVXpxPQPnVPk0pS4rgsufCkWisWwYiLioJ8gD1n9LTaFgq1LUai6Y58udBY35kK7LtLij07sUilelh6Bm0a6zA+6QYqXFrO+0XjM2mnvNnEMFM87uJTSsJiDqBlJ67HXh02939Ou2joGYKgmlqag7rqV6LOCApQjCcI9niJYvggXjvkepj6Bydz-roQEVF0dRoSYii5taUiFo+xbPr2LSNPupSktS9R6A0JjaKUZ5Rv4QA */
   context: {
@@ -130,7 +130,7 @@ const dmMachine = setup({
     },
 
     Prompt: {
-      entry: [{ type: "speakToTheUser", params: `How can I help you today? Book a meeting or hear about a celebrity. For help, say help.`}],
+      entry: [{ type: "speakToTheUser", params: `How can I help you today? In case you need help, say help.`}],
       on: {
         SPEAK_COMPLETE: "Listen",
       },
@@ -140,23 +140,76 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
         on: {
           RECOGNISED: [
-            {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]), //checking which path to take, creating a meeting
+            //to check if the user wants help:
+            {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToPrompt"},
+
+            //to check if the machine does not 'recognize' the celebrity name as an entity
+            {guard: ({ event }) => event.nluValue.entities.length === 0, actions: [{ type: "speakToTheUser", params: `Not sure I understood that name.`}], target: "HelpTransitionToPrompt"},
+            
+            //to check if the top user's top intent is creating a meeting AND the machine is confident about this:
+            {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]), actions: "setRepetitionBackToZero",
             target: "MeetingPersonSpeak"},
 
-            {guard: and([({event}) => checkIfWhoIsIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]),    //or celeb info
-            actions: assign({celebrity: ({event}) => event.nluValue.entities[0].text}), //assigning the celebrity in the context
+            //WHY DOES THIS NOT WORK????? --> to check if the top user's top intent is creating a meeting AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
+            {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false]), actions: "setRepetitionBackToZero",
+            target: "VerifyTheTopIntentIsMeetingSpeak"},
+
+            //to check if the user's top intent is getting celebrity info AND the machine is confident about this:
+            {guard: and([({event}) => checkIfWhoIsIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]),    
+            actions: [assign({celebrity: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"], //assigning the celebrity in the context
             target: "StartTellingAboutACelebrity"},
 
-            {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), 
-            actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "Prompt"},
+            //WHY DOES THIS NOT WORK????? --> to check if the user's top intent is getting celebrity info AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
+            {guard: and([({event}) => checkIfWhoIsIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false]),    
+            actions: [assign({celebrity: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"], //assigning the celebrity in the context
+            target: "VerifyTheTopIntentIsCelebritySpeak"},
 
-            {guard: ({ event }) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: [{type : "speakToTheUser", params: `I'm not sure what to do now, so I'm starting over.`}]}
+            //to check if the machine is very unsure about the intent of the user (in general?) in case the user asks to do something completely random:
+            {guard: ({ event }) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: [{type : "speakToTheUser", params: `I'm not sure what to do now, so I'm starting over.`}]},
             ],
           ASR_NOINPUT: [
             {guard: ({ context }) => context.repetition < 3, target: "ReRaisePrompt"}, 
-            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
+            {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
         },
       },
+
+    VerifyTheTopIntentIsMeetingSpeak: {
+      entry: [{ type: "speakToTheUser", params: `You want me to create a meeting, is that right?`}],
+      on : {
+        SPEAK_COMPLETE: "VerifyTheTopIntentIsMeetingSpeak"
+      }
+    },
+
+    VerifyTheTopIntentIsMeetingSpeak: {
+      entry: "listenForUsersAnswer",
+      on: {
+        RECOGNISED: [
+          {guard: ({ event }) => checkIfYes(event.nluValue.entities[0].category), target: "MeetingPersonSpeak"},
+          {guard: ({ event }) => checkIfNo(event.nluValue.entities[0].category), target: "Prompt"}],
+      }
+    },
+
+    VerifyTheTopIntentIsCelebritySpeak: {
+      entry: [{ type: "speakToTheUser", params: `You want me to tell something about that celebrity, is that right?`}],
+      on : {
+        SPEAK_COMPLETE: "VerifyTheTopIntentIsCelebrityListen"
+      }
+    },
+
+    VerifyTheTopIntentIsCelebrityListen: {
+      entry: "listenForUsersAnswer",
+      on: {
+        RECOGNISED: [
+          {guard: ({ event }) => checkIfYes(event.nluValue.entities[0].category), target: "StartTellingAboutACelebrity"},
+          {guard: ({ event }) => checkIfNo(event.nluValue.entities[0].category), target: "Prompt"}],
+      }
+    },
+
+    HelpTransitionToPrompt: {
+      entry: [{type: "speakToTheUser", params: `I'm helping you by going back to the previous step.`}],
+      on: {
+        SPEAK_COMPLETE: "Prompt"}
+    },
 
     ReRaisePrompt: {
       entry: [{type: "speakToTheUser", params: randomRepeat(repetitionphrases)}],
@@ -179,18 +232,24 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
       on: {
         RECOGNISED : [
-          {guard: ({event}) => event.nluValue.entities.length !== 0, actions: assign({meeting_name: ({event}) => event.nluValue.entities[0].text}),   
+          {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToMeetingPerson"},
+          {guard: ({event}) => event.nluValue.entities.length !== 0, actions: [assign({meeting_name: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"],   
           target: "MeetingDateTimeSpeak" },
           {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot create a meeting with this person, sorry.`, target: "Done"}]},
-          {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), 
-          actions: [{type: "speakToTheUser", params: `I'm going back to the previous step.`}], target: "MeetingPersonSpeak"},
         ],
     
         ASR_NOINPUT : [
             {guard: ({ context }) => context.repetition < 3, target: "ReRaiseMeetingPerson"}, 
-            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
+            {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
         },
       },
+
+    HelpTransitionToMeetingPerson: {
+      entry: [{type: "speakToTheUser", params: `I'm helping you by going back to the previous step.`}],
+      on: {
+        SPEAK_COMPLETE: "MeetingPersonSpeak"
+      }
+    },
     
     ReRaiseMeetingPerson: {
       entry: [{type: "speakToTheUser", params: randomRepeat(repetitionphrases)}],
@@ -212,14 +271,23 @@ const dmMachine = setup({
     MeetingDateTimeListen: {
       entry: "listenForUsersAnswer",
         on: {
-          RECOGNISED : { 
-            actions: assign({DateTime: ({event}) => event.nluValue.entities[0].text}),
-            target: "MeetingTitleYesOrNoSpeak" },
+          RECOGNISED : [
+            {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToMeetingDateTime"},
+            {actions: [assign({DateTime: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"],
+            target: "MeetingTitleYesOrNoSpeak"}],
           ASR_NOINPUT : [
             {guard: ({ context }) => context.repetition < 3, target: "ReRaiseMeetingDateTime"}, 
-            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
-              },
-            },
+            {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}
+          ]
+        },
+      },
+
+    HelpTransitionToMeetingDateTime: {
+      entry: [{type: "speakToTheUser", params: `I'm helping you by going back the previous state.`}],
+      on: {
+        SPEAK_COMPLETE: "MeetingDateTimeSpeak"
+      }
+    },
     
     ReRaiseMeetingDateTime: {
       entry: [{ type: "speakToTheUser", 
@@ -242,12 +310,21 @@ const dmMachine = setup({
     MeetingTitleYesOrNoListen: {
       entry: "listenForUsersAnswer",
       on: {
-        RECOGNISED: [{guard: ({event}) => checkIfYes(event.nluValue.entities[0].category),
+        RECOGNISED: [
+                    {guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), actions: "setRepetitionBackToZero",
                     target: "MeetingTitleSpeak"},
-                    {guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "VerificationSpeak"}],
+                    {guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), actions: "setRepetitionBackToZero", target: "VerificationSpeak"},
+                    {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToMeetingTitleYesOrNo"},],
         ASR_NOINPUT: [
           {guard: ({ context }) => context.repetition < 3, target: "ReraiseMeetingTitleYesOrNo"}, 
-          {guard: ({ context }) => context.repetition === 3, target: "Done"}]
+          {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
+      }
+    },
+
+    HelpTransitionToMeetingTitleYesOrNo: {
+      entry: [{type: "speakToTheUser", params: `I'm helping you by going back to the previous step.`}],
+      on: {
+        SPEAK_COMPLETE: "MeetingTitleYesOrNoSpeak"
       }
     },
 
@@ -271,13 +348,21 @@ const dmMachine = setup({
       entry: "listenForUsersAnswer",
       on: {
         RECOGNISED: [
-          {guard: ({event}) => event.nluValue.entities.length !== 0, actions: assign({meeting_title: ({event}) => event.nluValue.entities[0].text}),   
-          target: "MeetingDateTimeSpeak" },
-          {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot name the meeting title as that, sorry.`, target: "Done"}]}],
+          {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToMeetingTitle"},
+          {guard: ({event}) => event.nluValue.entities.length !== 0, actions: [assign({meeting_title: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"],   
+          target: "VerificationWithTitleSpeak" },
+          {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I couldn't properly register the meeting title, sorry.`, target: "HelpTransitionToMeetingTitle"}]}],
         ASR_NOINPUT:  [
           {guard: ({ context }) => context.repetition < 3, target: "ReRaiseMeetingTitle"}, 
-          {guard: ({ context }) => context.repetition === 3, target: "Done"}]
+          {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
       },
+    },
+
+    HelpTransitionToMeetingTitle: {
+      entry: [{type: "speakToTheUser", params: `I'm helping you by going back to the previous step.`}],
+      on: {
+        SPEAK_COMPLETE: "MeetingTitleSpeak"
+      }
     },
 
     ReRaiseMeetingTitle: {
@@ -302,12 +387,21 @@ const dmMachine = setup({
     VerificationWithTitleListen: {
       entry: "listenForUsersAnswer",
       on: { 
-        RECOGNISED : [{ guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
-                        { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "MeetingPersonSpeak" }],
+        RECOGNISED : [
+          { guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
+          { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), actions: "setRepetitionBackToZero", target: "MeetingPersonSpeak" },
+          {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToVerificationWithTitle"},],
         ASR_NOINPUT : [
           {guard: ({ context }) => context.repetition < 3, target: "ReRaiseVerificationWithTitleSpeak"}, 
-          {guard: ({ context }) => context.repetition === 3, target: "Done"}]
+          {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
         },
+      },
+
+      HelpTransitionToVerificationWithTitle: {
+        entry: [{type: "speakToTheUser", params: `I'm helping you by going back to the previous step.`}],
+        on: {
+          SPEAK_COMPLETE: "VerificationWithTitleSpeak"
+        }
       },
 
     ReRaiseVerificationWithTitleSpeak: {
@@ -335,13 +429,22 @@ const dmMachine = setup({
     VerificationListen: {
         entry: "listenForUsersAnswer",
         on: { 
-          RECOGNISED : [{ guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
-                          { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), target: "MeetingPersonSpeak" }],
+          RECOGNISED : [
+            { guard: ({event}) => checkIfYes(event.nluValue.entities[0].category), target: "Done" },
+            { guard: ({event}) => checkIfNo(event.nluValue.entities[0].category), actions: "setRepetitionBackToZero", target: "MeetingPersonSpeak" },
+            {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToVerification"}],
           ASR_NOINPUT : [
             {guard: ({ context }) => context.repetition < 3, target: "ReRaiseVerificationSpeak"}, 
-            {guard: ({ context }) => context.repetition === 3, target: "Done"}]
+            {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
           },
         },
+
+    HelpTransitionToVerification: {
+      entry: [{type: "speakToTheUser", params: `I'm helping you by going back to the previous step.`}],
+      on: {
+        SPEAK_COMPLETE: "VerificationSpeak"
+      }
+    },
     
     ReRaiseVerificationSpeak: {
           entry: [{ type: "speakToTheUser", 
@@ -363,7 +466,7 @@ const dmMachine = setup({
           {guard: ({ context }) => isInCelebrityDatabase(context.celebrity) === false,
             actions: [{type: "speakToTheUser",
             params: `I'm sorry. I don't have any information of that particular person.`}],
-            target: "Done"}
+            target: "Done"},
           ],
         },
       },
