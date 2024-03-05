@@ -62,19 +62,48 @@ const slots = [
 ];
 
 
+const helpState = {
+  entry: ({ context }) =>
+    context.ssRef.send({type: "SPEAK", value: { utterance: "I'm a digital assistant that can help you book meetings." }}),
+  on: { SPEAK_COMPLETE: "Prompt" },
+};
+
+
 function createState(params) {
+  var entry;
+  if(params.entry) {
+    entry = params.entry;
+  } else {
+    entry = ({ context }) => {
+      context.ssRef.send({
+        type: "SPEAK",
+        value: {
+          utterance: params.prompt,
+        },
+      });
+    };
+  }
+
+  var onNoInput = params.onNoInput ? params.onNoInput : "heard_nothing";
+
+  var onRecognised = [
+    {
+      guard: ({ context, event }) => (getIntent(event) == 'help'),
+      target: "help",
+    }
+  ];
+  if(params.onRecognised) {
+    onRecognised = onRecognised.concat(params.onRecognised);
+  }
+  onRecognised.push({
+    target: params.nextState ? params.nextState : "nomatch"
+  });
+
   return {
       initial: "Prompt",
       states: {
         Prompt: {
-          entry: ({ context }) => {
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: params.prompt,
-              },
-            });
-          },
+          entry: entry,
           on: { SPEAK_COMPLETE: "Listen" },
         },
         Listen: {
@@ -83,25 +112,23 @@ function createState(params) {
               type: "LISTEN",
             }),
           on: {
-            RECOGNISED: [
-              {
-                guard: ({ context, event }) => (getIntent(event) == 'help'),
-                target: "help",
-              },
-              {
-                target: params.nextState,
-              },
-            ],
+            RECOGNISED: onRecognised,
             ASR_NOINPUT: {
-              target: params.onNoInput
+              target: onNoInput
             },
           },
         },
-        help: {
+        nomatch: {
           entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "I'm a digital assistant that can help you book meetings." }}),
+            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
           on: { SPEAK_COMPLETE: "Prompt" },
-        }
+        },
+        heard_nothing: {
+          entry: ({ context }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+          on: { SPEAK_COMPLETE: "Prompt" },
+        },
+        help: helpState,
       }
     };
 }
@@ -179,11 +206,7 @@ function createSlotFillingState(params) {
             context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
           on: { SPEAK_COMPLETE: "Prompt" },
         },
-        help: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "I'm a digital assistant that can help you book meetings." }}),
-          on: { SPEAK_COMPLETE: "Prompt" },
-        }
+        help: helpState,
       }
     };
 }
@@ -295,59 +318,29 @@ const dmMachine = setup({
       slot: 'time',
       entity: 'time',
       nextState: '#DM.AskConfirmCreateMeeting'}),
-    AskConfirmCreateMeeting: {
-      initial: "Prompt",
-      states: {
-        Prompt: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "SPEAK",
-              value: {
-                utterance: confirmationQuestionUtterance(context),
-              },
-            }),
-          on: { SPEAK_COMPLETE: "Listen" },
-        },
-        Listen: {
-          entry: ({ context }) =>
-            context.ssRef.send({
-              type: "LISTEN",
-            }),
-          on: {
-            RECOGNISED: [
-              {
-                guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
-                target: "#DM.ConfirmCreatedMeeting",
-              },
-              {
-                guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
-                target: "#DM.ask_person",
-              },
-              {
-                target: "nomatch",
-              },
-            ],
-            ASR_NOINPUT: {
-              target: "heard_nothing"
-            },
+    AskConfirmCreateMeeting: createState({
+      entry: ({ context }) => {
+        context.ssRef.send({
+          type: "SPEAK",
+          value: {
+            utterance: confirmationQuestionUtterance(context),
           },
+        });
+      },
+      onRecognised: [
+        {
+          guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
+          target: "#DM.ConfirmCreatedMeeting",
         },
-        nomatch: {
-          entry: [{
-              type: "say",
-              params: "Sorry, I didn't understand.",
-            }],
-          on: { SPEAK_COMPLETE: "Prompt" },
+        {
+          guard: ({ context, event }) => (getEntity(event, 'boolean') == false),
+          target: "#DM.ask_person",
         },
-        heard_nothing: {
-          entry: [{
-              type: "say",
-              params: "I didn't hear you.",
-            }],
-          on: { SPEAK_COMPLETE: "Prompt" },
+        {
+          target: "nomatch",
         },
-      }
-    },
+      ]
+    }),
     ConfirmCreatedMeeting: {
       initial: "Prompt",
       states: {
