@@ -84,8 +84,6 @@ function createState(params) {
     };
   }
 
-  var onNoInput = params.onNoInput ? params.onNoInput : "heard_nothing";
-
   var onRecognised = [
     {
       guard: ({ context, event }) => (getIntent(event) == 'help'),
@@ -114,13 +112,13 @@ function createState(params) {
           on: {
             RECOGNISED: onRecognised,
             ASR_NOINPUT: {
-              target: onNoInput
+              target: params.onNoInput ? params.onNoInput : "heard_nothing"
             },
           },
         },
         nomatch: {
           entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
+            context.ssRef.send({type: "SPEAK", value: { utterance: params.noMatchResponse }}),
           on: { SPEAK_COMPLETE: "Prompt" },
         },
         heard_nothing: {
@@ -198,7 +196,7 @@ function createSlotFillingState(params) {
         },
         nomatch: {
           entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "Sorry, I didn't understand." }}),
+            context.ssRef.send({type: "SPEAK", value: { utterance: params.noMatchResponse }}),
           on: { SPEAK_COMPLETE: "Prompt" },
         },
         heard_nothing: {
@@ -289,16 +287,19 @@ const dmMachine = setup({
       prompt: `Who are you meeting with?`,
       slot: 'person',
       entity: 'person',
+      noMatchResponse: "Sorry, I didn't understand. Please answer with a name.",
       nextState: '#DM.ask_day'}),
     ask_day: createSlotFillingState({
       prompt: `On which day is your meeting?`,
       slot: 'day',
       entity: 'day',
+      noMatchResponse: "Sorry, I didn't understand. Please answer with a day.",
       nextState: '#DM.ask_whole_day'}),
     ask_whole_day: createSlotFillingState({
       prompt: `Will it take the whole day?`,
       slot: 'whole_day',
       entity: 'boolean',
+      noMatchResponse: "Sorry, I didn't understand. Please answer yes or no.",
       onRecognised: [
           {
             guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
@@ -317,6 +318,7 @@ const dmMachine = setup({
       prompt: `What time is your meeting?`,
       slot: 'time',
       entity: 'time',
+      noMatchResponse: "Sorry, I didn't understand. Please answer with a time.",
       nextState: '#DM.AskConfirmCreateMeeting'}),
     AskConfirmCreateMeeting: createState({
       entry: ({ context }) => {
@@ -327,6 +329,7 @@ const dmMachine = setup({
           },
         });
       },
+      noMatchResponse: "Sorry, I didn't understand. Please answer yes or no.",
       onRecognised: [
         {
           guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
