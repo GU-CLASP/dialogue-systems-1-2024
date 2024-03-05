@@ -35,6 +35,9 @@ const grammar = {
   help: { intent: "help" },
 };
 
+const confidenceThreshold = 0.6;
+
+
 /* Helper functions */
 
 function getEntity(event, entity) {
@@ -51,6 +54,10 @@ function getIntent(event) {
     var interpretation = grammar[utterance];
     return interpretation.intent;
   }
+}
+
+function getConfidence(event) {
+  return event.value[0].confidence;
 }
 
 
@@ -104,7 +111,8 @@ function createState(params) {
     if(params.slot != null) {
       onRecognised = onRecognised.concat([
         {
-          guard: ({ context, event }) => !!getEntity(event, params.entity),
+          guard: ({ context, event }) =>
+            (!!getEntity(event, params.entity) && getConfidence(event) >= confidenceThreshold),
           target: params.nextState,
           actions: ({ context, event }) => {
             slots.forEach((slot) => {
@@ -113,6 +121,13 @@ function createState(params) {
                 context[slot.name] = value;
               }
             });
+          },
+        },
+        {
+          guard: ({ context, event }) => !!getEntity(event, params.entity),
+          target: "AskForConfirmation",
+          actions: ({ context, event }) => {
+            context.eventToConfirm = event;
           },
         },
         {
@@ -129,6 +144,10 @@ function createState(params) {
     onRecognised.push({
       target: params.nextState ? params.nextState : "nomatch"
     });
+  }
+
+  function generateConfirmationQuestion(event) {
+    return getEntity(event, params.entity) + ', is that correct?'
   }
 
   return {
@@ -155,6 +174,37 @@ function createState(params) {
                 target: params.onNoInput ? params.onNoInput : "heard_nothing"
               }
             ],
+          },
+        },
+        AskForConfirmation: {
+          entry: ({ context, event }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: generateConfirmationQuestion(event) }}),
+          on: { SPEAK_COMPLETE: "ListenAfterAskingForConfirmation" },
+        },
+        ListenAfterAskingForConfirmation: {
+          entry: ({ context }) =>
+            context.ssRef.send({
+              type: "LISTEN",
+            }),
+          on: {
+            RECOGNISED: [
+              {
+                guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
+                target: params.nextState,
+                actions: ({ context, event }) => {
+                  slots.forEach((slot) => {
+                    var value = getEntity(context.eventToConfirm, slot.entity);
+                    if(value) {
+                      context[slot.name] = value;
+                    }
+                  });
+                },
+              },
+              {
+                target: "Prompt",
+              },
+            ],
+            ASR_NOINPUT: "Prompt",
           },
         },
         nomatch: {
