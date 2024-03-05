@@ -99,6 +99,7 @@ function createState(params) {
 
   return {
       initial: "Prompt",
+      entry: ({ context }) => { context.noInputCount = 0 },
       states: {
         Prompt: {
           entry: entry,
@@ -111,9 +112,15 @@ function createState(params) {
             }),
           on: {
             RECOGNISED: onRecognised,
-            ASR_NOINPUT: {
-              target: params.onNoInput ? params.onNoInput : "heard_nothing"
-            },
+            ASR_NOINPUT: [
+              {
+                guard: ({ context, event }) => (context.noInputCount >= 3),
+                target: "#DM.Done"
+              },
+              {
+                target: params.onNoInput ? params.onNoInput : "heard_nothing"
+              }
+            ],
           },
         },
         nomatch: {
@@ -122,8 +129,10 @@ function createState(params) {
           on: { SPEAK_COMPLETE: "Prompt" },
         },
         heard_nothing: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+          entry: ({ context }) => {
+            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }});
+            context.noInputCount += 1;
+          },
           on: { SPEAK_COMPLETE: "Prompt" },
         },
         help: helpState,
@@ -177,6 +186,7 @@ function createSlotFillingState(params) {
   }
   return {
       initial: "Prompt",
+      entry: ({ context }) => { context.noInputCount = 0 },
       states: {
         Prompt: {
           entry: ({ context }) => onEntry(context),
@@ -189,9 +199,15 @@ function createSlotFillingState(params) {
             }),
           on: {
             RECOGNISED: onRecognised,
-            ASR_NOINPUT: {
-              target: "heard_nothing"
-            },
+            ASR_NOINPUT: [
+              {
+                guard: ({ context, event }) => (context.noInputCount >= 3),
+                target: "#DM.Done"
+              },
+              {
+                target: "heard_nothing"
+              },
+            ],
           },
         },
         nomatch: {
@@ -200,8 +216,10 @@ function createSlotFillingState(params) {
           on: { SPEAK_COMPLETE: "Prompt" },
         },
         heard_nothing: {
-          entry: ({ context }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }}),
+          entry: ({ context }) => {
+            context.ssRef.send({type: "SPEAK", value: { utterance: "I didn't hear you." }});
+            context.noInputCount += 1;
+          },
           on: { SPEAK_COMPLETE: "Prompt" },
         },
         help: helpState,
