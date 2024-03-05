@@ -21,21 +21,27 @@ const settings = {
 
 /* Grammar definition */
 const grammar = {
-  vlad: { person: "Vladislav Maraev" },
-  aya: { person: "Nayat Astaiza Soriano" },
-  rasmus: { person: "Rasmus Blanck" },
-  alex: { person: "Alex Berman" },
-  monday: { day: "Monday" },
-  tuesday: { day: "Tuesday" },
-  "alex on monday": { person: "Alex Berman", day: "Monday" },
-  "10": { time: "10:00" },
-  "11": { time: "11:00" },
-  yes: { boolean: true },
-  no: { boolean: false },
-  help: { intent: "help" },
+  vlad: [{ person: "Vladislav Maraev", confidence: 1 }],
+  aya: [{ person: "Nayat Astaiza Soriano", confidence: 1 }],
+  rasmus: [{ person: "Rasmus Blanck", confidence: 1 }],
+  alex: [{ person: "Alex Berman", confidence: 1 }],
+  monday: [{ day: "Monday", confidence: 1 }],
+  tuesday: [{ day: "Tuesday", confidence: 1 }],
+  sunday: [
+    { day: "Sunday", confidence: 0.7 },
+    { person: "Sunday Rose", confidence: 0.7 },
+  ],
+  "alex on monday": [{ person: "Alex Berman", day: "Monday", confidence: 1 }],
+  "10": [{ time: "10:00", confidence: 1 }],
+  "11": [{ time: "11:00", confidence: 1 }],
+  yes: [{ boolean: true, confidence: 1 }],
+  no: [{ boolean: false, confidence: 1 }],
+  help: [{ intent: "help", confidence: 1 }],
 };
 
-const confidenceThreshold = 0.6;
+
+const asrConfidenceThreshold = 0.6;
+const interpretationConfidenceThreshold = 0.8;
 
 
 /* Helper functions */
@@ -43,11 +49,30 @@ const confidenceThreshold = 0.6;
 function getEntity(event, entity) {
   var utterance = event.value[0].utterance.toLowerCase();
   if(utterance in grammar) {
-    var interpretation = grammar[utterance];
-    return interpretation[entity];
+    var interpretations = grammar[utterance];
+    var result = null;
+    interpretations.forEach((interpretation) => {
+      if(interpretation[entity] != null) {
+        result = interpretation[entity];
+      }
+    });
+    return result;
   }
 }
 
+function getInterpretationConfidence(event, entity) {
+  var utterance = event.value[0].utterance.toLowerCase();
+  if(utterance in grammar) {
+    var interpretations = grammar[utterance];
+    var result = null;
+    interpretations.forEach((interpretation) => {
+      if(interpretation[entity] != null) {
+        result = interpretation.confidence;
+      }
+    });
+    return result;
+  }
+}
 function getIntent(event) {
   var utterance = event.value[0].utterance.toLowerCase();
   if(utterance in grammar) {
@@ -56,7 +81,7 @@ function getIntent(event) {
   }
 }
 
-function getConfidence(event) {
+function getAsrConfidence(event) {
   return event.value[0].confidence;
 }
 
@@ -110,26 +135,46 @@ function createState(params) {
   } else {
     if(params.slot != null) {
       onRecognised = onRecognised.concat([
+        // The transitions below are guarded by the presence of a relevant answer to the current question
         {
+          // If both ASR and NLU confidence for the entity under discussion are above the configured thresholds,
+          // integrate all the interpreted slot values that are above the interpretation threshold
           guard: ({ context, event }) =>
-            (!!getEntity(event, params.entity) && getConfidence(event) >= confidenceThreshold),
+            (!!getEntity(event, params.entity) &&
+            getAsrConfidence(event) >= asrConfidenceThreshold &&
+            getInterpretationConfidence(event, params.entity) >= interpretationConfidenceThreshold),
           target: params.nextState,
           actions: ({ context, event }) => {
             slots.forEach((slot) => {
               var value = getEntity(event, slot.entity);
               if(value) {
-                context[slot.name] = value;
+                if(getInterpretationConfidence(event, slot.entity) >= interpretationConfidenceThreshold) {
+                  context[slot.name] = value;
+                }
               }
             });
           },
         },
         {
-          guard: ({ context, event }) => !!getEntity(event, params.entity),
-          target: "AskForConfirmation",
+          // Else, if NLU confidence for the entity under discussion is below the threshold,
+          // ask for semantic confirmation
+          guard: ({ context, event }) =>
+            (!!getEntity(event, params.entity) &&
+            getInterpretationConfidence(event, params.entity) < interpretationConfidenceThreshold),
+          target: "AskForInterpretationConfirmation",
           actions: ({ context, event }) => {
             context.eventToConfirm = event;
           },
         },
+        {
+          // Else, ASR confidence must be below the threshold, so ask for perceptual confirmation
+          guard: ({ context, event }) => !!getEntity(event, params.entity),
+          target: "AskForPerceptualConfirmation",
+          actions: ({ context, event }) => {
+            context.eventToConfirm = event;
+          },
+        },
+        // The transitions below can be triggered in the absence of a relevant answer to the current question
         {
           guard: ({ context, event }) => (getIntent(event) == 'help'),
           target: "help",
@@ -146,8 +191,12 @@ function createState(params) {
     });
   }
 
-  function generateConfirmationQuestion(event) {
-    return getEntity(event, params.entity) + ', is that correct?'
+  function generatePerceptualConfirmationQuestion(event) {
+    return getEntity(event, params.entity) + ', did I hear correctly?'
+  }
+
+  function generateInterpretationConfirmationQuestion(event) {
+    return getEntity(event, params.entity) + ', did I understand correctly?'
   }
 
   return {
@@ -176,9 +225,14 @@ function createState(params) {
             ],
           },
         },
-        AskForConfirmation: {
+        AskForPerceptualConfirmation: {
           entry: ({ context, event }) =>
-            context.ssRef.send({type: "SPEAK", value: { utterance: generateConfirmationQuestion(event) }}),
+            context.ssRef.send({type: "SPEAK", value: { utterance: generatePerceptualConfirmationQuestion(event) }}),
+          on: { SPEAK_COMPLETE: "ListenAfterAskingForConfirmation" },
+        },
+        AskForInterpretationConfirmation: {
+          entry: ({ context, event }) =>
+            context.ssRef.send({type: "SPEAK", value: { utterance: generateInterpretationConfirmationQuestion(event) }}),
           on: { SPEAK_COMPLETE: "ListenAfterAskingForConfirmation" },
         },
         ListenAfterAskingForConfirmation: {
@@ -192,12 +246,8 @@ function createState(params) {
                 guard: ({ context, event }) => (getEntity(event, 'boolean') == true),
                 target: params.nextState,
                 actions: ({ context, event }) => {
-                  slots.forEach((slot) => {
-                    var value = getEntity(context.eventToConfirm, slot.entity);
-                    if(value) {
-                      context[slot.name] = value;
-                    }
-                  });
+                  var value = getEntity(context.eventToConfirm, params.entity);
+                  context[params.slot] = value;
                 },
               },
               {
