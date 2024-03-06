@@ -1,0 +1,106 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>project</title>
+    <!-- <link rel="stylesheet" href="style.css" -->
+</head>
+<body>
+    <button></button>
+    <!-- <div class="wrapper">
+        <hi></hi>
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 3.jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 4.jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 5 (1).jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 6.jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 7.jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 8.jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 9.jpg" alt="">
+        <img src="C:\Users\daniv\dialogue-systems-1-2024\Code\imagesguesswho\guess who 10.jpg" alt="">
+    </div> -->
+    <br>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Options</title>
+</head>
+<body>
+    <div id="selectOptions"></div>
+
+    <script> 
+        // Paste your JavaScript code here
+        function setupSelect(element) {
+            const options = [
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 3.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who1.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who2.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 4.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 5.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 6.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 7.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 8.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 9.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 10.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 11.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 12.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 13.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 14.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 15.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 16.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 17.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 18.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 19.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 20.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 21.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 22.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 23.jpg" },
+                { image: "c:/Users/daniv/dialogue-systems-1-2024/Code/imagesguesswho/guess who 24.jpg" },
+            ];
+            for (const option of options) {
+                const optionButton = document.createElement("button");
+                optionButton.type = "button";
+
+                const img= document.createElement("img");
+                img.src = option.image;
+                img.alt= option.image;
+                optionButton.appendChild(img);
+
+                //this hides and the we click and we get the previous opacity 
+                /* img.addEventListener("click", () => {
+                    const currentOpacity = parseFloat(img.style.opacity || "1");
+                    if (currentOpacity <1){
+                        img.style.opacity = "1";
+                    } else{img.style.opacity= "0.5"; }
+                }); */
+
+                //when we press it the image is erased
+                img.addEventListener("click", () => {
+                    img.style.display = "none";
+                }); 
+                
+                //to click the image 
+            /*  optionButton.addEventListener("click", () => {
+                if (dmActor){ dmActor.send({ type: "SELECT", value: option.name });
+                } else{
+                    console.log("dmisnot");
+                }
+            
+            }); */
+
+                element.appendChild(optionButton);
+            }
+        }
+
+        // Call the setupSelect function when the page loads
+        window.onload = function() {
+            const selectOptionsDiv = document.getElementById("selectOptions");
+            setupSelect(selectOptionsDiv);
+        };
+    </script>
+</body>
+</html>
