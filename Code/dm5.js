@@ -332,7 +332,7 @@ const dmMachine = setup({
         {guard :and([({event})=> helpIntent(event.nluValue.topIntent), ({event}) => event.nluValue.entities.length === 0 ]),
               actions : [{type : "say", params : help[6]}],
               target : "CheckInfo"},
-        {target : "IntentNotRecognised"},
+        {target : "IntentNotRecognised"}
       ],
     },
   },
@@ -380,9 +380,33 @@ const dmMachine = setup({
       type: "say",
       params : ({context}) => `Do you want me to create an appointment with ${context.person} on ${context.day} at ${context.time}?`
     }],
-    on : {SPEAK_COMPLETE:"ListenCheckInfo"},
+    on : {SPEAK_COMPLETE: "ListenCheckAllInfo" },
   },
-},
+  ListenCheckAllInfo : {
+    entry : [{type: "listen"}],
+    on : {
+      ASR_NOINPUT : [
+        {guard: ({context})=> context.re_prompt_count<=1, 
+        target: "CantHearCheckAllInfo",
+        actions : ({context})=> context.re_prompt_count++},
+        {guard: ({context})=> context.re_prompt_count >1,
+        target : "#DM.Done" }],
+      RECOGNISED : [
+        {guard : ({event}) => checkPositive(event.nluValue.entities[0].category),
+        target : "AppointmentCreated"},
+        {guard : ({event})=> checkNegative(event.nluValue.entities[0].category),
+        target : "Ask"},
+        {guard :and([({event})=> helpIntent(event.nluValue.topIntent), ({event}) => event.nluValue.entities.length === 0 ]),
+              actions : [{type : "say", params : help[6]}],
+              target : "CheckAllInfo"},
+        {target : "IntentNotRecognised"}
+      ],
+    },
+  },
+  CantHearCheckAllInfo : {
+    entry : [{type : "say", params : `I didn't hear you.`}],
+      on : {SPEAK_COMPLETE : "CheckAllInfo"}},
+  },
     },
     Done: {
       on: {
