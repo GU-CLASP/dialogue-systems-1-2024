@@ -1,7 +1,8 @@
 import "./style.css";
 //import { setupButton } from "./dm.js";
 //import { setupButton } from "./dm3.js";
-import { setupButton } from "./dm4.js";
+//import { setupButton } from "./dm4.js";
+import { setupButton } from "./dm5.js";
 
 document.querySelector("#app").innerHTML = `
   <div>
