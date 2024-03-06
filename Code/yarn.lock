@@ -2957,7 +2957,7 @@ __metadata:
     typescript: "npm:^5.3.3"
     typescript-language-server: "npm:^4.3.1"
     vite: "npm:^5.0.8"
-    xstate: "npm:^5.5.1"
+    xstate: "npm:^5.9.1"
   languageName: unknown
   linkType: soft
 
@@ -4211,6 +4211,13 @@ __metadata:
   version: 5.6.0
   resolution: "xstate@npm:5.6.0"
   checksum: 10c0/eb0920ba3506bbeb57ba6ae5b89e7bc4876e9fa456316190473aaf9ba6a72530e78adb9e07fb3fc7b733967c9d5a8ea89aceeda27e6cbdb7fefce27aa510ad2e
+  languageName: node
+  linkType: hard
+
+"xstate@npm:^5.9.1":
+  version: 5.9.1
+  resolution: "xstate@npm:5.9.1"
+  checksum: 10c0/97b7e4051072917f29f32ea60823d66095ada320a86b6b1493e632bb8ea79ba6f93e2d0b310d282ad0dd152252894aa6043d81f351d7952263a73d6efd6d1e2e
   languageName: node
   linkType: hard
 

@@ -143,15 +143,16 @@ const dmMachine = setup({
             //to check if the user wants help:
             {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToPrompt"},
 
-            //to check if the machine does not 'recognize' the celebrity name as an entity
-            {guard: ({ event }) => event.nluValue.entities.length === 0, actions: [{ type: "speakToTheUser", params: `Not sure I understood that name.`}], target: "HelpTransitionToPrompt"},
+            //to check if the machine is very unsure about the intent of the user (in general?) in case the user asks to do something completely random:
+            //{guard: ({ event }) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: [{type : "speakToTheUser", params: `I'm not sure what to do now, so I'm starting over.`}], 
+            //target: "HelpTransitionToPrompt"},
             
             //to check if the top user's top intent is creating a meeting AND the machine is confident about this:
-            {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore)]), actions: "setRepetitionBackToZero",
+            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) && checkThreshold(event.nluValue.intents[0].confidenceScore), actions: "setRepetitionBackToZero",
             target: "MeetingPersonSpeak"},
 
             //WHY DOES THIS NOT WORK????? --> to check if the top user's top intent is creating a meeting AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
-            {guard: and([({event}) => checkIfMeetingIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false]), actions: "setRepetitionBackToZero",
+            {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) === true && checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: "setRepetitionBackToZero",
             target: "VerifyTheTopIntentIsMeetingSpeak"},
 
             //to check if the user's top intent is getting celebrity info AND the machine is confident about this:
@@ -159,14 +160,12 @@ const dmMachine = setup({
             actions: [assign({celebrity: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"], //assigning the celebrity in the context
             target: "StartTellingAboutACelebrity"},
 
-            //WHY DOES THIS NOT WORK????? --> to check if the user's top intent is getting celebrity info AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
-            {guard: and([({event}) => checkIfWhoIsIntent(event.nluValue.topIntent), ({event}) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false]),    
+            //This one works now --> to check if the user's top intent is getting celebrity info AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
+            {guard: ({event}) => checkIfWhoIsIntent(event.nluValue.topIntent) === true && checkThreshold(event.nluValue.intents[0].confidenceScore) === false,    
             actions: [assign({celebrity: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"], //assigning the celebrity in the context
             target: "VerifyTheTopIntentIsCelebritySpeak"},
-
-            //to check if the machine is very unsure about the intent of the user (in general?) in case the user asks to do something completely random:
-            {guard: ({ event }) => checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: [{type : "speakToTheUser", params: `I'm not sure what to do now, so I'm starting over.`}]},
             ],
+
           ASR_NOINPUT: [
             {guard: ({ context }) => context.repetition < 3, target: "ReRaisePrompt"}, 
             {guard: ({ context }) => context.repetition === 3, actions: [{ type: "speakToTheUser", params: `Dear user, I think we are done here.`}], target: "Done"}]
@@ -235,7 +234,7 @@ const dmMachine = setup({
           {guard: ({event}) => checkIfHelp(event.nluValue.topIntent), target: "HelpTransitionToMeetingPerson"},
           {guard: ({event}) => event.nluValue.entities.length !== 0, actions: [assign({meeting_name: ({event}) => event.nluValue.entities[0].text}), "setRepetitionBackToZero"],   
           target: "MeetingDateTimeSpeak" },
-          {guard: ({event}) => event.nluValue.entities.length == 0, actions: [{type: "speakToTheUser", params: `I cannot create a meeting with this person, sorry.`, target: "Done"}]},
+          {guard: ({event}) => event.nluValue.entities.length === 0, actions: [{type: "speakToTheUser", params: `I cannot create a meeting with this person, sorry.`, target: "Done"}]},
         ],
     
         ASR_NOINPUT : [
@@ -341,7 +340,6 @@ const dmMachine = setup({
       on: {
         SPEAK_COMPLETE: "MeetingTitleListen"
       }
-
     },
 
     MeetingTitleListen: {
