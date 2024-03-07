@@ -86,6 +86,9 @@ function isNo(utterance) {
   return noGrammar.has(utterance.toLowerCase());
 }
 
+function isHelp(utterance) {
+  return utterance.toLowerCase() === "help";
+}
 
 function hasCelebrity(nluValue) {
   return nluValue.entities.length == 1 && nluValue.entities[0].category === "celebrity";
@@ -109,9 +112,20 @@ function explainCelebrity(celebrity) {
 }
 
 
-function make_ask_information_states(state_name, query, fn, next_state) {
+// utility function to handle queries that are pure strings
+function ensure_fn(query) {
+  if (typeof query === "string")
+    return (({context}) => query);
+  return query;
+}
+
+
+function make_ask_information_states(state_name, query, elaboration, fn, next_state) {
   return {
     [state_name]: {
+      entry: [
+        ({ context, event }) => { context.tries = 0; },
+      ],
       always: [
         {
           guard:  fn.check_unset || (() => true),
@@ -125,7 +139,11 @@ function make_ask_information_states(state_name, query, fn, next_state) {
     },
     ["Do" + state_name]: {
       entry: [
-        {type: 'say', params: query},
+        {
+          type: 'say',
+          // elaborate on the expected answer on the final try
+          params: ({ context }) => ensure_fn(query)({context}) + ((context.tries === 2) ? " " + elaboration : ""),
+        },
       ],
       on: {
         SPEAK_COMPLETE: { actions: ["listen"] },
@@ -137,26 +155,41 @@ function make_ask_information_states(state_name, query, fn, next_state) {
             ],
             target: next_state,
           },
+          {
+            guard: ({ context, event }) => isHelp(event.value[0].utterance),
+            target: "Help" + state_name,
+          },
           "Unknown" + state_name,
         ],
         ASR_NOINPUT: "Reset" + state_name,
       },
+    },
+    ["Help" + state_name]: {
+      entry: [{ type: 'say', params: elaboration }],
+      on: { SPEAK_COMPLETE: "Do" + state_name },
     },
     ...make_repeat_states(state_name),
   };
 }
 
 function make_yesno_states(state_name, query, yes_state, no_state) {
+  const elaboration = "Answer with yes or no";
+
   return {
-    // dummy state to fit in the general pattern
     [state_name]: {
+      entry: [
+        ({ context, event }) => { context.tries = 0; },
+      ],
       always: "Do" + state_name,
     },
     ["Do" + state_name]: {
-      entry: [{
-        type: 'say',
-        params: query,
-      }],
+      entry: [
+        {
+          type: 'say',
+          // elaborate on the expected answer on the final try
+          params: ({ context }) => ensure_fn(query)({context}) + ((context.tries === 2) ? " " + elaboration : ""),
+        },
+      ],
       on: {
         SPEAK_COMPLETE: { actions: ["listen"] },
         RECOGNISED: [
@@ -173,19 +206,36 @@ function make_yesno_states(state_name, query, yes_state, no_state) {
         ASR_NOINPUT: "Reset" + state_name,
       },
     },
+    ["Help" + state_name]: {
+      entry: [{ type: 'say', params: elaboration }],
+      on: { SPEAK_COMPLETE: "Do" + state_name },
+    },
     ...make_repeat_states(state_name),
   };
 }
 
 function make_repeat_states(state_name) {
   return {
-    ["Reset" + state_name]: {
-      entry: [{ type: 'say', params: "I didn't hear you" }],
-      on: { SPEAK_COMPLETE: "Do" + state_name },
-    },
-    ["Unknown" + state_name]: {
-      entry: [{ type: 'say', params: "I didn't understand" }],
-      on: { SPEAK_COMPLETE: "Do" + state_name },
+    ["Reset" + state_name]: make_repeat_state("I didn't hear you", "Do" + state_name),
+    ["Unknown" + state_name]: make_repeat_state("I didn't understand", "Do" + state_name),
+  };
+}
+
+function make_repeat_state(message, next_state) {
+  return {
+    entry: [
+      ({ context, event }) => { context.tries += 1; },
+      { type: 'say', params: message },
+    ],
+    on: {
+      SPEAK_COMPLETE: [
+        {
+          // go to end after 3 tries
+          guard: ({ context, event }) => context.tries >= 3,
+          target: "#DM.WaitToStart",
+        },
+        next_state,
+      ],
     },
   };
 }
@@ -299,7 +349,7 @@ const dmMachine = setup({
     ...make_repeat_states("ReceiveInstruction"),
 
     ...make_ask_information_states(
-      "AskName", "Who are you meeting with?",
+      "AskName", "Who are you meeting with?", "Answer with a valid name",
       {
         check_unset: ({ context, event }) => context.name === undefined,
         check_response_in_grammar: ({ context, event }) => getPerson(event.value[0].utterance) !== undefined,
@@ -309,7 +359,7 @@ const dmMachine = setup({
     ),
 
     ...make_ask_information_states(
-      "AskDay", "On which day is your meeting?",
+      "AskDay", "On which day is your meeting?", "Answer with a weekday",
       {
         check_unset: ({ context, event }) => context.date === undefined,
         check_response_in_grammar: ({ context, event }) => getDay(event.value[0].utterance) !== undefined,
@@ -319,7 +369,7 @@ const dmMachine = setup({
     ),
 
     ...make_ask_information_states(
-      "AskTakeWholeDay", "Will it take the whole day?",
+      "AskTakeWholeDay", "Will it take the whole day?", "Answer with yes or no",
       {
         check_unset: ({ context, event }) => context.take_whole_day === undefined,
         check_response_in_grammar: ({ context, event }) => isYes(event.value[0].utterance) || isNo(event.value[0].utterance),
@@ -329,7 +379,7 @@ const dmMachine = setup({
     ),
 
     ...make_ask_information_states(
-      "AskTime", "What time is your meeting?",
+      "AskTime", "What time is your meeting?", "Answer with a time of day",
       {
         check_unset: ({ context, event }) => context.take_whole_day === false && context.time === undefined,
         check_response_in_grammar: ({ context, event }) => getTime(event.value[0].utterance) !== undefined,
