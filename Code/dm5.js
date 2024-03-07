@@ -378,8 +378,8 @@ const dmMachine = setup({
               entry: ({ context }) => context.ssRef.send({ type: "LISTEN", value: { nlu: true }}), 
               on: {
                 RECOGNISED: [
-                  { target: "#DM.Main.ConfirmCreateFullDayAppointment" , guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' },
-                  { target: "#DM.Main.AskTimePrompt" , guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'decline' },
+                  { target: "#DM.Main.TransToConfirmCreateFullDayAppointment" , guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' },
+                  { target: "#DM.Main.TransToAskTime" , guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'decline' },
                   { target: "AskFullDay",
                     actions: ({ context, event }) =>
                     context.ssRef.send({
@@ -394,43 +394,60 @@ const dmMachine = setup({
             },
           }
         },
-        ConfirmCreateFullDayAppointment: {
-          entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Ok, let's make a confirmation. Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day?`),
+        TransToConfirmCreateFullDayAppointment: {
+          entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Ok, let's make a confirmation.`),
           on: {
-            SPEAK_COMPLETE:"CreateFullDayAppointment",
-          },
+            SPEAK_COMPLETE:"ConfirmCreateFullDayAppointmentPrompt",
+            },
         },
-        CreateFullDayAppointment: {
-          entry: ({ context }) => context.ssRef.send({ type: "LISTEN", value: { nlu: true }}), 
-          on: {
-            RECOGNISED: [
-              { target: "AppointmentCreated", guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' },
-              { target: "#DM.Main.createMeeting",
-                actions: [ ({ context, event }) =>
-                context.ssRef.send({
-                  type: "SPEAK",
-                  value: {
-                    utterance: `Ok, I will ask again from scratch.`,
-                  },
-                }),
-                "clearFields" ],
-                guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'decline' },
-              { target: "ReCreateFullDayAppointment",
-                actions: ({ context, event }) =>
-                context.ssRef.send({
-                  type: "SPEAK",
-                  value: {
-                    utterance: `Sorry, I didn't understand you. Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day? Please say "yes" or "no".`,
-                  }, 
-                }),
-                guard: ({event}) => event.nluValue?.entities?.[0]?.category !== 'accept' && event.nluValue?.entities?.[0]?.category !== 'decline' },
-            ],
-          },
-        },
-        ReCreateFullDayAppointment: {
-          on: {
-            SPEAK_COMPLETE: "CreateFullDayAppointment"
+        ConfirmCreateFullDayAppointmentPrompt:{
+          initial: "ConfirmCreateFullDayAppointment",
+          states:{
+            ConfirmCreateFullDayAppointment: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day?`),
+              on: {
+                SPEAK_COMPLETE:"CreateFullDayAppointment",
+              },
+            },
+            CreateFullDayAppointment: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN", value: { nlu: true }}), 
+              on: {
+                RECOGNISED: [
+                  { target: "#DM.Main.AppointmentCreated", guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' },
+                  { target: "#DM.Main.createMeeting",
+                    actions: [ ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Ok, I will ask again from scratch.`,
+                      },
+                    }),
+                    "clearFields" ],
+                    guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'decline' },
+                  { target: "ReCreateFullDayAppointment",
+                    actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Sorry, I didn't understand you. Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day? Please say "yes" or "no".`,
+                      }, 
+                    }),
+                    guard: ({event}) => event.nluValue?.entities?.[0]?.category !== 'accept' && event.nluValue?.entities?.[0]?.category !== 'decline' },
+                ],
+              },
+            },
+            ReCreateFullDayAppointment: {
+              on: {
+                SPEAK_COMPLETE: "#DM.Main.ConfirmCreateFullDayAppointmentPrompt"
+              }
+            },
           }
+        },
+        TransToAskTime:{
+          entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `You just said your appointment would not take the whole day, so`),
+          on: {
+            SPEAK_COMPLETE:"AskTimePrompt",
+            },
         },
         AskTimePrompt: {
           initial:"AskTime",
@@ -475,7 +492,7 @@ const dmMachine = setup({
             },
             WaitingForGetTimeComplete1: {
               on: {
-                SPEAK_COMPLETE: "#DM.Main.AskPartialDay"
+                SPEAK_COMPLETE: "#DM.Main.TransToAskPartialDay"
               }
             },
             WaitingForGetTimeComplete2: {
@@ -485,43 +502,54 @@ const dmMachine = setup({
             },
           }
         },
-        AskPartialDay: {
-          entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `So let's check all the information. Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}?`),
+        TransToAskPartialDay: {
+          entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `So let's check all the information.`),
           on: {
-            SPEAK_COMPLETE:"ConfirmPartialDay",
+            SPEAK_COMPLETE:"AskPartialDayPrompt",
             },
         },
-        ConfirmPartialDay: {
-          entry: ({ context }) => context.ssRef.send({ type: "LISTEN", value: { nlu: true }}), 
-          on: {
-            RECOGNISED: [
-              { target: "AppointmentCreated", guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' },
-              { target: "#DM.Main.createMeeting", 
-                actions: [ ({ context, event }) =>
-                  context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `Ok, I will ask you again.`,
-                    },
-                  }),
-                "clearFields" ],
-                guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'decline' },
-              { target: "ReConfirmPartialDay",
-                actions: ({ context, event }) =>
-                context.ssRef.send({
-                  type: "SPEAK",
-                  value: {
-                    utterance: `Sorry, I didn't understand you. Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}? Please say "yes" or "no".`,
-                  }, 
-                }),
-                guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' && event.nluValue?.entities?.[0]?.category === 'decline' },
-              ],
+        AskPartialDayPrompt:{
+          initial: "AskPartialDay",
+          states:{
+            AskPartialDay: {
+              entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", `Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}?`),
+              on: {
+                SPEAK_COMPLETE:"ConfirmPartialDay",
+                },
+            },
+            ConfirmPartialDay: {
+              entry: ({ context }) => context.ssRef.send({ type: "LISTEN", value: { nlu: true }}), 
+              on: {
+                RECOGNISED: [
+                  { target: "#DM.Main.AppointmentCreated", guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' },
+                  { target: "#DM.Main.createMeeting", 
+                    actions: [ ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `Ok, I will ask you again.`,
+                        },
+                      }),
+                    "clearFields" ],
+                    guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'decline' },
+                  { target: "ReConfirmPartialDay",
+                    actions: ({ context, event }) =>
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: `Sorry, I didn't understand you. Do you want me to create an appointment with ${context.name} on ${context.day} at ${context.time}? Please say "yes" or "no".`,
+                      }, 
+                    }),
+                    guard: ({event}) => event.nluValue?.entities?.[0]?.category === 'accept' && event.nluValue?.entities?.[0]?.category === 'decline' },
+                  ],
+              },
+            },
+            ReConfirmPartialDay: {
+              on: {
+                SPEAK_COMPLETE: "ConfirmPartialDay"
+              }
+            },
           },
-        },
-        ReConfirmPartialDay: {
-          on: {
-            SPEAK_COMPLETE: "ConfirmPartialDay"
-          }
         },
         AppointmentCreated: {
           entry: ({ context }) => sendSpeechCommand(context.ssRef, "SPEAK", "Great! Your appointment has been created!"),
