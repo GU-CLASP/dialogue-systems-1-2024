@@ -423,7 +423,7 @@ const dmMachine = setup({
                     utterance: `Sorry, I didn't understand you. Do you want me to create an appointment with ${context.name} on ${context.day} for the whole day? Please say "yes" or "no".`,
                   }, 
                 }),
-                guard: ({event}) => event.nluValue?.entities?.[0]?.category !== 'accept' || event.nluValue?.entities?.[0]?.category !== 'decline' },
+                guard: ({event}) => event.nluValue?.entities?.[0]?.category !== 'accept' && event.nluValue?.entities?.[0]?.category !== 'decline' },
             ],
           },
         },
