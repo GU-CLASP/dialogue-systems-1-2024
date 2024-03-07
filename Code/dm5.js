@@ -363,6 +363,10 @@ const dmMachine = setup({
             target: "ExplainCelebrity",
           },
           {
+            guard: ({ context, event }) => event.nluValue.topIntent === "help", // (not actually implemented in the nlu)
+            target: "HelpReceiveInstruction",
+          },
+          {
             target: "UnknownReceiveInstruction",
           },
         ],
@@ -370,6 +374,12 @@ const dmMachine = setup({
       },
     },
     ...make_repeat_states("ReceiveInstruction"),
+
+    HelpReceiveInstruction: {
+      entry: [{ type: 'say', params: "I can book a meeting, or give information on a celebrity. What do you want to do?" }],
+      on: { SPEAK_COMPLETE: "DoReceiveInstruction" },
+    },
+
 
     ...make_ask_information_states(
       "AskName", "Who are you meeting with?", "Answer with a valid name",
