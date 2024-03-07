@@ -1,5 +1,5 @@
 // -*- js-indent-level: 2 -*-
-import { assign, createActor, setup } from "xstate";
+import { assign, createActor, setup, and } from "xstate";
 import { speechstate } from "speechstate";
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js";
@@ -52,6 +52,9 @@ const grammar = {
   "13": { time: "13:00" },
   // ...
 };
+
+const confidence_threshold = 0.5;
+
 
 /* Helper functions */
 function isInGrammar(utterance) {
@@ -149,11 +152,22 @@ function make_ask_information_states(state_name, query, elaboration, fn, next_st
         SPEAK_COMPLETE: { actions: ["listen"] },
         RECOGNISED: [
           {
-            guard:   fn.check_response_in_grammar,
+            guard: and([
+              fn.check_response_in_grammar,
+              ({ context, event }) => (event.value[0].confidence >= confidence_threshold)
+            ]),
             actions: [
               fn.update_information,
             ],
             target: next_state,
+          },
+          {
+            guard:   fn.check_response_in_grammar,
+            actions: [
+              fn.update_information,
+            ],
+            // move to yes-no question, keeping the proposed answer in 'context'
+            target: "Unconfident" + state_name,
           },
           {
             guard: ({ context, event }) => isHelp(event.value[0].utterance),
@@ -169,6 +183,9 @@ function make_ask_information_states(state_name, query, elaboration, fn, next_st
       on: { SPEAK_COMPLETE: "Do" + state_name },
     },
     ...make_repeat_states(state_name),
+
+    // returns to DoStateName if answer is no, this works because the skip check happens in StateName
+    ...make_yesno_states("Unconfident" + state_name, fn.confirm_information_query, next_state, "Do" + state_name),
   };
 }
 
@@ -193,6 +210,12 @@ function make_yesno_states(state_name, query, yes_state, no_state) {
       on: {
         SPEAK_COMPLETE: { actions: ["listen"] },
         RECOGNISED: [
+          //
+          // Don't take confidence into account for these kinds of
+          // yes/no questions; there is little chance for mishearing,
+          // and it might put us in an endless loop of "Did you mean
+          // 'yes'?" "yes"
+          //
           {
             guard: ({ context, event }) => isYes(event.value[0].utterance),
             target: yes_state,
@@ -354,6 +377,7 @@ const dmMachine = setup({
         check_unset: ({ context, event }) => context.name === undefined,
         check_response_in_grammar: ({ context, event }) => getPerson(event.value[0].utterance) !== undefined,
         update_information: ({ context, event }) => { context.name = getPerson(event.value[0].utterance) },
+        confirm_information_query: ({ context }) => `You're meeting with ${context.name}?`,
       },
       "AskDay"
     ),
@@ -364,6 +388,7 @@ const dmMachine = setup({
         check_unset: ({ context, event }) => context.date === undefined,
         check_response_in_grammar: ({ context, event }) => getDay(event.value[0].utterance) !== undefined,
         update_information: ({ context, event }) => { context.date = getDay(event.value[0].utterance) },
+        confirm_information_query: ({ context }) => `The meeting is on ${context.date}?`,
       },
       "AskTakeWholeDay"
     ),
@@ -374,6 +399,11 @@ const dmMachine = setup({
         check_unset: ({ context, event }) => context.take_whole_day === undefined,
         check_response_in_grammar: ({ context, event }) => isYes(event.value[0].utterance) || isNo(event.value[0].utterance),
         update_information: ({ context, event }) => { context.take_whole_day = isYes(event.value[0].utterance) },
+
+        // We need to be careful about how we ask to confirm that the meeting will not take the whole day,
+        // if we simply say "It will not take the whole day?", the user would answer "no" to confirm.
+        // This still isn't perfect...
+        confirm_information_query: ({ context }) => context.take_whole_day ? "It will take the whole day?" : "Did you say that it won't take the whole day?",
       },
       "AskTime"
     ),
@@ -384,6 +414,7 @@ const dmMachine = setup({
         check_unset: ({ context, event }) => context.take_whole_day === false && context.time === undefined,
         check_response_in_grammar: ({ context, event }) => getTime(event.value[0].utterance) !== undefined,
         update_information: ({ context, event }) => { context.time = getTime(event.value[0].utterance) },
+        confirm_information_query: ({ context }) => `The meeting is at ${context.time}?`,
       },
       "BookMeeting"
     ),
