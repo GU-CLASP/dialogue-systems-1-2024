@@ -55,6 +55,10 @@ const grammar = {
 
 const confidence_threshold = 0.5;
 
+// this has to be set rather high, since the nlu is pretty sure that
+// it got the intent right most of the time
+const nlu_confidence_threshold = 0.8;
+
 
 /* Helper functions */
 function isInGrammar(utterance) {
@@ -319,10 +323,30 @@ const dmMachine = setup({
       entry: ["listen_nlu"],
       on: {
         RECOGNISED: [
+
+          // Combine ASR and NLU confidence by first checking the ASR
+          // confidence; if it's too low we don't do the NLU
+          // interpretation, to prevent misunderstandings.
+          //
+          // In an ideal world, the NLU engine would get more detailed
+          // information about the recognized string, since low
+          // confidence in some parts of the audio input does not
+          // necessarily hurt the understanding, and the other way
+          // around. But that would make it much harder to get
+          // training data both for the ASR set and the NLU step.
+
+          {
+            guard: ({ context, event }) => (event.value[0].confidence < confidence_threshold),
+            target: "ResetReceiveInstruction",
+          },
+
           {
             guard: ({ context, event }) => event.nluValue.topIntent === "create_meeting",
             actions: [
               ({ context, event }) => {
+                // save the confidence score, if this is too low we ask the user to confirm
+                context.nlu_confidence = event.nluValue.intents[0].confidenceScore;
+
                 for (const entity of event.nluValue.entities) {
                   // set person
                   if (entity.category === "person" ) {
@@ -353,9 +377,10 @@ const dmMachine = setup({
                 console.log(context);
               },
             ],
-            target: "AskName",
+            target: "MaybeConfirmCreateMeeting",
           },
           {
+            // (nlu confidence score is not handled for this instruction)
             guard: ({ context, event }) => event.nluValue.topIntent === "who_is_x" && hasCelebrity(event.nluValue),
             actions: [
               ({ context, event }) => { context.celebrity = getCelebrity(event.nluValue); },
@@ -380,6 +405,24 @@ const dmMachine = setup({
       on: { SPEAK_COMPLETE: "DoReceiveInstruction" },
     },
 
+    // either fall through to 'AskName' if NLU confidence is high, or
+    // ask a confirming question.
+    MaybeConfirmCreateMeeting: {
+      always: [
+        {
+          guard: ({context}) => context.nlu_confidence >= nlu_confidence_threshold,
+          target: "AskName",
+        },
+        "UnconfidentReceiveInstructionCreateMeeting",
+      ]
+    },
+
+    ...make_yesno_states(
+      "UnconfidentReceiveInstructionCreateMeeting",
+      ({ context }) => "You want to create a meeting?",
+      "AskName",
+      "DoReceiveInstruction"
+    ),
 
     ...make_ask_information_states(
       "AskName", "Who are you meeting with?", "Answer with a valid name",
