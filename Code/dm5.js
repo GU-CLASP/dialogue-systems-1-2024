@@ -1,5 +1,4 @@
-import { assign, createActor, setup } from "xstate";
-import { speechstate } from "speechstate";
+import { assign, createActor, setup } from "xstate"; 
 import { createBrowserInspector } from "@statelyai/inspect";
 import { KEY, NLU_KEY } from "./azure.js";
 
@@ -55,45 +54,43 @@ function WhoIsXIntent(event) {
   return event === "Who is X";
 }
 
-function isYesResponse(event) {
-  return event === "Yes";
-}
+const verifyASRConfidence = ({ context, event }) => {
+  const { confidence } = event || {};
+  context.asrConfidenceThreshold = Math.max(confidence || 0, context.asrConfidenceThreshold - 0.1);
+};
 
-function isNoResponse(event) {
-  return event === "No";
-}
+const verifyNLUConfidence = ({ context, event }) => {
+  const { confidence } = event?.nluValue || {};
+  context.nluConfidenceThreshold = Math.max(confidence || 0, context.nluConfidenceThreshold - 0.1);
+};
 
 const dmMachine = setup({
-  actions: {
-    listenUser: ({ context }) =>
-      context.ssRef.send({
-        type: "LISTEN",
-        value: { nlu: true }
-      }),
-
-    speakUser: ({ context }, params) =>
-      context.ssRef.send({
-        type: "SPEAK",
-        value: {
-          utterance: params
-        }
-      }),
-
-    incrementNoInputCounter: assign({
-      noInputCounter: (context) => context.noInputCounter + 1
-    })
-  },
-  guards: {
-    noInputLimitReached: (context) => context.noInputCounter >= 3
-  }
-}).createMachine({
-  context: {
+    
+    actions: {
+        listenUser: ({ context }) =>
+          context.ssRef.send({
+            type: "LISTEN",
+            value: { nlu: true }
+          }),
+    
+        speakUser: ({ context }, params) =>
+          context.ssRef.send({
+            type: "SPEAK",
+            value: {
+              utterance: params
+            }
+          })
+      }
+    }).createMachine({ 
+        context: {
     celebrity: "",
     meeting_time: "",
     meeting_hour: "",
     noInputCounter: 0,
+    asrInput: "",
+    asrConfidenceThreshold: 0.7,
+    nluConfidenceThreshold: 0.8,
   },
-  id: "DM",
   initial: "Prepare",
   states: {
     Prepare: {
@@ -125,6 +122,15 @@ const dmMachine = setup({
               celebrity: ({ event }) => event?.nluValue?.entities?.[0]?.text
             }),
             target: "ExtraInfo"
+          },
+          {
+            target: "Noinput",
+            actions: [
+              assign({
+                asrInput: ({ event }) => event?.nluValue?.topTranscript
+              }),
+              "incrementNoInputCounter"
+            ]
           }
         ],
         ASR_NOINPUT: "Noinput"
@@ -141,31 +147,28 @@ const dmMachine = setup({
 
     Noinput2: {
       entry: [
-        { type: "speakUser", params: `Sorry, I didn't understand. Will the meeting take the whole day, please say "yes" or "no".` },
+        { type: "speakUser", params: `Sorry, I didn't understand. Will the meeting take the whole day?.` },
         { type: "incrementNoInputCounter" }
       ],
-      on: { SPEAK_COMPLETE: "VerificationListen" }
+      on: { SPEAK_COMPLETE: "Noinput3" }
     },
 
-    VerificationListen: {
-      entry: "listenUser",
-      on: {
-        RECOGNISED: [
-          {
-            guard: ({ event }) => isYesResponse(event.nluValue?.entities?.[0]?.category),
-            target: "Done"
-          },
-          {
-            guard: ({ event }) => isNoResponse(event.nluValue?.entities?.[0]?.category),
-            target: "WithWhom"
-          }
-        ]
-      }
-    },
-
+    Noinput3: {
+        entry: [
+          { type: "speakUser", params: `Sorry, I still didn't get that. Are you there?` },
+          { type: "incrementNoInputCounter" }
+        ],
+        on: {
+          SPEAK_COMPLETE: [
+            { target: "Done", guard: "LimitReached" },
+            { target: "Listen" }
+          ]
+        }
+      },
+      
     WithWhom: {
       entry: [
-        { type: "speakUser", params: `With whom would you like to meet?.` }
+        { type: "speakUser", params: `With whom would you like to have a meeting with?` }
       ],
       on: { SPEAK_COMPLETE: "ListenPersonMeet" }
     },
@@ -183,16 +186,31 @@ const dmMachine = setup({
           target: "Day"
         },
         ASR_NOINPUT: {
-          target: "Noinput"
+          target: "Didntunderstand"
         }
       }
     },
 
+    Didntunderstand: {
+      entry: [
+        {
+          type: "speakUser",
+          params: `I didn't understand, can you repeat?`
+        }
+      ],
+      on: { SPEAK_COMPLETE: "WithWhom" }
+    },
+
     Day: {
       entry: [
-        { type: "speakUser", params: `On which day would you like to have a meeting?` }
+        {
+          type: "speakUser",
+          params: `On which day would you like to have a meeting?`
+        }
       ],
-      on: { SPEAK_COMPLETE: "TimeHour" }
+      on: {
+        SPEAK_COMPLETE: "TimeHour"
+      }
     },
 
     TimeHour: {
@@ -212,16 +230,24 @@ const dmMachine = setup({
 
     ReRaise: {
       entry: [
-        { type: "speakUser", params: `I didn't understand, can you repeat?` }
+        {
+          type: "speakUser",
+          params: `I didn't understand, can you repeat?`
+        }
       ],
       on: { SPEAK_COMPLETE: "Day" }
     },
 
     Time: {
       entry: [
-        { type: "speakUser", params: `What time is the meeting going to take place?` }
+        {
+          type: "speakUser",
+          params: `What time is the meeting going to take place?`
+        }
       ],
-      on: { SPEAK_COMPLETE: "ListenTime" }
+      on: {
+        SPEAK_COMPLETE: "ListenTime"
+      }
     },
 
     ListenTime: {
@@ -241,26 +267,33 @@ const dmMachine = setup({
 
     ReRaise1: {
       entry: [
-        { type: "speakUser", params: `I didn't understand, can you repeat?` }
+        {
+          type: "speakUser",
+          params: `I didn't understand, can you repeat?`
+        }
       ],
       on: { SPEAK_COMPLETE: "Time" }
     },
 
     Verification: {
       entry: [
-        { type: "speakUser", params: ({ context }) => `You want to create an appointment at ${context.meeting_hour} with ${context.celebrity} on ${context.meeting_time}, let's proceed.` }
+        {
+          type: "speakUser",
+          params: ({ context }) =>
+            `You want to create an appointment at ${context.meeting_hour} with ${context.celebrity} on ${context.meeting_time}, let's proceed.`
+        }
       ],
       on: { SPEAK_COMPLETE: "ExtraInfo" }
     },
 
     ExtraInfo: {
       entry: [
-        { 
-          type: "speakUser", 
+        {
+          type: "speakUser",
           params: ({ context }) =>
-            isInFamousPeople(context.celebrity) ? 
-            `In order to prepare your meeting with ${context.celebrity}, here is some information you would want to know. ${getFamousPeopleInf(context.celebrity).information}` :
-            `I don't have information about ${context.celebrity}.`
+            isInFamousPeople(context.celebrity) ?
+              `In order to prepare your meeting with ${context.celebrity}, here is some information you would want to know. ${getFamousPeopleInf(context.celebrity).information}` :
+              `I don't have information about ${context.celebrity}.`
         }
       ],
       on: {
@@ -271,6 +304,11 @@ const dmMachine = setup({
     Done: {
       entry: [{ type: "speakUser", params: `Enjoy your meeting!` }],
       on: { CLICK: "Prompt" }
+    }
+  },
+  on: {
+    "ASR_REC": {
+      actions: ["verifyASRConfidence", "verifyNLUConfidence"]
     }
   }
 });
