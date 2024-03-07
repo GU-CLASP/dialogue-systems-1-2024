@@ -151,7 +151,7 @@ const dmMachine = setup({
             {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) && checkThreshold(event.nluValue.intents[0].confidenceScore), actions: "setRepetitionBackToZero",
             target: "MeetingPersonSpeak"},
 
-            //WHY DOES THIS NOT WORK????? --> to check if the top user's top intent is creating a meeting AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
+            //WHY DOES THIS ONE NOT WORK????? --> to check if the top user's top intent is creating a meeting AND the machine is NOT very confident about this (doesn't surpass the confidence threshold):
             {guard: ({event}) => checkIfMeetingIntent(event.nluValue.topIntent) === true && checkThreshold(event.nluValue.intents[0].confidenceScore) === false, actions: "setRepetitionBackToZero",
             target: "VerifyTheTopIntentIsMeetingSpeak"},
 
