@@ -1,0 +1,610 @@
+{
+    "projectFileVersion": "2022-10-01-preview",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+        "projectKind": "Conversation",
+        "settings": {
+            "confidenceThreshold": 0,
+            "normalizeCasing": true
+        },
+        "projectName": "appointment",
+        "multilingual": true,
+        "description": "lab 4",
+        "language": "en-us"
+    },
+    "assets": {
+        "projectKind": "Conversation",
+        "intents": [
+            {
+                "category": "None"
+            },
+            {
+                "category": "Create a meeting"
+            },
+            {
+                "category": "Who is X"
+            }
+        ],
+        "entities": [
+            {
+                "category": "celebrity",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "meeting_title",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "meeting_time",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "Yes",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "No",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "meeting_hour",
+                "compositionSetting": "combineComponents"
+            }
+        ],
+        "utterances": [
+            {
+                "text": "7:00",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "8:00",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "9:00 ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "15:00",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I can do at 16:00.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 12,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I would like to have a meeting at 14:00.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 34,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "13:00",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "12:00",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "11:00 ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_hour",
+                        "offset": 0,
+                        "length": 5
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Not really. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "No",
+                        "offset": 0,
+                        "length": 3
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I can't on Monday. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "No",
+                        "offset": 0,
+                        "length": 7
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "No, I don't want to discuss. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "No",
+                        "offset": 0,
+                        "length": 2
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Yes, create a meeting on Friday. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "Yes",
+                        "offset": 0,
+                        "length": 3
+                    },
+                    {
+                        "category": "meeting_time",
+                        "offset": 25,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Of course! Let's discuss.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "Yes",
+                        "offset": 0,
+                        "length": 10
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Yeah I'd like to schedule a meeting.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "Yes",
+                        "offset": 0,
+                        "length": 4
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Create a meeting regarding the article about Stieg Larsson. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 31,
+                        "length": 7
+                    },
+                    {
+                        "category": "celebrity",
+                        "offset": 45,
+                        "length": 13
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's talk about the latest news regarding Childish Gambino on Friday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 21,
+                        "length": 11
+                    },
+                    {
+                        "category": "celebrity",
+                        "offset": 43,
+                        "length": 16
+                    },
+                    {
+                        "category": "meeting_time",
+                        "offset": 63,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "We need to have a meeting regarding perfomance reviews. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 36,
+                        "length": 18
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's meet to talk about a new topic. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 27,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Create a meeting regarding the sales marketing pitch.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 31,
+                        "length": 21
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's discuss client presentation. ",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_title",
+                        "offset": 14,
+                        "length": 19
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Schedule a meeting for next Wednesday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 23,
+                        "length": 14
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's meet next Tuesday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 11,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's have a meeting on next Monday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 24,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's meet on Sunday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 14,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's schedule a meeting on Saturday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 28,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Book a meeting on Friday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 18,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Create a meeting on Thursday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 20,
+                        "length": 8
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "I'd like to have a meeting on Wednesday",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 30,
+                        "length": 9
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Let's meet on Tuesday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 14,
+                        "length": 7
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Schedule a meeting on Monday.",
+                "language": "en-us",
+                "intent": "Create a meeting",
+                "entities": [
+                    {
+                        "category": "meeting_time",
+                        "offset": 22,
+                        "length": 6
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "What do you know about Lea Salongga?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 23,
+                        "length": 13
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Ludwig Göransson?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 16
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "What do you know about Corey Taylor?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 23,
+                        "length": 12
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Ella Fitzgerald?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 15
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Please tell me something about Rosa Parks",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 31,
+                        "length": 10
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Tell me about Stieg Larsson",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 14,
+                        "length": 13
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you tell me about Mick Jagger",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 22,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "What do you know about Anna Delvey?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 23,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Who is Marvin Gaye?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 7,
+                        "length": 11
+                    }
+                ],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you tell me something about Childish Gambino?",
+                "language": "en-us",
+                "intent": "Who is X",
+                "entities": [
+                    {
+                        "category": "celebrity",
+                        "offset": 32,
+                        "length": 16
+                    }
+                ],
+                "dataset": "Train"
+            }
+        ]
+    }
+}
