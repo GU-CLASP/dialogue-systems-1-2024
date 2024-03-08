@@ -70,6 +70,18 @@ function getTime(utterance){
   return (grammar[utterance.toLowerCase()] || {}).time;
 }
 
+// Helper function to generate re-prompt formulations
+function generateRepromptFormulation(repromptCounter) {
+  switch (repromptCounter) {
+    case 1:
+      return `Your answer is not in the grammar.`;
+    case 2:
+      return `Sorry, I still didn't find your answer in the grammar.`;
+    case 3:
+      return `I apologize, but it seems like there's no corresponding item in the grammar.`;
+  }
+}
+
 const dmMachine = setup({
   actions: {
     Say:({ context }, params) =>
@@ -87,13 +99,25 @@ const dmMachine = setup({
         },
       }); 
     },
+    HandleOutOfGrammar: ({ context }) => {
+      if (context.outOfGrammarCount <=3 ) {
+        const repromptFormulation = generateRepromptFormulation(context.outOfGrammarCount);
+        context.ssRef.send({
+          type: "SPEAK",
+          value: { utterance: repromptFormulation },});
+        context.outOfGrammarCount += 1;
+      } else {
+        return "#DM.Running.Done";
+      }
+    },
   },
 }).createMachine({
   context: {
     person: null,
     day: null,
     time: 0,
-    outOfGrammarCount: 0,
+    outOfGrammarCount: 1,
+    noInputCount: 0,
   },
   id: "DM",
   initial: "Prepare",
@@ -126,351 +150,523 @@ const dmMachine = setup({
             type: "Say",
             params: `Are you there?`,
             }),
-          on: { SPEAK_COMPLETE: "Main" },
+          on: { 
+            SPEAK_COMPLETE: [
+              {
+                guard:({ context }) => {
+                  console.log(context.noInputCount);
+                  return (context.noInputCount === 3);
+                },
+                target: "NoResponse",
+              },
+              {
+                actions:
+                [
+                  assign({ 
+                    noInputCount: ({context}) => context.noInputCount + 1,
+                  }),
+                  ({context}) => console.log( context.noInputCount ),
+                ],
+                target: "Main",
+              },
+            ],
+          },
+        },
+        NotInGrammar: {
+          entry: [
+            {type:"HandleOutOfGrammar"}
+          ],
+          on:{SPEAK_COMPLETE: "Main"}
         },
         Main: {
           initial: "hist",
           states: {
-            hist: { type: "history", histroy: "deep", target: "Prompt",reenter: true},
-            Prompt: {
+            hist: { type: "history", target: "Stage1", reenter: true},
+            Stage1: {
               entry: [{
                 type: "Say",
-                params: `Hi!`,
+                params: `Hi! You are entering stage1. What can I help you?`,
               }],
-              on: { SPEAK_COMPLETE: "FirstListen" },
-            },
-            FirstListen: {
-              entry: ({ context }) =>
-                { 
-                context.ssRef.send({
-                  type: "LISTEN", value:{ nlu:true, completeTimeout: 5}
-                });},
-              on: {
-                RECOGNISED: [
-                  {
-                    guard: ({ event }) => {
-                      const recognizedUtterance = event.value[0].utterance;
-                      console.log('Recognized Utterance:', recognizedUtterance);
-                      return (recognizedUtterance === 'Help');
-                      
-                    },
-                    actions: { 
-                      type: "ShowHelpAndReturn",
-                      params: `You are using Help, I'm sending you to the previous state.`, 
-                    },
-                    target: 'Prompt',reenter:true
+              initial: "Stage1Listen",
+              on: { SPEAK_COMPLETE: ".Stage1Listen" },
+              states:{
+                Stage1Listen: {
+                  entry: ({ context }) =>
+                    { 
+                    context.ssRef.send({
+                      type: "LISTEN", value:{ nlu:true, completeTimeout: 5}
+                    });},
+                  on: {
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: '#DM.Running.Main',reenter:true
+                      },
+                      {target: "Stage1Ending",
+                      guard: ({ event }) => 
+                        {const recognizedUtterance = event.nluValue;
+                          console.log(recognizedUtterance);
+                        return (
+                          recognizedUtterance.topIntent === 'create a meeting'
+                        );
+                        },
+                      },
+                      {
+                      target: "#DM.Running.NotInGrammar",
+                      },
+                    ],
                   },
-                  {target: "FirstQuestion",
-                  guard: ({ event }) => 
-                    {const recognizedUtterance = event.nluValue;
-                      console.log(recognizedUtterance);
-                    return (
-                      recognizedUtterance.topIntent === 'create a meeting'
-                    );
-                    },
-                  },
-                  {actions: ({ context, event }) =>
-                  context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `You just said: ${
-                        event.value[0].utterance
-                      }. And it is not an expected answer in the grammar.`,
-                    },
-                  }),
-                  target: "Prompt",
-                  },
-                ],
+                },
+                Stage1Ending: {
+                  entry: [{
+                    type: "Say",
+                    params: `I see you want to make an appointment. You are entering Stage2.`,
+                  }], 
+                  on: { SPEAK_COMPLETE: "#DM.Running.Main.Stage2" },
+                },
               },
             },
-            FirstQuestion: {
+            Stage2: {
               entry: [{
-                type: "Say",
-                params: `I see you want to make an appointment. Now you may ask me about a famous person.`,
-              }], 
-              on: { SPEAK_COMPLETE: "SecondListen" },
-            },
-            SecondListen:{
-              entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN", value:{nlu:true, completeTimeout: 5}
-              }),
-              on:{
-                RECOGNISED: [
-                  {
-                    guard: ({ event }) => {
-                      const recognizedUtterance = event.value[0].utterance;
-                      console.log('Recognized Utterance:', recognizedUtterance);
-                      return (recognizedUtterance === 'Help');
-                      
-                    },
-                    actions: { 
-                      type: "ShowHelpAndReturn",
-                      params: `You are using Help, I'm sending you to the previous state.`, 
-                    },
-                    target: 'FirstQuestion',reenter:true
-                  },
-                  {
-                  target: "SecondQuestion",
-                  guard: ({ event }) => 
-                    {const recognizedName = event.nluValue.entities[0].text;
-                    const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
-                    return (
-                      event.nluValue.topIntent === "who is X" && targetEntityKey
-                    );
-                    },
-                  actions: [
-                    ({ context,event }) => 
-                    {const recognizedName = event.nluValue.entities[0].text;
-                    const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
+                  type: "Say",
+                  params: `Ask me about a famous person.`,
+              }],
+              initial: "Stage2Listen",
+              on: { SPEAK_COMPLETE: ".Stage2Listen" },
+              states:{
+                Stage2Listen:{
+                  entry: ({ context }) =>
                   context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: ` ${recognizedName} is ${grammar[targetEntityKey].intro}`},})},
-                ],
-                  },
-                  {actions: ({ context, event }) =>
-                  context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `You just said: ${
-                        Object.keys(grammar).find(key => grammar[key].person === event.nluValue)
-                      }. And it is not a name in the grammar, please try again with a name.`,
-                    },
+                    type: "LISTEN", value:{nlu:true, completeTimeout: 5}
                   }),
-                  target: "FirstQuestion",
-                  }
-                ],
-              },
+                  on:{
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: "#DM.Running.Main"
+                      },
+                      {
+                      target: "Stage2Ending",
+                      guard: ({ event }) => 
+                        {const recognizedName = event.nluValue.entities[0].text;
+                        const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
+                        return (
+                          event.nluValue.topIntent === "who is X" && targetEntityKey
+                        );
+                        },
+                      actions: [
+                        ({ context,event }) => 
+                        {const recognizedName = event.nluValue.entities[0].text;
+                        const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: ` ${recognizedName} is ${grammar[targetEntityKey].intro}`},})},
+                    ],
+                      },
+                      {actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            Object.keys(grammar).find(key => grammar[key].person === event.nluValue)
+                          }. And it is not a name in the grammar, please try again with a name.`,
+                        },
+                      }),
+                      target: "#DM.Running.NotInGrammar",
+                      }
+                    ],
+                  },
+                },
+                Stage2Ending: {
+                  entry:[{
+                    type: "Say",
+                    params: `You are entering Stage3.`,
+                  }],
+                  on: { SPEAK_COMPLETE: "#DM.Running.Main.Stage3" },
+                },
+              }
             },
-            SecondQuestion: {
-              entry:[{
+            Stage3: {
+              entry: [{
                 type: "Say",
                 params: `On which day is your meeting?`,
-              }],
-              on: { SPEAK_COMPLETE: "ThirdListen" },
-            },
-            ThirdListen: {
-              entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN", value:{nlu:true, completeTimeout: 5}
-              }),
-              on:{
-                RECOGNISED: [
-                  {
-                    guard: ({ event }) => {
-                      const recognizedUtterance = event.value[0].utterance;
-                      console.log('Recognized Utterance:', recognizedUtterance);
-                      return (recognizedUtterance === 'Help');
-                      
-                    },
-                    actions: { 
-                      type: "ShowHelpAndReturn",
-                      params: `You are using Help, I'm sending you to the previous state.`, 
-                    },
-                    target: 'SecondQuestion',reenter:true
-                  },
-                  {
-                  guard: ({ event }) => 
-                    {const recognizedday = event.value[0].utterance;
-                    return (
-                      !!getDay(recognizedday)
-                    );
-                    },
-                  actions: [
-                    assign({ day: ({event}) => getDay(event.value[0].utterance) }),
-                    ({event}) => console.log( getDay(event.value[0].utterance ))
-                  ],
-                  target: "ThirdQuestion",
-                  },
-                  {actions: ({ context, event }) =>
+            }],
+              initial:"Stage3Listen",
+              on: { SPEAK_COMPLETE: ".Stage3Listen" },
+              states:{
+                Stage3Listen: {
+                  entry: ({ context }) =>
                   context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `You just said: ${
-                        event.value[0].utterance
-                      }. And it is not a day in the grammar, please try again with a day.`,
-                    },
+                    type: "LISTEN", value:{nlu:true, completeTimeout: 5}
                   }),
-                  target: "SecondQuestion",
-                  }
-                ],
+                  on:{
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: "#DM.Running.Main",reenter:true
+                      },
+                      {
+                      guard: ({ event }) => 
+                        {const recognizedday = event.value[0].utterance;
+                        return (
+                          !!getDay(recognizedday)
+                        );
+                        },
+                      actions: [
+                        assign({ day: ({event}) => getDay(event.value[0].utterance) }),
+                        ({event}) => console.log( getDay(event.value[0].utterance ))
+                      ],
+                      target: "Stage3Ending",
+                      },
+                      {actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is not a day in the grammar, please try again with a day.`,
+                        },
+                      }),
+                      target: "#DM.Running.NotInGrammar",
+                      }
+                    ],
+                  },
+                },
+                Stage3Ending: {
+                  entry:[{
+                    type: "Say",
+                    params: `You are entering Stage4.`,
+                  }],
+                  on: { SPEAK_COMPLETE: "#DM.Running.Main.Stage4" }
+                },
               },
             },
-            ThirdQuestion: {
-              entry:[{
+            Stage4: {
+              entry: [{
                 type: "Say",
                 params: `Will it take the whole day? Answer with yes or no please.`,
               }],
-              on: { SPEAK_COMPLETE: "FourthListen" },
-            },
-            FourthListen:{
-              entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN", value:{nlu:true, completeTimeout: 5}
-              }),
-              on:{
-                RECOGNISED: [
-                  {
-                    guard: ({ event }) => {
-                      const recognizedUtterance = event.value[0].utterance;
-                      console.log('Recognized Utterance:', recognizedUtterance);
-                      return (recognizedUtterance === 'Help');
-                      
-                    },
-                    actions: { 
-                      type: "ShowHelpAndReturn",
-                      params: `You are using Help, I'm sending you to the previous state.`, 
-                    },
-                    target: 'ThirdQuestion',reenter:true
-                  },
-                  {target: "LastQuestion",
-                  guard: ({ event }) => 
-                    {const answer = event.value[0].utterance;
-                      return (
-                      answer &&
-                      isInGrammar(answer) && 
-                      grammar[answer.toLowerCase()].response === 'positive'
-                    );
-                    },
-                  },
-                  {target: "FifthQuestion",
-                  guard: ({ event }) => 
-                    {const answer = event.value[0].utterance;
-                    return (
-                      answer &&
-                      isInGrammar(answer) && 
-                      grammar[answer.toLowerCase()].response === 'negative'
-                    );
-                    },
-                  },
-                  {actions: ({ context, event }) =>
+              initial: "Stage4Listen",
+              on: { SPEAK_COMPLETE: ".Stage4Listen" },
+              states:{
+                Stage4Listen:{
+                  entry: ({ context }) =>
                   context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `You just said: ${
-                        event.value[0].utterance
-                      }. And it is not an expected answer in the grammar, please try again with yes or no`,
-                    },
+                    type: "LISTEN", value:{nlu:true, completeTimeout: 5}
                   }),
-                  target: "ThirdQuestion",
-                  }
-                ],
+                  on:{
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: "#DM.Running.Main",reenter:true
+                      },
+                      {target: "Stage4Ending_wholeday",
+                      guard: ({ event }) => 
+                        {const answer = event.value[0].utterance;
+                          return (
+                          answer &&
+                          isInGrammar(answer) && 
+                          grammar[answer.toLowerCase()].response === 'positive'
+                        );
+                        },
+                      },
+                      {target: "Stage4Ending_time",
+                      guard: ({ event }) => 
+                        {const answer = event.value[0].utterance;
+                        return (
+                          answer &&
+                          isInGrammar(answer) && 
+                          grammar[answer.toLowerCase()].response === 'negative'
+                        );
+                        },
+                      },
+                      {actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is not an expected answer in the grammar, please try again with yes or no`,
+                        },
+                      }),
+                      target: "#DM.Running.NotInGrammar",
+                      }
+                    ],
+                  },
+                },
+                Stage4Ending_wholeday: {
+                  entry:[{
+                    type: "Say",
+                    params: `You are entering Stage6, whole-day confirming`,
+                  }],
+                  on: { SPEAK_COMPLETE: "#DM.Running.Main.Stage6" },
+                },
+                Stage4Ending_time: {
+                  entry:[{
+                    type: "Say",
+                    params: `You are entering Stage5, time confirming`,
+                  }],
+                  on: { SPEAK_COMPLETE: "#DM.Running.Main.Stage5" },
+                },
               },
             },
-            FifthQuestion: {
-              entry:[{
-                type: "Say",
-                params: `What time is your meeting?`,
+            Stage5:{
+              entry: [{
+                  type: "Say",
+                  params: `What time is your meeting?`,
               }],
-              on: { SPEAK_COMPLETE: "FifthListen" },
-            },
-            FifthListen: {
-              entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN", value:{nlu:true, completeTimeout: 5}
-              }),
-              on:{
-                RECOGNISED: [
-                  {target: "SixthQuestion",
-                  guard: ({ event }) => 
-                    {const recognizedtime = event.value[0].utterance;
-                    return (
-                      !!getTime(recognizedtime)
-                    );
-                    },
-                  actions: [
-                    assign({ time: ({event}) => getTime(event.value[0].utterance) }),
-                    ({event}) => console.log( getTime(event.value[0].utterance ))
-                  ]
-                  },
-                  {actions: ({ context, event }) =>
+              initial: "Stage5Listen",
+              on: { SPEAK_COMPLETE: ".Stage5Listen" },
+              states:{
+                Stage5Listen: {
+                  entry: ({ context }) =>
                   context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `You just said: ${
-                        event.value[0].utterance
-                      }. And it is not a time in the grammar, please try again with a time number from 1 to 24`,
-                    },
+                    type: "LISTEN", value:{nlu:true, completeTimeout: 5}
                   }),
-                  target: "FifthQuestion",
-                  }
-                ],
+                  on:{
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: "#DM.Running.Main",reenter:true
+                      },
+                      {target: "Stage5Ending",
+                      guard: ({ event }) => 
+                        {const recognizedtime = event.value[0].utterance;
+                        return (
+                          !!getTime(recognizedtime)
+                        );
+                        },
+                      actions: [
+                        assign({ time: ({event}) => getTime(event.value[0].utterance) }),
+                        ({event}) => console.log( getTime(event.value[0].utterance ))
+                      ]
+                      },
+                      {actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is not a time in the grammar, please try again with a time number from 1 to 24`,
+                        },
+                      }),
+                      target: "#DM.Running.NotInGrammar",
+                      }
+                    ],
+                  },
+                },
+                Stage5Ending:{
+                  entry:({
+                    type: "Say",
+                    params: `You are entering Stage7, final confirming.`,
+                  }),
+                  on: { SPEAK_COMPLETE: "#DM.Running.Main.Stage7" },
+                },
               },
             },
-            SixthQuestion:{
+            Stage6:{
+              entry:({ context }) =>
+                context.ssRef.send({
+                type: "SPEAK",
+                  value: {
+                    utterance: `Do you want to create an appointment with ${context.person} 
+                  on ${context.day} for the whole day?`},
+                }),
+              initial: "Stage6Listen",
+              on: { SPEAK_COMPLETE: ".Stage6Listen" },
+              states:{
+                Stage6Listen:{
+                  entry: ({ context }) =>
+                  context.ssRef.send({
+                    type: "LISTEN", value:{nlu:true, completeTimeout: 5}
+                  }),
+                  on:{
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: "#DM.Running.Main",reenter:true
+                      },
+                      {target: "#DM.Running.Done",
+                      guard: ({ event }) => 
+                        {const recognizedUtterance = event.value[0].utterance;
+                        return (
+                          recognizedUtterance &&
+                          isInGrammar(recognizedUtterance) && 
+                          grammar[recognizedUtterance.toLowerCase()].response === 'positive'
+                        );
+                        },
+                      },
+                      {target: "#DM.Running.Main.Stage2",
+                      guard: ({ event }) => 
+                        {const recognizedUtterance = event.value[0].utterance;
+                        return (
+                          recognizedUtterance &&
+                          isInGrammar(recognizedUtterance) && 
+                          grammar[recognizedUtterance.toLowerCase()].response === 'negative'
+                        );
+                        },
+                      actions: {
+                        type: "Say",
+                        params: `I see. Let's do it over again.`,
+                      },
+                      },
+                      {actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is not an expected answer in the grammar, please try again with yes or no.`,
+                        },
+                      }),
+                      target: "#DM.Running.NotInGrammar",
+                      }
+                    ],
+                  },
+                },
+              },
+            },
+            Stage7:{
               entry:({ context }) =>
                 context.ssRef.send({
                 type: "SPEAK",
                 value: {
                   utterance:`Do you want to create an appointment with ${context.person} 
                 on ${context.day} at ${context.time}?`},
-              }),
-              on: { SPEAK_COMPLETE: "LastListen" },
-            },
-            LastQuestion:{
-              entry:({ context }) =>
-              context.ssRef.send({
-              type: "SPEAK",
-                value: {
-                  utterance: `Do you want to create an appointment with ${context.person} 
-                on ${context.day} for the whole day?`},
-              }),
-              on: { SPEAK_COMPLETE: "LastListen" },
-            },
-            LastListen:{
-              entry: ({ context }) =>
-              context.ssRef.send({
-                type: "LISTEN", value:{nlu:true, completeTimeout: 5}
-              }),
-              on:{
-                RECOGNISED: [
-                  {target: "Done",
-                  guard: ({ event }) => 
-                    {const recognizedUtterance = event.value[0].utterance;
-                    return (
-                      recognizedUtterance &&
-                      isInGrammar(recognizedUtterance) && 
-                      grammar[recognizedUtterance.toLowerCase()].response === 'positive'
-                    );
-                    },
-                  },
-                  {target: "FirstQuestion",
-                  guard: ({ event }) => 
-                    {const recognizedUtterance = event.value[0].utterance;
-                    return (
-                      recognizedUtterance &&
-                      isInGrammar(recognizedUtterance) && 
-                      grammar[recognizedUtterance.toLowerCase()].response === 'negative'
-                    );
-                    },
-                  actions: {
-                    type: "Say",
-                    params: `I see. Let's do it over again.`,
-                  },
-                  },
-                  {actions: ({ context, event }) =>
+                }),
+              initial: "Stage7Listen",
+              on: { SPEAK_COMPLETE: ".Stage7Listen" },
+              states:{
+                Stage7Listen:{
+                  entry: ({ context }) =>
                   context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: `You just said: ${
-                        event.value[0].utterance
-                      }. And it is not an expected answer in the grammar, please try again with yes or no.`,
-                    },
+                    type: "LISTEN", value:{nlu:true, completeTimeout: 5}
                   }),
-                  target: "FifthQuestion",
-                  }
-                ],
+                  on:{
+                    RECOGNISED: [
+                      {
+                        guard: ({ event }) => {
+                          const recognizedUtterance = event.value[0].utterance;
+                          console.log('Recognized Utterance:', recognizedUtterance);
+                          return (recognizedUtterance === 'Help');
+                          
+                        },
+                        actions: { 
+                          type: "ShowHelpAndReturn",
+                          params: `You are using Help, I'm sending you to the start of the stage.`, 
+                        },
+                        target: "#DM.Running.Main.Stage5",reenter:true
+                      },
+                      {target: "#DM.Running.Done",
+                      guard: ({ event }) => 
+                        {const recognizedUtterance = event.value[0].utterance;
+                        return (
+                          recognizedUtterance &&
+                          isInGrammar(recognizedUtterance) && 
+                          grammar[recognizedUtterance.toLowerCase()].response === 'positive'
+                        );
+                        },
+                      },
+                      {target: "#DM.Running.Main.Stage2",
+                      guard: ({ event }) => 
+                        {const recognizedUtterance = event.value[0].utterance;
+                        return (
+                          recognizedUtterance &&
+                          isInGrammar(recognizedUtterance) && 
+                          grammar[recognizedUtterance.toLowerCase()].response === 'negative'
+                        );
+                        },
+                      actions: {
+                        type: "Say",
+                        params: `I see. Let's do it over again.`,
+                      },
+                      },
+                      {actions: ({ context, event }) =>
+                      context.ssRef.send({
+                        type: "SPEAK",
+                        value: {
+                          utterance: `You just said: ${
+                            event.value[0].utterance
+                          }. And it is not an expected answer in the grammar, please try again with yes or no.`,
+                        },
+                      }),
+                      target: "#DM.Running.NotInGrammar",
+                      }
+                    ],
+                  },
+                },
               },
             },
-            Done: {
-              entry:[{
-                type: "Say",
-                params: `Your appointment has been created!`,
-              }],
-              on: { CLICK: "#DM.Running"},
-            },
           },
+        },
+        Done: {
+          entry:[{
+            type: "Say",
+            params: `Your appointment has been created!`,
+          }],
+          on: { CLICK: "Main"},
+        },
+        NoResponse: {
+          entry:[{
+            type: "Say",
+            params: `Too much false input. The program is ended.`,
+          }],
+          on: { CLICK: "Main"},
         },
       },
     },
