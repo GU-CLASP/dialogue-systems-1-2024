@@ -94,11 +94,11 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
             on: { 
               RECOGNISED: 
                 [{
-                  guard: ({ event }) => event.nluValue.topIntent == "create a meeting",
+                  guard: ({ event }) => event.nluValue.topIntent === "create a meeting",
                   target: "#DM.WhichDate",    
                 },
                 {
-                  guard: ({ event }) => event.nluValue.topIntent == "who is adam lambert" || "who is Adam Lambert" ,
+                  guard: ({ event }) => event.nluValue.topIntent === "who is adam lambert" ,
                   target: "#DM.WhoisAdam",
                 },
                 "#DM.NoQVoice"
@@ -139,7 +139,7 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
                   [
                   {
                     //e.g. Adam Lambert is 42 years old
-                    guard: ({ event }) => event.nluValue.entities[0].text == "Monday" || "Tuesday" || "Wednesday" || "Thursday" || "Friday",
+                    guard: ({ event }) => event.nluValue.entities[0].text === "Monday" || "Tuesday" || "Wednesday" || "Thursday" || "Friday",
                     actions: [
                       ({ context, event }) => { context.weekdate = event.nluValue.entities[0].text},
                     ],
@@ -154,9 +154,9 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
       },
       /* Not received voice */
       NoWhichDateVoice: {
-        initial: "Novoice",
+        initial: "noWhichDateVoice",
         states: {
-          Novoice: {
+          noWhichDateVoice: {
             entry: [{type: "say", params:`I didn’t hear you`}],
             on: {            
               SPEAK_COMPLETE: "#DM.WhichDate"
@@ -182,7 +182,7 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
                   [
                   {
                     //e.g. Adam Lambert is 42 years old
-                    guard: ({ event }) => event.nluValue.entities[0].text == "departmental meeting" || "meeting" || "virtual meeting",
+                    guard: ({ event }) => event.nluValue.entities[0].text === "departmental meeting" || "meeting" || "virtual meeting",
                     actions: [
                       ({ context, event }) => { context.meeting_name = event.nluValue.entities[0].text},
                     ],
@@ -239,7 +239,7 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
                   [
                   {
                     //e.g. Adam Lambert is 42 years old
-                    guard: ({ event }) => event.nluValue.entities[0].text == "42 years old",
+                    guard: ({ event }) => event.nluValue.entities[0].text === "42 years old",
                     actions: [
                       ({ context, event }) => { context.age = event.nluValue.entities[0].text},
                     ],
@@ -282,7 +282,7 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
                   [
                   {
                     //e.g. Adam Lambert is born in Jan 29th
-                    guard: ({ event }) => event.nluValue.entities[0].text == "Jan 29th",
+                    guard: ({ event }) => event.nluValue.entities[0].text === "Jan 29th",
                     actions: [
                       ({ context, event }) => { context.birthday = event.nluValue.entities[0].text},
                     ],
@@ -320,51 +320,6 @@ Regarding improveingNLU coverage, I think I need to add more time datas and pers
         },
       },
 
-  
-
-    
-
-
-
-
-
-    //   WhichDate: {
-    //     initial: "Whichdate",
-    //     states: {
-    //       Whichdate: {
-    //         entry: [{type: "say", params:`On which day is your meeting?`}],
-    //         on: { SPEAK_COMPLETE: "Ask" },
-    //       },
-    //       Ask: {
-    //         entry: ({ context }) =>
-    //           context.ssRef.send({
-    //             type: "LISTEN",
-    //             value: { 
-    //               noInputTimeOut: 1000     
-    //             }
-    //           }),
-    //           on: { 
-    //             RECOGNISED: 
-    //               [
-    //               {
-    //                 guard: ({ event }) => isInDayGrammar(event.value[0].utterance) === true,
-    //                 actions: [
-    //                   ({ context, event }) => { context.date = getDate(event.value[0].utterance) },
-    //                 ],
-    //                 target: "#DM.Done",    
-    //               },
-    //               {
-    //                 guard: ({ event }) => isInDayGrammar(event.value[0].utterance) === false,
-    //                 target: "#DM.Done",
-    //               },
-    //               ],
-    //             ASR_NOINPUT:"#DM.NoDateVoice", 
-    //           },
-    //       },
-    //     },
-    //   },
-
-    
       Done: {
         on: {
           CLICK: "PromptAndAsk",
