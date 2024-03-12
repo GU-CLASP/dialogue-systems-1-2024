@@ -1,0 +1,38 @@
+<!--Reference to original performance: Iron Maiden, "Hallowed be thy name", performed 1982, uploaded Sept. 2006 by Shane Lentz, url: https://www.youtube.com/watch?v=7vP2hFFV57E&ab_channel=ShaneLentz Note: Deviated slightly from performance due to song vs recital medium (voice style, pronunciation in some places) -->
+<!--ID=B7267351-473F-409D-9765-754A8EBCDE05;Version=1|{"VoiceNameToIdMapItems":[{"Name":"Microsoft Server Speech Text to Speech Voice (en-US, GuyNeural)","ShortName":"en-US-GuyNeural","Locale":"en-US","Id":"e0638b39-fbd2-4497-a482-e2f65759412a","VoiceType":"StandardVoice"},{"Name":"Microsoft Server Speech Text to Speech Voice (en-US, AriaNeural)","ShortName":"en-US-AriaNeural","Locale":"en-US","Id":"27e2f1c8-cfe0-4324-88e2-cd0bafeffe1b","VoiceType":"StandardVoice"}]}-->
+<!--ID=5B95B1CC-2C7B-494F-B746-CF22A0E779B7;Version=1|{"Locales":{"en-US":{"AutoApplyCustomLexiconFiles":[{}]}}}-->
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" xml:lang="en-US"><voice name="en-US-GuyNeural"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">I'm waiting</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">in my cold cell</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural" commasilence-exact="500ms"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">when the bell, begins, to chime</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">Reflecting </prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">on my past life</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural" commasilence-exact="500ms"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">and it doesn't, have, much time</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">'Cause at five o'clock, they take me, to the gallows pole</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural" tailingsilence-exact="1s"><s /><mstts:express-as style="whispering"><prosody rate="-10.00%" volume="-10.00%">The sands of time, for me, are running low</prosody></mstts:express-as></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">When the priest comes to read me the last rites</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Take a look through the bars at the last sights</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Of a world that has gone very wrong for me</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Can it be that there's some sort of error?</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Hard to stop the surmounting terror</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Is it really the end, not some crazy dream?</prosody></mstts:express-as><s />
+<s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Somebody please tell me that I'm dreaming</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">It's not easy to stop from screaming</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">But words escape me, when I try to speak</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Tears fall, but why am I crying?</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">After all, I'm not afraid of dying</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Don't I believe that there never is an end?</prosody></mstts:express-as><s />
+<s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">As the guards march me out to the courtyard</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Somebody cries from a cell</prosody><mstts:ttsbreak strength="none" /></mstts:express-as></voice>
+<voice name="en-US-GuyNeural"><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+50.00%" contour="(81%, +79%)">"God be with you!"</prosody></mstts:express-as></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">If there's a God, why has He let me go?</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">As I walk, my life drifts before me</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">And though the end is near, I'm not sorry</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural" tailingsilence-exact="1s"><s /><mstts:express-as style="Default"><prosody rate="+30.00%" volume="+20.00%">Catch my soul, it's willing to fly away</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="hopeful"><prosody rate="+10.00%" volume="+20.00%">Mark my words, believe my soul lives on</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="hopeful"><prosody rate="+10.00%" volume="+20.00%">Don't worry now that I have gone</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="hopeful"><prosody rate="+10.00%" volume="+20.00%">I've gone beyond to seek the truth</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="hopeful"><prosody rate="+10.00%" volume="+20.00%">When you know that your time is close at hand</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural"><s /><mstts:express-as style="hopeful"><prosody rate="+10.00%" volume="+20.00%">Maybe then you'll begin to understand</prosody></mstts:express-as><s /></voice>
+<voice name="en-US-GuyNeural" leadingsilence="250ms"><s /><mstts:express-as style="hopeful"><prosody rate="+10.00%" volume="+20.00%">Life down here is just a strange illusion</prosody></mstts:express-as></voice></speak>
