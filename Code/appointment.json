@@ -23,6 +23,9 @@
             },
             {
                 "category": "Who is X"
+            },
+            {
+                "category": "help"
             }
         ],
         "entities": [
@@ -38,6 +41,32 @@
             {
                 "category": "day_time",
                 "compositionSetting": "combineComponents",
+                "list": {
+                    "sublists": [
+                        {
+                            "listKey": "time",
+                            "synonyms": [
+                                {
+                                    "language": "en-us",
+                                    "values": [
+                                        "10",
+                                        "11",
+                                        "12",
+                                        "1",
+                                        "2",
+                                        "3",
+                                        "4",
+                                        "5",
+                                        "6",
+                                        "7",
+                                        "8",
+                                        "9"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
                 "prebuilts": [
                     {
                         "category": "DateTime"
@@ -112,6 +141,62 @@
             }
         ],
         "utterances": [
+            {
+                "text": "What are you saying?",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Assist",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Can you help me?",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "What do you mean?",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I don't understand ",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "I need help",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Please help me",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
+            {
+                "text": "Help",
+                "language": "en-us",
+                "intent": "help",
+                "entities": [],
+                "dataset": "Train"
+            },
             {
                 "text": "Who is Tom Holland?",
                 "language": "en-us",
@@ -297,10 +382,16 @@
                 "dataset": "Train"
             },
             {
-                "text": "I would like a meeting ",
+                "text": "I would like a meeting at 10",
                 "language": "en-us",
                 "intent": "create a meeting",
-                "entities": [],
+                "entities": [
+                    {
+                        "category": "day_time",
+                        "offset": 26,
+                        "length": 2
+                    }
+                ],
                 "dataset": "Train"
             },
             {
