@@ -191,13 +191,20 @@ const dmMachine = setup({
             entry : [{
             type : "listen"
           }],
-          on : {
+          on : { ASR_NOINPUT : "CantHearPerson",
             RECOGNISED : {
                 actions : assign({ person : ({event}) => event.nluValue.entities[0].text }),
                 target : "DayQuestion"
             }
           }
         },
+        CantHearPerson : {
+          entry : [{
+              type : "say",
+              params : `I didn't hear you.`
+            }],
+            on : {SPEAK_COMPLETE : "Ask"},
+          },
         DayQuestion : {
           entry : [{
             type: "say",
@@ -209,13 +216,20 @@ const dmMachine = setup({
           entry : [{
             type : "listen"
           }],
-          on : {
+          on : { ASR_NOINPUT : "CantHearDay",
             RECOGNISED : {
                 actions : assign({ day : ({event}) => event.nluValue.entities[0].text }),
                 target : "WholeDay"
             }
           }
         },
+        CantHearDay : {
+          entry : [{
+              type : "say",
+              params : `I didn't hear you.`
+            }],
+            on : {SPEAK_COMPLETE : "DayQuestion"},
+          },
     WholeDay : {
       entry : [{
         type : "say",
@@ -227,7 +241,7 @@ const dmMachine = setup({
       entry : [{
         type: "listen"
       }],
-      on : {
+      on : { ASR_NOINPUT : "CantHearWholeDay",
         RECOGNISED : [
           {
          guard : ({event}) => event.nluValue.entities[0].category == "positive",
@@ -237,6 +251,13 @@ const dmMachine = setup({
         ],
       },
   },
+  CantHearWholeDay : {
+    entry : [{
+        type : "say",
+        params : `I didn't hear you.`
+      }],
+      on : {SPEAK_COMPLETE : "WholeDay"},
+    },
   CheckInfo : {
     entry : [{
       type: "say",
@@ -248,7 +269,7 @@ const dmMachine = setup({
     entry : [{
       type: "listen"
     }],
-    on : {
+    on : { ASR_NOINPUT : "CantHearCheck",
       RECOGNISED : [
         {
         guard : ({event}) => event.nluValue.entities[0].category == "positive",
@@ -258,6 +279,13 @@ const dmMachine = setup({
       ],
     },
   },
+  CantHearCheck : {
+    entry : [{
+        type : "say",
+        params : `I didn't hear you.`
+      }],
+      on : {SPEAK_COMPLETE : "CheckInfo"},
+    },
   AppointmentCreated : {
     entry : [{
       type : "say",
@@ -276,22 +304,50 @@ const dmMachine = setup({
     entry : [{
       type : "listen"
     }],
-    on : {
+    on : { ASR_NOINPUT : "CantHearTime",
         RECOGNISED : {
             actions : assign({ time : ({event}) => event.nluValue.entities[0].text || event.nluValue.utterance}),
             target : "CheckAllInfo"
         }
       }
     },
+    CantHearTime : {
+      entry : [{
+          type : "say",
+          params : `I didn't hear you.`
+        }],
+        on : {SPEAK_COMPLETE : "TimeQuestion"},
+      },
   CheckAllInfo : {
     entry : [{
       type: "say",
       params : ({context}) => `Do you want me to create an appointment with ${context.person} on ${context.day} at ${context.time}?`
     }],
-    on : {SPEAK_COMPLETE:"ListenCheckInfo"},
+    on : {SPEAK_COMPLETE:"ListenCheckAllInfo"},
+  },
+  ListenCheckAllInfo : {
+    entry : [{
+      type: "listen"
+    }],
+    on : { ASR_NOINPUT : "CantHearCheckAll",
+      RECOGNISED : [
+        {
+        guard : ({event}) => event.nluValue.entities[0].category == "positive",
+        target : "AppointmentCreated"
+      },
+      {target : "Ask"},
+      ],
+    },
+  },
+  CantHearCheckAll : {
+    entry : [{
+        type : "say",
+        params : `I didn't hear you.`
+      }],
+      on : {SPEAK_COMPLETE : "CheckAllInfo"},
   },
   },
-  },
+},
     Done: {
       on: {
         CLICK: "PromptAndAsk",
