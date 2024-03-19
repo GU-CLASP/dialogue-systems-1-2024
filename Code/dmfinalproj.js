@@ -25,36 +25,36 @@ const settings = {
     asrDefaultCompleteTimeout: 0,
     asrDefaultNoInputTimeout: 50000,
     locale: "en-US",
-    ttsDefaultVoice: "en-US-AvaNeural",
+    ttsDefaultVoice: "en-US-MichelleNeural", //"JANE,AVA,Monica"
 };
 
-const namespeople = ["Carmen", "Joe", "Victor", "Isabelle", "Sarah", "Anne", "Eric", "Maria", "Bernard", "Frank","Anita", "Sophie", "Hans", "Stephen"]; 
+const namespeople = ["Carmen", "Joe", "Victor", "Isabelle", "Sarah", "Anne", "Eric", "Maria", "Bernard", "Frank", "Anita", "Sophie", "Hans", "Stephen"];
 
 const persinfo = {
     "Carmen": {
-        "gender": ["woman", "female", "girl"],  
-        "hair": ["brown hair", "short hair", "hair short", "hair brown"], //it needs to be a pair in nlu and here otherwise it doesnt recognize it 
-        "accessories": "no",        
+        "gender": ["woman", "female", "girl"],
+        "hair": ["brown hair", "short hair", "hair short", "hair brown", "brunette"], //it needs to be a pair in nlu and here otherwise it doesnt recognize it 
+        "accessories": "no",
         "eyes": ["brown eyes", "eyes brown"],
-        "colorskin": ["dark skin", "brown skin", "skin brown", "skin dark"],
+        "colorskin": ["dark skin", "brown skin", "skin brown", "skin dark", "darker skin", "skin darker"],
         "beard": "no",
     },
 
     "Joe": {
         "gender": ["man", "male", "boy"],
-        "hair": ["blonde hair", "short hair", "hair short", "hair blonde"],
+        "hair": ["blonde hair", "short hair", "hair short", "hair blonde", "blonde"],
         "accessories": "no",
         "eyes": ["blue eyes", "eyes blue"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
     "Victor": {
         "gender": ["man", "boy", "male"],
-        "hair": ["white hair", "short hair","hair short", "hair white"],
+        "hair": ["white hair", "short hair", "hair short", "hair white"],
         "accessories": "no",
         "eyes": ["brown eyes", "eyes brown"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
@@ -62,17 +62,17 @@ const persinfo = {
         "gender": ["woman", "female", "girl"],
         "hair": ["red hair", "long hair", "hair long", "hair red"],
         "accessories": "no",
-        "eyes": ["brown eyes","eyes brown"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
     "Sarah": {
         "gender": ["woman", "female", "girl"],
-        "hair": ["blonde hair", "short hair", "hair short", "hair blonde"],
-        "accessories": ["hat", "glasses"],
-        "eyes": ["brown eyes", "eyes brown"], 
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "hair": ["blonde hair", "short hair", "hair short", "hair blonde", "blonde"],
+        "accessories": ["hat", "glasses", "earrings"],
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
@@ -80,80 +80,80 @@ const persinfo = {
         "gender": ["woman", "female", "girl"],
         "hair": ["white hair", "short hair", "hair short", "hair white"],
         "accessories": ["earrings", "glasses"],
-        "eyes": ["blue eyes","eyes blue"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "eyes": ["blue eyes", "eyes blue"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
     "Eric": {
         "gender": ["man", "boy", "male"],
-        "hair": ["blonde hair", "short hair", "hair short", "hair blonde"],
+        "hair": ["blonde hair", "short hair", "hair short", "hair blonde", "blonde"],
         "accessories": "hat",
-        "eyes": ["brown eyes","eyes brown"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
     "Maria": {
         "gender": ["woman", "female", "girl"],
-        "hair": ["brown hair", "short hair", "hair short", "hair brown"],
+        "hair": ["brown hair", "short hair", "hair short", "hair brown", "brunette"],
         "accessories": ["earrings", "hat"],
-        "eyes": ["brown eyes","eyes brown"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
     "Bernard": {
         "gender": ["man", "boy", "male"],
-        "hair": ["brown hair", "short hair", "hair short", "hair brown"],
+        "hair": ["brown hair", "short hair", "hair short", "hair brown", "brunet"],
         "accessories": "hat",
         "eyes": ["brown eyes", "eyes brown"],
-        "colorskin": ["dark skin", "brown skin", "skin brown", "skin dark"],
+        "colorskin": ["dark skin", "brown skin", "skin brown", "skin dark", "darker skin", "skin darker"],
         "beard": "no",
-        },
+    },
 
     "Frank": {
         "gender": ["man", "boy", "male"],
-        "hair": ["black hair", "short hair", "hair short", "hair black"],
+        "hair": ["black hair", "short hair", "hair short", "hair black", "brunet"],
         "accessories": "hat",
-        "eyes": ["brown eyes","eyes brown"],
-        "colorskin": ["white skin", "light skin", "skin white", "skin light"],
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["white skin", "light skin", "skin white", "skin light", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
     "Anita": {
         "gender": ["woman", "female", "girl"],
-        "hair": ["blonde hair", "short hair", "hair short", "hair blonde"],
+        "hair": ["blonde hair", "short hair", "hair short", "hair blonde", "blonde"],
         "accessories": "no",
-        "eyes": ["blue eyes","eyes blue"],
-        "colorskin": ["white skin", "light skin", "skin light", "skin white"],
+        "eyes": ["blue eyes", "eyes blue"],
+        "colorskin": ["white skin", "light skin", "skin light", "skin white", "lighter skin", "skin lighter"],
         "beard": "no",
     },
 
     "Sophie": {
         "gender": ["woman", "female", "girl"],
-        "hair": ["black hair", "long hair", "hair black", "hair long"],
+        "hair": ["black hair", "long hair", "hair black", "hair long", "brunette"],
         "accessories": "glasses",
-        "eyes": ["brown eyes","eyes brown"],
-        "colorskin": ["dark skin", "brown skin", "skin brown", "skin dark"],
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["dark skin", "brown skin", "skin brown", "skin dark", "darker skin", "skin darker"],
     },
 
 
     "Hans": {
         "gender": ["man", "boy", "male"],
-        "hair": ["blonde hair", "short hair","hair short", "hair blonde"],
+        "hair": ["blonde hair", "short hair", "hair short", "hair blonde", "blonde"],
         "accessories": "no",
-        "eyes": ["brown eyes","eyes brown"],
-        "colorskin": ["white skin", "light skin","skin white", "skin light"],
-        "beard": "mustache",
+        "eyes": ["brown eyes", "eyes brown"],
+        "colorskin": ["white skin", "light skin", "skin white", "skin light", "lighter skin", "skin lighter"],
+        "beard": ["mustache", "beard"],
     },
 
     "Stephen": {
         "gender": ["man", "boy", "male"],
         "hair": ["red hair", "short hair", "hair short", "hair red"],
         "accessories": "no",
-        "eyes": ["blue eyes","eyes blue"],
-        "colorskin": ["white skin", "light skin", "skin white", "skin light"],
-        "beard": "mustache",
+        "eyes": ["blue eyes", "eyes blue"],
+        "colorskin": ["white skin", "light skin", "skin white", "skin light", "lighter skin", "skin lighter"],
+        "beard": ["mustache", "beard"],
     },
 
 
@@ -249,16 +249,16 @@ const dmMachine = setup({
             entry: [
                 assign({
                     ssRef: ({ spawn }) => spawn(speechstate, { input: settings }),
-                   // choice: selectcharacter(namespeople),
+                    // choice: selectcharacter(namespeople),
                 }),
                 ({ context }) => context.ssRef.send({ type: "PREPARE" }),
             ],
             on: { ASRTTS_READY: "WaitToStart" },
         },
         WaitToStart: {
-    /*     after: {
-                "1000": "PromptAndAsk"
-            }, */ 
+            /*     after: {
+                        "1000": "PromptAndAsk"
+                    }, */
             on: {
                 CLICK: "PromptAndAsk"
             }
@@ -266,36 +266,35 @@ const dmMachine = setup({
         PromptAndAsk: {
             initial: "Prompt",
             states: {
-            
-            
-            /* {
-            initial: "Checkcharacterselection",
-            states: {
-                Checkcharacterselection: {
-                    always: [
-                        { guard: IsCharacterselected, target: "Prompt" },
 
-                        { target: "CharacterSelection" },
 
-                    ],
-                }, 
-
-                CharacterSelection: {
-                    entry: [
-                        assign({ choice: selectcharacter(namespeople) })
-                    ],
-                    on: {
-                        target: "Prompt",
-                    },
-                }, */
+                /* {
+                initial: "Checkcharacterselection",
+                states: {
+                    Checkcharacterselection: {
+                        always: [
+                            { guard: IsCharacterselected, target: "Prompt" },
+    
+                            { target: "CharacterSelection" },
+    
+                        ],
+                    }, 
+    
+                    CharacterSelection: {
+                        entry: [
+                            assign({ choice: selectcharacter(namespeople) })
+                        ],
+                        on: {
+                            target: "Prompt",
+                        },
+                    }, */
 
                 Prompt: {
                     entry: [chosenCharacter,
                         {
-                        type: "say",
-                        params: ` Let's start the guess who game. In this game I will be a person from the images that you see and you have to ask me things for my hair, my eyes, my colorskin or my accessories. 
-                            Do you want to start?`,
-                    }],
+                            type: "say",
+                            params: `Welcome to the guess who game. In this game I will be a person from the images that you see and you have to ask me yes or no questions for my gender, my hair, my eyes, my colorskin or my accessories, until you manage to find my character. Do you want to start?`,
+                        }],
 
                     on: { SPEAK_COMPLETE: "yesornostartgame" },
                 },
@@ -305,14 +304,22 @@ const dmMachine = setup({
                         type: "listen"
                     }],
                     on: {
-                        ASR_NOINPUT : //"Canthear1",
-                        [{guard: ({context}) => context.reprompt <= 1,
-                        target: "Canthear1",
-                        actions: ({context}) => context.reprompt++},
-                        {guard: ({context}) =>  context.reprompt >2,
-                        target: "#DM.Done"}],
-                        
+                        ASR_NOINPUT: //"Canthear1",
+                            [{
+                                guard: ({ context }) => context.reprompt <= 1,
+                                target: "Canthear1",
+                                actions: ({ context }) => context.reprompt++
+                            },
+                            {
+                                guard: ({ context }) => context.reprompt > 2,
+                                target: "#DM.Done"
+                            }],
+
                         RECOGNISED: [
+
+                            {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "DontunderstandYesNo"},
                             {
                                 guard: ({ event }) => IsPositive(event.nluValue.entities[0].category),
                                 target: "Startgame"
@@ -325,6 +332,13 @@ const dmMachine = setup({
                     },
                 },
 
+                DontunderstandYesNo: {
+                    entry: [{
+                        type: "say",
+                        params: `Sorry, I didnt understand you. Do you want to play?`,
+                    }],
+                    on: { SPEAK_COMPLETE: "yesornostartgame"}
+                },
 
                 Startgame: {
                     entry: [{
@@ -335,187 +349,263 @@ const dmMachine = setup({
                 },
 
 
-            QuestionsState: {
-                entry: [{
-                    type: "listen"
-                }],
-                on: {
-                    RECOGNISED: [
-                        //GUARD GENDER
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "gender" && chosenCharacter.gender.includes(event.nluValue.entities[0].text),//chosenCharacter["gender"] === event.nluValue.entities[0].text,//chosenCharacter.gender.includes(event.nluValue.entities[0].text), 
-                            actions: assign({ gender: ({ event }) => event.nluValue.entities[0].text }),
-                            target: "Positiveanswergender"
-                        },
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "gender" && not(chosenCharacter.gender.includes(event.nluValue.entities[0].text)),
-                        target: "Negativeanswergender" },
+                QuestionsState: {
+                    entry: [{
+                        type: "listen"
+                    }],
+                    on: {
+                        ASR_NOINPUT: //"Canthear2",
+                            [{
+                                guard: ({ context }) => context.reprompt <= 1,
+                                target: "Canthear2",
+                                actions: ({ context }) => context.reprompt++
+                            },
+                            {
+                                guard: ({ context }) => context.reprompt > 2,
+                                target: "#DM.Done"
+                            }],
 
-                        //  THIS JUST CHECKS THE FIRST GUARD AND DOESNT CHECK THE OTHER ONES
-                        /* {guard: ({ event }) => chosenCharacter.gender.includes(event.nluValue.entities[0].text),//chosenCharacter["gender"] === event.nluValue.entities[0].text,//chosenCharacter.gender.includes(event.nluValue.entities[0].text), 
-                            actions: assign({ gender: ({ event }) => event.nluValue.entities[0].text }),
-                            target: "Positiveanswer"
-                        },
-                        {guard: ({ event }) => not(chosenCharacter.gender.includes(event.nluValue.entities[0].text)),
-                        target: "Negativeanswer" }, */
 
-                        //GUARD HAIR
-                        {guard: ({ event }) =>  event.nluValue.entities[0].category === "hair" && chosenCharacter.hair.includes(event.nluValue.entities[0].text), //includes in order to access the array 
+                        RECOGNISED: [
+
+                            //GUARD DONTUNDERSTAND 
+                            {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand"},
+
+                            //GUARD GENDER
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "gender" && chosenCharacter.gender.includes(event.nluValue.entities[0].text),//chosenCharacter["gender"] === event.nluValue.entities[0].text,//chosenCharacter.gender.includes(event.nluValue.entities[0].text), 
+                                actions: assign({ gender: ({ event }) => event.nluValue.entities[0].text }),
+                                target: "Positiveanswergender"
+                            },
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "gender" && not(chosenCharacter.gender.includes(event.nluValue.entities[0].text)),
+                                target: "Negativeanswergender"
+                            },
+
+                            //  THIS JUST CHECKS THE FIRST GUARD AND DOESNT CHECK THE OTHER ONES
+                            /* {guard: ({ event }) => chosenCharacter.gender.includes(event.nluValue.entities[0].text),//chosenCharacter["gender"] === event.nluValue.entities[0].text,//chosenCharacter.gender.includes(event.nluValue.entities[0].text), 
+                                actions: assign({ gender: ({ event }) => event.nluValue.entities[0].text }),
+                                target: "Positiveanswer"
+                            },
+                            {guard: ({ event }) => not(chosenCharacter.gender.includes(event.nluValue.entities[0].text)),
+                            target: "Negativeanswer" }, */
+
+                            //GUARD HAIR
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "hair" && chosenCharacter.hair.includes(event.nluValue.entities[0].text), //includes in order to access the array 
                                 //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
                                 actions: assign({ hair: ({ event }) => event.nluValue.entities[0].text }),
                                 target: "Positiveanswerhair"
                             },
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "hair" && not(chosenCharacter.hair.includes(event.nluValue.entities[0].text)), target: "Negativeanswerhair" },
-                        
-                        //GUARD ACCESSORIES
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "accessories" && chosenCharacter.accessories.includes(event.nluValue.entities[0].text), //includes in order to access the array 
-                            //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
-                            actions: assign({ accessories: ({ event }) => event.nluValue.entities[0].text }),
-                            target: "Positiveansweraccessories"
-                        },
+                            { guard: ({ event }) => event.nluValue.entities[0].category === "hair" && not(chosenCharacter.hair.includes(event.nluValue.entities[0].text)), target: "Negativeanswerhair" },
 
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "accessories" && not(chosenCharacter.accessories.includes(event.nluValue.entities[0].text)),
-                        target: "Negativeansweraccessories" },
+                            //GUARD ACCESSORIES
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "accessories" && chosenCharacter.accessories.includes(event.nluValue.entities[0].text), //includes in order to access the array 
+                                //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
+                                actions: assign({ accessories: ({ event }) => event.nluValue.entities[0].text }),
+                                target: "Positiveansweraccessories"
+                            },
 
-                        //GUARD EYES
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "eyes" && chosenCharacter.eyes.includes(event.nluValue.entities[0].text), //includes in order to access the array 
-                            //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
-                            actions: assign({ eyes: ({ event }) => event.nluValue.entities[0].text }),
-                            target: "Positiveanswereyes"
-                        },
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "accessories" && not(chosenCharacter.accessories.includes(event.nluValue.entities[0].text)),
+                                target: "Negativeansweraccessories"
+                            },
 
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "eyes" && not(chosenCharacter.eyes.includes(event.nluValue.entities[0].text)),
-                        target: "Negativeanswereyes" },
+                            //GUARD EYES
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "eyes" && chosenCharacter.eyes.includes(event.nluValue.entities[0].text), //includes in order to access the array 
+                                //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
+                                actions: assign({ eyes: ({ event }) => event.nluValue.entities[0].text }),
+                                target: "Positiveanswereyes"
+                            },
 
-
-                        // GUARD ACCESSORIES
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "beard" && chosenCharacter.beard.includes(event.nluValue.entities[0].text), //includes in order to access the array 
-                            //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
-                            actions: assign({ beard: ({ event }) => event.nluValue.entities[0].text }),
-                            target: "Positiveanswerbeard"
-                        },
-
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "beard" && not(chosenCharacter.beard.includes(event.nluValue.entities[0].text)),
-                        target: "Negativeanswerbeard" },
-                        //{action: [{type: "say", params: `no, this is not my gender`}],}, //this doesnt work  its like it works randomly  
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "eyes" && not(chosenCharacter.eyes.includes(event.nluValue.entities[0].text)),
+                                target: "Negativeanswereyes"
+                            },
 
 
-                        // GUARD COLORSKIN
-                        {guard: ({ event }) => event.nluValue.entities[0].category === "colorskin" && chosenCharacter.colorskin.includes(event.nluValue.entities[0].text), //includes in order to access the array 
-                            //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
-                            actions: assign({ colorskin: ({ event }) => event.nluValue.entities[0].text }),
-                            target: "Positiveanswercolorskin"
-                        },
+                            // GUARD ACCESSORIES
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "beard" && chosenCharacter.beard.includes(event.nluValue.entities[0].text), //includes in order to access the array 
+                                //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
+                                actions: assign({ beard: ({ event }) => event.nluValue.entities[0].text }),
+                                target: "Positiveanswerbeard"
+                            },
 
-                    {guard: ({ event }) => event.nluValue.entities[0].category === "colorskin" && not(chosenCharacter.colorskin.includes(event.nluValue.entities[0].text)),
-                        target: "Negativeanswercolorskin" },
-
-                    {guard: ({ event }) => event.nluValue.entities[0].text.includes(choice),
-                            target: "foundcharacter"},
-
-                    {guard: ({ event }) => not(event.nluValue.entities[0].text.includes(choice)),
-                            target: "notfoundcharacter"},
-
-                    ],
-
-            },
-        },
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "beard" && not(chosenCharacter.beard.includes(event.nluValue.entities[0].text)),
+                                target: "Negativeanswerbeard"
+                            },
+                            //{action: [{type: "say", params: `no, this is not my gender`}],}, //this doesnt work  its like it works randomly  
 
 
+                            // GUARD COLORSKIN
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "colorskin" && chosenCharacter.colorskin.includes(event.nluValue.entities[0].text), //includes in order to access the array 
+                                //{guard: ({event}) => chosenCharacter.accessories === event.nluValue.entities[0].text,
+                                actions: assign({ colorskin: ({ event }) => event.nluValue.entities[0].text }),
+                                target: "Positiveanswercolorskin"
+                            },
 
-        Canthear1 : {
-            entry: ({context}) =>
-            context.ssRef.send({
-                type: "SPEAK",
-                value: {
-                    utterance: randomRepeat(dearClient),
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "colorskin" && not(chosenCharacter.colorskin.includes(event.nluValue.entities[0].text)),
+                                target: "Negativeanswercolorskin"
+                            },
+
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "namespeople" && event.nluValue.entities[0].text.includes(choice),
+                                target: "foundcharacter"
+                            },
+
+                            {
+                                guard: ({ event }) => event.nluValue.entities[0].category === "namespeople" && not(event.nluValue.entities[0].text.includes(choice)),
+                                target: "notfoundcharacter"
+                            },
+
+                            {guard:({event}) => event.value.entities.length === 0 , target : "Dontunderstand"},  
+                            //{target: "Dontunderstand"}, 
+                            /* {
+                                guard: ({ event }) => event.nluValue.topIntent === "question" && entityarray.lentgh === 0,
+                                target: "Dontunderstand"
+                            }, */
+
+                        ],
+
+                    },
                 },
-            }),
-            on: {
-                SPEAK_COMPLETE: "#DM.PromptAndAsk.Prompt",
-            },
-        
-        },
-
-        foundcharacter: {
-            entry: [{
-                type: "say",
-                params: `Yes, you found me`,
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
 
 
-    notfoundcharacter: {
-        entry: [{
-            type: "say",
-            params: `No, this is not me`,
-        }],
-        on: { SPEAK_COMPLETE: "QuestionsState" },
-
-    },
-
-
-
-        Positiveanswercolorskin:{
-            entry: [{
-                type: "say",
-                params: ({ context }) => {
-                    const colorskin = context.colorskin;
-                    return `Yes, I have ${colorskin}`;
+                Dontunderstand: {
+                    entry: [{
+                        type: "say",
+                        params: `I am sorry but I don't understand you. Please ask me something else`,
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
                 },
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
 
-        Negativeanswercolorskin:{
-            entry: [{
-                type: "say",
-                params: `No, this is not my colorskin`,
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
+                Canthear1: {
+                    entry: ({ context }) =>
+                        context.ssRef.send({
+                            type: "SPEAK",
+                            value: {
+                                utterance: randomRepeat(dearClient),
+                            },
+                        }),
+                    on: {
+                        SPEAK_COMPLETE: "yesornostartgame",
+                    },
 
-
-
-
-        Positiveanswerbeard:{
-            entry: [{
-                type: "say",
-                params: ({ context }) => {
-                    const beard = context.beard;
-                    return `Yes, I have ${beard}`;
                 },
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
 
+                Canthear2: {
+                    entry: ({ context }) =>
+                        context.ssRef.send({
+                            type: "SPEAK",
+                            value: {
+                                utterance: randomRepeat(dearClient),
+                            },
+                        }),
+                    on: {
+                        SPEAK_COMPLETE: "QuestionsState",
+                    },
 
-        Negativeanswerbeard:{
-            entry: [{
-                type: "say",
-                params: `No, I do not have mustache`,
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
-
-
-        Positiveanswereyes:{
-            entry: [{
-                type: "say",
-                params: ({ context }) => {
-                    const eyes = context.eyes;
-                    return `Yes, I have ${eyes}`;
                 },
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
 
-        Negativeanswereyes: {
-            entry: [{
-                type: "say",
-                params: `No, this is not the color of my eyes`,
-            }],
-            on: { SPEAK_COMPLETE: "QuestionsState" },
-        },
+
+                foundcharacter: {
+                    entry: [{
+                        type: "say",
+                        params: `Yes, you found me`,
+                    }],
+                    on: { SPEAK_COMPLETE: "Endgame" },
+
+                },
+
+                Endgame: {
+                    entry: [{
+                        type: "say",
+                        params: `Thank you for playing the guess who game`,
+                    }],
+                    on: { SPEAK_COMPLETE: "#DM.Done" },
+                },
+
+
+                notfoundcharacter: {
+                    entry: [{
+                        type: "say",
+                        params: `No, this is not me`,
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+
+                },
+
+
+
+                Positiveanswercolorskin: {
+                    entry: [{
+                        type: "say",
+                        params: ({ context }) => {
+                            const colorskin = context.colorskin;
+                            return `Yes, I have ${colorskin}`;
+                        },
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+                },
+
+                Negativeanswercolorskin: {
+                    entry: [{
+                        type: "say",
+                        params: `No, this is not my colorskin`,
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+                },
+
+
+
+
+                Positiveanswerbeard: {
+                    entry: [{
+                        type: "say",
+                        params: ({ context }) => {
+                            const beard = context.beard;
+                            return `Yes, I have ${beard}`;
+                        },
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+                },
+
+
+                Negativeanswerbeard: {
+                    entry: [{
+                        type: "say",
+                        params: `No, I don't`,
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+                },
+
+
+                Positiveanswereyes: {
+                    entry: [{
+                        type: "say",
+                        params: ({ context }) => {
+                            const eyes = context.eyes;
+                            return `Yes, I have ${eyes}`;
+                        },
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+                },
+
+                Negativeanswereyes: {
+                    entry: [{
+                        type: "say",
+                        params: `No, this is not the color of my eyes`,
+                    }],
+                    on: { SPEAK_COMPLETE: "QuestionsState" },
+                },
 
 
 
@@ -538,10 +628,7 @@ const dmMachine = setup({
                 Positiveanswerhair: {
                     entry: [{
                         type: "say",
-                        params: ({ context }) => {
-                            const hair = context.hair;
-                            return `Yes, I have ${hair}`;
-                        },
+                        params: `Yes, that's my hair`,
                     }],
                     on: { SPEAK_COMPLETE: "QuestionsState" },
                 },
@@ -550,10 +637,10 @@ const dmMachine = setup({
                 Negativeanswerhair: {
                     entry: [{
                         type: "say",
-                        params: ({ context }) => {
-                            const hair = context.hair;          //i want to return the nluvalueentity so it says no i dont have brown hair 
-                            return `No, I do not have ${hair}`;
-                        },
+                        params: `No, that's not my hair`,
+                                      //i want to return the nluvalueentity so it says no i dont have brown hair 
+                        
+                        
                     }],
                     on: { SPEAK_COMPLETE: "QuestionsState" },
                 },
@@ -570,7 +657,7 @@ const dmMachine = setup({
                     }],
                     on: { SPEAK_COMPLETE: "QuestionsState" },
                 },
-        
+
 
                 Negativeansweraccessories: {
                     entry: [{
@@ -597,13 +684,17 @@ const dmMachine = setup({
 
 
 
-        },},
+            },
+        },
 
-                Done:{
-                    on:{
-                    CLICK : "PromptAndAsk"}},
+        Done: {
+            on: {
+                CLICK: "PromptAndAsk"
+            }
+        },
 
-},});
+    },
+});
 
 
 
@@ -616,9 +707,10 @@ dmActor.subscribe((state) => {
 });
 
 export function setupButton(element) {
-element.addEventListener("click", () => {
-    dmActor.send({ type: "CLICK" });
-})}; 
+    element.addEventListener("click", () => {
+        dmActor.send({ type: "CLICK" });
+    })
+};
 
 /* export function setupHelp(element, dmActor) {
     element.addEventListener("click", () => {
@@ -713,18 +805,18 @@ export function setupSelect(element) {
     image16Button.addEventListener("click", () => {
         image16Button.style.display = "none";
     });
-/*  image17Button.addEventListener("click", () => {
-        image17Button.style.display = "none";
-    });
-    image18Button.addEventListener("click", () => {
-        image18Button.style.display = "none";
-    }); */
+    /*  image17Button.addEventListener("click", () => {
+            image17Button.style.display = "none";
+        });
+        image18Button.addEventListener("click", () => {
+            image18Button.style.display = "none";
+        }); */
     image19Button.addEventListener("click", () => {
         image19Button.style.display = "none";
     });
-/*  image20Button.addEventListener("click", () => {
-        image20Button.style.display = "none";
-    }); */
+    /*  image20Button.addEventListener("click", () => {
+            image20Button.style.display = "none";
+        }); */
     image21Button.addEventListener("click", () => {
         image21Button.style.display = "none";
     });

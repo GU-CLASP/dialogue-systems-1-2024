@@ -34,11 +34,12 @@ a:hover {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  font-family: 'Arial', sans-serif;
 }
 
 /* i am trying to add a background behind so its not white but i cannot  */
 body {
-  background-image: url('../Code/backgroung guess.png');
+  background-image: url('../Code/guesswho finalbackground.png');
   background-size: 100% 100%;
 
   /* background-size: 100% 100%; */
@@ -96,7 +97,7 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #b5ba62 /* this is the color for guess who game */;
+    color: #d2dc76/* #b5ba62 */ /* this is the color for guess who game */;
     background-color: #ffffff ;
   }
   a:hover {
@@ -104,7 +105,7 @@ button:focus-visible {
 
   }
   button {
-    background-color: #b5ba62 /* this is the color for the button start */;
+    background-color: #d2dc76 /* this is the color for the button start */;
   }
   .start-button {
     background-color: #f0eaea

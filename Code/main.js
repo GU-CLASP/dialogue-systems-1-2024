@@ -1,5 +1,5 @@
 import "./style.css";
-import { setupButton } from "./dm3.js";
+import {/* setupHelp */ setupButton, setupSelect } from "./dmfinalproj.js";                                    //i can import here setupselect
 
 document.querySelector("#app").innerHTML = `
   <div>
@@ -8,5 +8,8 @@ document.querySelector("#app").innerHTML = `
     </div>
   </div>
 `;
-
+setupSelect(document.querySelector("#select"));
 setupButton(document.querySelector("#counter"));
+/* const helpButton = document.getElementById("helpButton")
+setupHelp(helpButton); */
+
