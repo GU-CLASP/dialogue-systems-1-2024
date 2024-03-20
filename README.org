@@ -10,3 +10,15 @@ Practice:
 - [[Labs/lab3.org][Lab III]]
 - [[Labs/lab4.org][Lab IV]]
 - [[Labs/lab5.org][Lab V]]
+
+  
+* How to deploy your app
+
+1. Use SSH to login to eduserv.
+2. Create a folder in =/srv/www/= with the same name as your gus-account, e.g. =gusxxxxxx=.
+3. Build your app: =yarn build --base=gusxxxxxx=, this will produce a =dist= directory with a few files in it. (More information can be found in [[https://vitejs.dev/guide/build.html][Vite documentation]]).
+4. Copy the contents of this directory to your folder on the server:
+   #+begin_src sh
+   scp -r dist/* eduserv:/srv/www/gusxxxxxx/
+   #+end_src
+5. Access your app at https://eduserv.flov.gu.se:9000/gusxxxxxx (protected by password).
