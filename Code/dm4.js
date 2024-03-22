@@ -110,25 +110,75 @@ const dmMachine = setup({
     },
     Running: {
       initial: "Main",
-      on: { ASR_NOINPUT : ".NoInput"},
+      on: { ASR_NOINPUT : ".NoInput", RESTART: ".Main.Reprompt"},
       states: {
         NoInput : {
           entry: ({
             type: "Say",
-            params: `Are you there?`,
+            params: `Are you there? `,
             }),
-          on: { SPEAK_COMPLETE: "Main" },
+          on: { 
+            SPEAK_COMPLETE: {
+              actions:[ 
+                ({ context }) =>
+                context.ssRef.send({
+                  type: "LISTEN", value:{ nlu:true, completeTimeout: 5}
+                }),
+              ],
+              target: "HandleNoInput" 
+            }
+          },
+        },
+        HandleNoInput:{
+          on:{
+            RECOGNISED: [
+              {
+                guard: ({ event }) => 
+                  {const recognizedUtterance = event.nluValue;
+                    console.log(recognizedUtterance);
+                  return ( recognizedUtterance.topIntent === 'positive response');
+                  },
+                actions:[ 
+                  {type:"Say", 
+                  params:`Ok, let's do it again.`},
+                  ({})=> {dmActor.send({type:"RESTART"})}
+                ],
+              },
+              {
+                guard: ({ event }) => 
+                {const recognizedUtterance = event.nluValue;
+                  console.log(recognizedUtterance);
+                return ( recognizedUtterance.topIntent === 'negative response');
+                },
+              actions:[ 
+                {type:"Say", 
+                  params:`The program is ended.`}
+              ],
+              target:"#DM.Running.Main.Done",
+              },
+            ],
+          },
         },
         Main: {
-          initial: "hist",
+          initial: "Prompt",
           states: {
-            hist: { type: "history", history: "deep", target: "Prompt"},
+            // hist: { type: "history", history: "deep", target: "Prompt"},
             Prompt: {
               entry: [{
                 type: "Say",
-                params: `Hi!`,
+                params: `Hi! You may ask me to make an appointment or ask me about a famous person like "Who is Taylor Swift".`,
               }],
               on: { SPEAK_COMPLETE: "FirstListen" },
+            },
+            Reprompt:{
+              on: { 
+                SPEAK_COMPLETE: {
+                  actions: {
+                    type: "Say",
+                    params: `You may ask me to make an appointment or ask me about a famous person like "Who is Taylor Swift".`,},
+                  target:"FirstListen",
+                } ,
+              },
             },
             FirstListen: {
               entry: ({ context }) =>
@@ -146,6 +196,28 @@ const dmMachine = setup({
                     );
                     },
                   },
+                  {
+                    target: "#DM.Running.Main.Done",
+                    guard: ({ event }) => {    
+                      const entities = event.nluValue && event.nluValue.entities;
+                      if (entities && entities.length > 0) {
+                        const recognizedName = entities[0].text;
+                        const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
+                        return event.nluValue.topIntent === "who is X" && targetEntityKey;
+                      } else {
+                        return false; // Return false if entities or entities[0] is undefined
+                      }
+                    },
+                    actions: [
+                      ({ context,event }) => 
+                      {const recognizedName = event.nluValue.entities[0].text;
+                      const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
+                    context.ssRef.send({
+                      type: "SPEAK",
+                      value: {
+                        utterance: ` ${recognizedName} is ${grammar[targetEntityKey].intro}`},})},
+                  ],
+                    },
                   {actions: ({ context, event }) =>
                   context.ssRef.send({
                     type: "SPEAK",
@@ -163,7 +235,7 @@ const dmMachine = setup({
             FirstQuestion: {
               entry: [{
                 type: "Say",
-                params: `I see you want to make an appointment. Now you may ask me about a famous person.`,
+                params: `I see you want to make an appointment. Who are you meeting with?`,
               }], 
               on: { SPEAK_COMPLETE: "SecondListen" },
             },
@@ -176,28 +248,22 @@ const dmMachine = setup({
                 RECOGNISED: [{
                   target: "SecondQuestion",
                   guard: ({ event }) => 
-                    {const recognizedName = event.nluValue.entities[0].text;
-                    const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
+                    {const recognizedname = event.value[0].utterance;
                     return (
-                      event.nluValue.topIntent === "who is X" && targetEntityKey
+                      !!getPerson(recognizedname)
                     );
                     },
                   actions: [
-                    ({ context,event }) => 
-                    {const recognizedName = event.nluValue.entities[0].text;
-                    const targetEntityKey = Object.keys(grammar).find(key => grammar[key].person === recognizedName);
-                  context.ssRef.send({
-                    type: "SPEAK",
-                    value: {
-                      utterance: ` ${recognizedName} is ${grammar[targetEntityKey].intro}`},})},
-                ],
+                    assign({ person: ({event}) => getPerson(event.value[0].utterance) }),
+                    ({event}) => console.log( getPerson(event.value[0].utterance ))
+                  ],
                   },
                   {actions: ({ context, event }) =>
                   context.ssRef.send({
                     type: "SPEAK",
                     value: {
                       utterance: `You just said: ${
-                        Object.keys(grammar).find(key => grammar[key].person === event.nluValue)
+                        event.value[0].utterance
                       }. And it is not a name in the grammar, please try again with a name.`,
                     },
                   }),
