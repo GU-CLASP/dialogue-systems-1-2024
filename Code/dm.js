@@ -138,6 +138,9 @@ const dmMachine = setup({
           },
 
           Listenwithwhom: {
+            after: {
+              "1000": "#DM.PromptAndAsk.Prompt"
+            },
             entry: ({ context }) =>
               context.ssRef.send({
                 type: "LISTEN",
@@ -186,6 +189,9 @@ const dmMachine = setup({
             on: { SPEAK_COMPLETE: "ListenTheday" },
           },
           ListenTheday: {
+            after: {
+              "1000": "#DM.PromptAndAsk.Prompt"
+            },
             entry: ({ context }) =>
               context.ssRef.send({
                 type: "LISTEN",
@@ -216,6 +222,9 @@ const dmMachine = setup({
               },
 
               ListenThewholeday:{
+                after: {
+                  "1000": "#DM.PromptAndAsk.Prompt"
+                },
               entry: ({ context }) =>
               context.ssRef.send({
                 type: "LISTEN",
@@ -256,6 +265,9 @@ const dmMachine = setup({
           },
 
           ListenTheTime: {
+            after: {
+              "1000": "#DM.PromptAndAsk.Prompt"
+            },
             entry: ({ context }) =>
               context.ssRef.send({
                 type: "LISTEN",
@@ -298,6 +310,9 @@ const dmMachine = setup({
             on: {SPEAK_COMPLETE: "NegPosVerif"},
           },
         NegPosVerif: {
+          after: {
+            "1000": "#DM.PromptAndAsk.Prompt"
+          },
           entry: ({ context }) =>
           context.ssRef.send({
             type: "LISTEN",
