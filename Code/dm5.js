@@ -149,6 +149,10 @@ const dmMachine = setup({
               target: "#DM.Done"}],
 
             RECOGNISED: [
+              {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand1"},
+
             {guard: ({event}) => event.nluValue.topIntent === "create a meeting" && confidencethreshold(event.nluValue.intents[0].confidenceScore),
             target: "#DM.PromptAndAsk.Askwithwhom"},
             {guard:({event}) => event.nluValue.topIntent === "create a meeting" && not(confidencethreshold(event.nluValue.intents[0].confidenceScore)),
@@ -169,11 +173,18 @@ const dmMachine = setup({
           actions : [{type: "say", params: `We can provide you two things, we can create an appointment for you or give you information for a celebrity`}], 
           target: "#DM.PromptAndAsk.Prompt"},
 
-          {target: "Dontunderstand"},
       ],
       
       },
     },
+
+    Dontunderstand1: {
+      entry: [{
+          type: "say",
+          params: `I am sorry but I don't understand you. Please tell me something else`,
+      }],
+      on: { SPEAK_COMPLETE: "intentchoice" },
+  },
 
 //if we dont have high confidence score we go to the state ensure person for the who is  x state.
 
@@ -199,6 +210,8 @@ Ensureperson:{
 
 },
 
+
+
 //if we dont have high confidence score we go to the state ensure meeting for the creating a meeting. 
     EnsureMeeting:{
         entry: [{
@@ -221,6 +234,10 @@ Ensureperson:{
           target: "#DM.Done"}],
 
         RECOGNISED: [
+          {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand2"},
+
             {guard: ({event}) => IsPositive(event.nluValue.entities[0].category),
             target: "#DM.PromptAndAsk.Askwithwhom"},
             {guard: ({event}) => IsNegative(event.nluValue.entities[0].category),
@@ -229,10 +246,18 @@ Ensureperson:{
             actions: [{type: "say", params: `You have to be sure that you want to create a meeting.`}], 
             target: "EnsureMeeting"
         },
-           {target: "Dontunderstand"}, 
-         ],
+        
+        ],
         },
     },
+
+    Dontunderstand2: {
+      entry: [{
+          type: "say",
+          params: `I am sorry but I don't understand you. Please tell me something else`,
+      }],
+      on: { SPEAK_COMPLETE: "PosNegAnswer" },
+  },
 
     Canthear1meeting : {
         entry: ({context}) =>
@@ -251,7 +276,7 @@ Ensureperson:{
 //whoisX STATE
 
     AskforwhoisX : {
-        entry: [{type: "say", params: `Do you want informations for a celebrity`}],
+        entry: [{type: "say", params: `Do you want information for a celebrity`}],
         on: {SPEAK_COMPLETE: "LearnWho"}
     },
 
@@ -266,6 +291,10 @@ Ensureperson:{
           {guard: ({context}) =>  context.reprompt >2,
           target: "#DM.Done"}],
           RECOGNISED: [
+            {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand3"},
+
             {guard: ({event}) => IsPositive(event.nluValue.entities[0].category) && isInGrammar(event.nluValue.entities[0].text),
             target: "Celebrityinfo"},
             {guard: ({event}) => IsPositive(event.nluValue.entities[0].category) && not(isInGrammar(event.nluValue.entities[0].text)),
@@ -275,11 +304,18 @@ Ensureperson:{
             {guard: ({event}) => helpint(event.nluValue.topIntent),
             actions: [{type: "say", params: `If you want information for a celebrity you have to say yes and the name of the celebrity, otherwise you should say no`}],
             target: "AskforwhoisX"
-        },
-           {target: "Dontunderstand"}, 
-         ],
+        }, 
+        ],
 
     }, },
+
+    Dontunderstand3: {
+      entry: [{
+          type: "say",
+          params: `I am sorry but I don't understand you. Please tell me something else`,
+      }],
+      on: { SPEAK_COMPLETE: "LearnWho" },
+  },
 
     Canthear2celebrity: {
         entry: ({context}) =>
@@ -304,13 +340,7 @@ Ensureperson:{
 
 },  
 
-        Dontunderstand:{
-          entry: [{
-            type: "say",
-            params: `I don't understand you. Please ask me something else`,
-          }],                     
-          on: { SPEAK_COMPLETE: "intentchoice" },
-        },
+    
 
         Celebrityinfo: {
           entry: [{
@@ -345,6 +375,10 @@ Ensureperson:{
               {guard: ({context}) =>  context.reprompt >2,
               target: "#DM.Done"}],
               RECOGNISED: [
+                {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand4"},
+
                 {guard: ({event}) => event.nluValue.entities[0].length> 0,
                 actions: assign({name: ({event}) => event.nluValue.entities[0].text
                 }),
@@ -353,12 +387,20 @@ Ensureperson:{
                 actions: [{type: "say", params: `You have to inform us about the name of the person you are going to meet with`}],
                 target: "#DM.PromptAndAsk.Askwithwhom"
             },
-               {target: "Dontunderstand"}, 
-             ],
+          
+            ],
     
         }, },
+
         
-         
+        Dontunderstand4:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please ask me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "Listenwithwhom" },
+        },
+        
             Canthear3withwhom : {
               entry: ({context}) =>
               context.ssRef.send({
@@ -398,6 +440,10 @@ Ensureperson:{
               {guard: ({context}) =>  context.reprompt >2,
               target: "#DM.Done"}],
               RECOGNISED: [
+                {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand5"},
+
                 {guard: ({event}) => event.nluValue.entities[0].length> 0,
                 actions: assign({day: ({event}) => event.nluValue.entities[0].text
                 }),
@@ -406,10 +452,18 @@ Ensureperson:{
                 actions: [{type: "say", params: `If you want to to create a meeting continue with the day of the meeting`}],
                 target: "Asktheday"
             },
-               {target: "Dontunderstand"}, 
-             ],
+        
+            ],
     
         }, },
+
+        Dontunderstand5:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please ask me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "Listentheday" },
+        },
 
 
 
@@ -450,6 +504,10 @@ Ensureperson:{
               {guard: ({context}) =>  context.reprompt >2,
               target: "#DM.Done"}],
               RECOGNISED: [
+                {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                target: "Dontunderstand6"},
+
                 {guard: ({event}) => IsPositive(event.nluValue.entities[0].category),
                 target: "Verifyappointment2"},
                 {guard: ({event}) => IsNegative(event.nluValue.entities[0].category),
@@ -458,10 +516,18 @@ Ensureperson:{
                 actions: [{type: "say", params: `You have to tell us if your appointment will last for the whole day. If no, you have to continue for the specific time`}],
                 target: "Askwholeday"
             },
-               {target: "Dontunderstand"}, 
-             ],
+              
+            ],
     
         }, },
+
+        Dontunderstand6:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please ask me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "ListenThewholeday" },
+        },
             
 
       Canthear5wholeday : {
@@ -502,6 +568,10 @@ Ensureperson:{
               {guard: ({context}) =>  context.reprompt >2,
               target: "#DM.Done"}],
               RECOGNISED: [
+                {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand7"},
+
                 {guard: ({event}) => event.nluValue.entities[0].length> 0,
                 actions: assign({time: ({event}) => event.nluValue.entities[0].text || event.nluValue.utterance
                 }),
@@ -510,10 +580,19 @@ Ensureperson:{
                 actions: [{type: "say", params: `You have to define the specific time of your meeting.`}],
                 target: "AskTheTime"
             },
-               {target: "Dontunderstand"}, 
-             ],
+              
+            ],
     
         }, },
+
+
+        Dontunderstand7:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please ask me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "ListenTheTime" },
+        },
 
     
       
@@ -552,6 +631,10 @@ Ensureperson:{
               {guard: ({context}) =>  context.reprompt >2,
               target: "#DM.Done"}],
               RECOGNISED: [
+                {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                target: "Dontunderstand8"},
+
                 {guard: ({event}) => IsPositive(event.nluValue.entities[0].category),
                 target: "CreateAppointment"},
                 {guard: ({event}) => IsNegative(event.nluValue.entities[0].category),
@@ -560,10 +643,18 @@ Ensureperson:{
                 actions: [{type: "say", params: `You have to say yes or no so you agree or diasagree with the verification of your appointment.`}],
                 target: "Verifyappointment1"
             },
-               {target: "Dontunderstand"}, 
-             ],
+          
+            ],
     
         }, },
+
+        Dontunderstand8:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please tell me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "NegPosVerif1" },
+        },
 
         Canthear6createappoint1: {
             entry: ({context}) =>
@@ -606,6 +697,10 @@ Ensureperson:{
               {guard: ({context}) =>  context.reprompt >2,
               target: "#DM.Done"}],
               RECOGNISED: [
+                {guard: ({event}) => event.nluValue.entities.length == 0 ,
+                            actions: ({event}) => console.log(event.nluValue.entities, event.nluValue.entities.length),
+                            target: "Dontunderstand9"},
+
                 {guard: ({event}) => IsPositive(event.nluValue.entities[0].category),
                 target: "CreateAppointment"},
                 {guard: ({event}) => IsNegative(event.nluValue.entities[0].category),
@@ -614,10 +709,18 @@ Ensureperson:{
                 actions: [{type: "say", params:  `You have to say yes or no so you agree or diasagree with the verification of your appointment.`}],
                 target: "Verifyappointment2"
             },
-               {target: "Dontunderstand"}, 
-             ],
+            
+            ],
     
         }, },
+
+        Dontunderstand9:{
+          entry: [{
+            type: "say",
+            params: `I don't understand you. Please ask me something else`,
+          }],                     
+          on: { SPEAK_COMPLETE: "NegPosVerif2" },
+        },
 
         Canthear7createappoint2:  {
             entry: ({context}) =>
