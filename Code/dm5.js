@@ -363,20 +363,21 @@ const dmMachine = setup({
                       target: "#DM.Running.Main.Stage1.Stage1ListenConfirmQuestion", 
                       },
                       { 
-                        target: "#DM.Running.Main.Stage7",
                         guard: ({ event }) => {
                         const recognizedUtterance = event.nluValue;
-                        const confidence = event.nluValue.confidenceScore;
+                        const confidence = event.nluValue.intents[0].confidenceScore;
                         console.log(recognizedUtterance);
-                        return (checkConfidence(confidence)
-                          &&recognizedUtterance.topIntent === 'create a meeting'
-                        );
+                        console.log(checkConfidence(confidence));
+                        return checkConfidence(confidence)
+                          &&recognizedUtterance.topIntent === 'create a meeting';
                         },
-                        action:[
-                          assign({ person: ({event}) => getPerson(event.nluValue.entities[0].text) }),
-                          assign({ day: ({event}) => getDay(event.nluValue.entities[1].text) }),
-                          assign({ time: ({event}) => getTime(event.nluValue.entities[2].text) }),
+                        actions:[
+                          assign({ person: ({ event }) => event.nluValue.entities[0].text }),
+                          assign({ day: ({ event }) => event.nluValue.entities[1].text }),
+                          assign({ time: ({ event }) => event.nluValue.entities[2].text }),
+                          ({ event }) => console.log(event.nluValue.entities[0].text),
                         ],
+                        target: "#DM.Running.Main.Stage7",
                       },
                       {
                       target: "#DM.Running.NotInGrammar",
