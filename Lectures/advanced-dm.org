@@ -142,7 +142,8 @@ reenter: entry and exit actions
 
 state hierarchy and events
 
-Custom events 
+main
+Custom events (next time!)
 
 ** Abstraction over SPEAK
 
@@ -250,5 +251,6 @@ communicate back to the agent (to the state chart). I recommend the following:
 - to hide the buttons again you can have a simple action that clear up
   the contents (=innerHTML= of the element) which you execute on =SELECT=
   event.
+
 
 
